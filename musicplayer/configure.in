@@ -1,0 +1,21 @@
+AC_INIT(src/main.c)
+
+PACKAGE=musicplayer
+VERSION=0.1.0
+
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+
+
+AC_ISC_POSIX
+AC_PROG_CC
+AM_PROG_CC_STDC
+AC_HEADER_STDC
+AC_HEADER_DIRENT
+
+
+AC_OUTPUT([
+Makefile
+src/Makefile
+])
+
+
