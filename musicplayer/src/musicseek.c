@@ -1,4 +1,4 @@
-/* music-seek.c */
+/*a music-seek.c */
 
 #include "music-seek.h"
 #include <gtk/gtk.h>
