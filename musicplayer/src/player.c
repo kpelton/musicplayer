@@ -16,6 +16,13 @@ static void gtk_widget_finalize (GObject *object);
 static gboolean isPlaying(GsPlayer *me);
 static gboolean gs_checkEnd(gpointer data);
 
+typedef enum {
+     TAGS,
+     ERROR,
+     EOS,
+     NEWFILE
+}SIGNALS;
+
 
 
 
@@ -40,26 +47,38 @@ gs_player_class_init (GsPlayerClass *klass)
      GObjectClass *object_class = G_OBJECT_CLASS (klass);
      
      signals[TAGS]= g_signal_newv ("new-tags",
-					  G_TYPE_FROM_CLASS (klass),
-					  G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-					  NULL /* closure */,
-					  NULL /* accumulator */,
-					  NULL /* accumulator data */,
-					  g_cclosure_marshal_VOID__VOID,
-					  G_TYPE_NONE /* return_type */,
-					  0     /* n_params */,
-					  NULL  /* param_types */);
-
+				   G_TYPE_FROM_CLASS (klass),
+				   G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+				   NULL /* closure */,
+				   NULL /* accumulator */,
+				   NULL /* accumulator data */,
+				   g_cclosure_marshal_VOID__VOID,
+				   G_TYPE_NONE /* return_type */,
+				   0     /* n_params */,
+				   NULL  /* param_types */);
+     
      signals[EOS]= g_signal_newv ("eof",
-					  G_TYPE_FROM_CLASS (klass),
-					  G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-					  NULL /* closure */,
-					  NULL /* accumulator */,
-					  NULL /* accumulator data */,
-					  g_cclosure_marshal_VOID__VOID,
-					  G_TYPE_NONE /* return_type */,
+				  G_TYPE_FROM_CLASS (klass),
+				  G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+				  NULL /* closure */,
+				  NULL /* accumulator */,
+				  NULL /* accumulator data */,
+				  g_cclosure_marshal_VOID__VOID,
+				  G_TYPE_NONE /* return_type */,
 				  0     /* n_params */,
-					  NULL /* param_types */);
+				  NULL /* param_types */);
+
+     signals[NEWFILE]= g_signal_new ("new-file",
+			     G_TYPE_FROM_CLASS (klass),
+			     G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+			     0 /* closure */,
+			     NULL /* accumulator */,
+			     NULL /* accumulator data */,
+			     g_cclosure_marshal_VOID__STRING ,                            
+			     G_TYPE_NONE /* return_tpe */,
+			     1,
+			     G_TYPE_STRING);
+
 
      object_class->dispose = gtk_widget_dispose;
      object_class->finalize = gtk_widget_finalize;
@@ -103,6 +122,10 @@ void gs_playFile(GsPlayer *me , char *location)
 
      gst_element_set_state (me->play, GST_STATE_NULL);
      g_object_set (G_OBJECT (me->play), "uri",location, NULL);
+
+
+     g_signal_emit ((gpointer)me, signals[NEWFILE],0,(gpointer)location,G_TYPE_NONE);
+
      gst_element_set_state (me->play, GST_STATE_PLAYING);
      
      me->isPlaying == FALSE;

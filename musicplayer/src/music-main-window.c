@@ -8,9 +8,14 @@ static void init_widgets(MusicMainWindow *self);
 
 static void mwindow_expander_activate(GtkExpander *expander,
 				      gpointer     user_data);
-static void
-music_main_window_get_property (GObject *object, guint property_id,
-                              GValue *value, GParamSpec *pspec)
+
+
+static void mwindow_new_file(GsPlayer *player,
+					gchar *str,gpointer data);
+
+
+static void music_main_window_get_property (GObject *object, guint property_id,
+				GValue *value, GParamSpec *pspec)
 {
   switch (property_id) {
   default:
@@ -144,9 +149,7 @@ static void init_widgets(MusicMainWindow *self)
 					  self->dhight);
 
      
- 
-
-      //show all 
+     //show all 
 
      gtk_widget_show(self->mainvbox);
      gtk_widget_show(self->mainhbox);
@@ -164,6 +167,15 @@ static void init_widgets(MusicMainWindow *self)
       g_signal_connect(expander, "activate",
 		       G_CALLBACK(mwindow_expander_activate),
 			self);
+
+       g_signal_connect(self->player, "new-file",
+		       G_CALLBACK(mwindow_new_file),
+			self);
+
+      
+
+
+      
 
 }
 static void mwindow_expander_activate(GtkExpander *expander,
@@ -183,4 +195,14 @@ static void mwindow_expander_activate(GtkExpander *expander,
 	  gtk_window_set_resizable (GTK_WINDOW(self),FALSE);
 
      }     
+}
+
+
+static void mwindow_new_file(GsPlayer *player,
+			     gchar *str,gpointer user_data)
+{
+     MusicMainWindow *self = (MusicMainWindow *)user_data;
+   
+     printf("file:%s\n",str);
+
 }

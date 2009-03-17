@@ -72,11 +72,7 @@ gdouble gs_Get_Volume(GsPlayer *player);
 void gs_loadFile(GsPlayer *me , char *location);
 G_END_DECLS
 
-typedef enum {
-     TAGS,
-     ERROR,
-     EOS,
-}SIGNALS;
+
 
 
 #endif /* _GS_PLAYER */

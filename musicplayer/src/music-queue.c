@@ -1,4 +1,4 @@
-/* music-queue.c */
+/* Music-queue.c */
 
 #include "music-queue.h"
 
