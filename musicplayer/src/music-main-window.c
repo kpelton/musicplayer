@@ -11,7 +11,7 @@ static void mwindow_expander_activate(GtkExpander *expander,
 
 
 static void mwindow_new_file(GsPlayer *player,
-					gchar *str,gpointer data);
+					gpointer p_track,gpointer data);
 
 
 static void music_main_window_get_property (GObject *object, guint property_id,
@@ -52,6 +52,7 @@ music_main_window_class_init (MusicMainWindowClass *klass)
 
 
   object_class->get_property = music_main_window_get_property;
+
   object_class->set_property = music_main_window_set_property;
   object_class->dispose = music_main_window_dispose;
   object_class->finalize = music_main_window_finalize;
@@ -80,14 +81,14 @@ static void init_widgets(MusicMainWindow *self)
      gint dwidth;
      gint dhight;
 
- //init player window
+     //init player window
      self->player = gs_player_new();
 
      // gtk_window_set_resizable (GTK_WINDOW(self),FALSE);
 
      gtk_window_set_title (GTK_WINDOW (self), ("test"));
 
-    //add mainvbox to mainwindow
+     //add mainvbox to mainwindow
      self->mainvbox = gtk_vbox_new(FALSE,0);
 
      gtk_container_add (GTK_CONTAINER (self), self->mainvbox);
@@ -126,7 +127,7 @@ static void init_widgets(MusicMainWindow *self)
 
 
     
-        //packing of hbox expander in vbox
+    //packing of hbox expander in vbox
 
     gtk_box_pack_start (GTK_BOX (self->mainvbox), self->mainhbox, FALSE, FALSE,0);
     gtk_box_pack_start (GTK_BOX (self->mainvbox), expander, TRUE, TRUE,1);
@@ -168,7 +169,7 @@ static void init_widgets(MusicMainWindow *self)
 		       G_CALLBACK(mwindow_expander_activate),
 			self);
 
-       g_signal_connect(self->player, "new-file",
+      g_signal_connect(self->player, "new-file",
 		       G_CALLBACK(mwindow_new_file),
 			self);
 
@@ -199,10 +200,17 @@ static void mwindow_expander_activate(GtkExpander *expander,
 
 
 static void mwindow_new_file(GsPlayer *player,
-			     gchar *str,gpointer user_data)
+			     gpointer p_track,gpointer user_data)
 {
      MusicMainWindow *self = (MusicMainWindow *)user_data;
-   
-     printf("file:%s\n",str);
+     mtrack * track = (mtrack *) p_track;
+     gchar title[200];
+         
+     if(track->artist && track->title)
+	  g_sprintf(title,"%s - %s",track->artist,track->title);
 
-}
+     
+
+     gtk_window_set_title(GTK_WINDOW(self),title); 
+
+    }

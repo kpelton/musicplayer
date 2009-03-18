@@ -1,4 +1,5 @@
 #include "player.h"
+#include <string.h>
 
 G_DEFINE_TYPE (GsPlayer, gs_player, G_TYPE_OBJECT)
 
@@ -69,15 +70,15 @@ gs_player_class_init (GsPlayerClass *klass)
 				  NULL /* param_types */);
 
      signals[NEWFILE]= g_signal_new ("new-file",
-			     G_TYPE_FROM_CLASS (klass),
-			     G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-			     0 /* closure */,
-			     NULL /* accumulator */,
-			     NULL /* accumulator data */,
-			     g_cclosure_marshal_VOID__STRING ,                            
-			     G_TYPE_NONE /* return_tpe */,
-			     1,
-			     G_TYPE_STRING);
+				     G_TYPE_FROM_CLASS (klass),
+				     G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+				     0 /* closure */,
+				     NULL /* accumulator */,
+				     NULL /* accumulator data */,
+				     g_cclosure_marshal_VOID__POINTER ,                            
+				     G_TYPE_NONE /* return_tpe */,
+				     1,
+				     G_TYPE_STRING);
 
 
      object_class->dispose = gtk_widget_dispose;
@@ -92,8 +93,7 @@ gs_player_init (GsPlayer *me)
      
      me->play = gst_element_factory_make ("playbin", "playbin");
      me->isPlaying = FALSE;
-     me->gotAtag = FALSE;
-  
+     
      me->bus = gst_pipeline_get_bus (GST_PIPELINE (me->play));
      gst_bus_add_watch (me->bus, my_bus_callback, me);
      
@@ -105,6 +105,9 @@ gs_player_init (GsPlayer *me)
      g_timeout_add      (2000,
 				  gs_checkEnd,
 				  me);
+
+
+     me->track = NULL;
 }
 
 GsPlayer*
@@ -116,31 +119,90 @@ gs_player_new (void)
 
 void gs_playFile(GsPlayer *me , char *location)
 {
-
+     gst_element_set_state (me->play, GST_STATE_NULL);
      
+     freeTrack(me->track);
+     me->track = NULL;
      gst_bus_add_watch (me->bus, my_bus_callback, me);
 
-     gst_element_set_state (me->play, GST_STATE_NULL);
+     
+     
+          
+     
+   
+    me->track = (mtrack *) g_malloc(sizeof(mtrack));
+    me->track->title=NULL;
+    me->track->artist=NULL;
+    me->track->genre=NULL;
+    me->track->codec=NULL;
+    me->track->duration = 0;
+
+    me->track->uri = strdup(location);
+
+     me->isPlaying == FALSE;
+     me->lock = FALSE;
+     
+     
      g_object_set (G_OBJECT (me->play), "uri",location, NULL);
-
-
-     g_signal_emit ((gpointer)me, signals[NEWFILE],0,(gpointer)location,G_TYPE_NONE);
-
      gst_element_set_state (me->play, GST_STATE_PLAYING);
      
-     me->isPlaying == FALSE;
-     
-     me->track = NULL;
-     
     
+       
 }
+void freeTrack(mtrack *track)
+{
+     if(track){
+	  if(track->uri)
+	       free(track->uri);
+	  if(track->title)
+	       free(track->title);
+	  if(track->artist)
+	       free(track->artist);
+	  if(track->genre)
+	       free(track->genre);
+	  if(track->codec)
+	       free(track->codec);
+
+
+     free(track);
+     }
+}
+
+
+mtrack * copyTrack(mtrack *track)
+{
+     mtrack * newTrack = NULL;
+
+   
+
+     if(track){
+	  newTrack = g_malloc(sizeof(mtrack));
+	 
+	  if(track->uri)
+	       newTrack->uri = strdup(track->uri);
+	  if(track->title)
+	       newTrack->title = strdup(track->title);
+	  if(track->artist)
+	       newTrack->artist =strdup(track->artist);
+	  if(track->genre)
+	       newTrack->genre =strdup (track->genre);
+	  if(track->codec)
+	       newTrack->codec =strdup (track->codec);
+	  
+        }
+
+     return newTrack;
+}
+
+
+
+
 
 void gs_loadFile(GsPlayer *me , char *location)
 {
      me->isPlaying == FALSE;
      gst_bus_add_watch (me->bus, my_bus_callback, me);
      me->track = NULL;
-     me->gotAtag = FALSE;
      g_object_set (G_OBJECT (me->play), "uri",location, NULL);
      gst_element_set_state (me->play, GST_STATE_READY);
     
@@ -355,10 +417,9 @@ my_bus_callback (GstBus     *bus,
      GstState old, new,pend;
      gchar *str;
      GstMessage *peek;
-     mtrack *track;
+     mtrack *new_track;
     
-
-     //g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
+     g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
 
      switch (GST_MESSAGE_TYPE (message)) {
      case GST_MESSAGE_ERROR: {
@@ -377,30 +438,15 @@ my_bus_callback (GstBus     *bus,
      }
             
      case GST_MESSAGE_TAG:
-	  // player->isPlaying=TRUE;
+
 
 	  gst_message_parse_tag(message,&list);
-	 
-	  track = (mtrack *) g_malloc(sizeof(mtrack));
-	  track->title=NULL;
-	  track->artist=NULL;
-	  track->genre=NULL;
-	  
+	 	  
 	  if(!gst_tag_list_is_empty(list)){
-	        gst_tag_list_foreach (list,gst_new_tags,track);
+	        gst_tag_list_foreach (list,gst_new_tags,player->track);
 	  }
-	 
-     
-	
-	 
-	  gst_tag_list_free (list);
 	  
-	  if(track->title != NULL || track->artist !=NULL || track->genre != NULL)
-	  {
-	       player->track = track;
-	       g_signal_emit (data, signals[TAGS], 0 /* details */);
-	       
-	  }
+	  gst_tag_list_free (list);
 	  break;
 
      case GST_MESSAGE_EOS:
@@ -409,6 +455,21 @@ my_bus_callback (GstBus     *bus,
 	  g_signal_emit (data, signals[EOS], 0 /* details */);
 	  
 	  break;
+     case GST_MESSAGE_STATE_CHANGED :
+	  gst_message_parse_state_changed(message,&old,&new,&pend);
+
+	  //emit signal here since tag scanning is finished
+	  if(new == GST_STATE_PLAYING && pend == GST_STATE_VOID_PENDING && !player->lock)
+
+	  {
+	       g_signal_emit (data, signals[NEWFILE],0,(gpointer)player->track);
+	       player->lock = TRUE;
+	  }
+	  
+
+
+	  break;
+
   default:
 
        
@@ -418,7 +479,7 @@ my_bus_callback (GstBus     *bus,
      }
      
      
-     
+     return TRUE;
 
     
 }
@@ -439,6 +500,7 @@ static void gst_new_tags                (const GstTagList *list,
      gchar *str;
      const GValue *date;
      mtrack *track = (mtrack *)user_data;
+     guint dur;
      
 
      if(strcmp(tag,GST_TAG_TITLE) == 0){
@@ -480,10 +542,13 @@ static void gst_new_tags                (const GstTagList *list,
      else if(strcmp(tag,GST_TAG_AUDIO_CODEC)== 0){
 	  if(gst_tag_list_get_string (list, GST_TAG_AUDIO_CODEC, &str) == TRUE){
 
-
-	       g_free(str);
-	       }
+	       track->codec = str;
 	  }
+     }
+     else if(strcmp(tag,GST_TAG_DURATION)== 0){
+	  gst_tag_list_get_uint64(list,GST_TAG_DURATION,&(track->duration));
+	      
+     }
      else{
 
 

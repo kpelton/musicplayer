@@ -32,6 +32,9 @@ typedef struct  {
      gchar *artist;
      gchar *genre;
      gchar *uri;
+     gchar *codec;
+     guint64 duration;
+
      
 }mtrack;
 
@@ -43,9 +46,10 @@ typedef struct {
      gboolean isPlaying;
      GtkWidget *scroll;
      GstTagList *taglist;
-     gboolean gotAtag;
      mtrack *track;
      GstElement* fake;
+     gchar uri[1500];
+     gboolean lock;
      
 } GsPlayer;
 
@@ -70,6 +74,8 @@ mtrack * gs_get_tag(GsPlayer *player);
 void gs_Set_Volume(GsPlayer *player, gdouble value);
 gdouble gs_Get_Volume(GsPlayer *player);
 void gs_loadFile(GsPlayer *me , char *location);
+void freeTrack(mtrack *track);
+mtrack * copyTrack(mtrack *track);
 G_END_DECLS
 
 
