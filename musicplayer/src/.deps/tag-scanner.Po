@@ -1,4 +1,4 @@
-tag-scanner.o: tag-scanner.c tag-scanner.h player.h \
+tag-scanner.o: tag-scanner.c tag-scanner.h \
   /usr/include/glib-2.0/glib-object.h \
   /usr/include/glib-2.0/gobject/gboxed.h \
   /usr/include/glib-2.0/gobject/gtype.h /usr/include/glib-2.0/glib.h \
@@ -74,8 +74,11 @@ tag-scanner.o: tag-scanner.c tag-scanner.h player.h \
   /usr/include/glib-2.0/gobject/gtypemodule.h \
   /usr/include/glib-2.0/gobject/gtypeplugin.h \
   /usr/include/glib-2.0/gobject/gvaluearray.h \
-  /usr/include/glib-2.0/gobject/gvaluetypes.h \
-  /usr/include/gstreamer-0.10/gst/gst.h \
+  /usr/include/glib-2.0/gobject/gvaluetypes.h /usr/include/semaphore.h \
+  /usr/include/sys/types.h /usr/include/endian.h \
+  /usr/include/bits/endian.h /usr/include/sys/select.h \
+  /usr/include/bits/select.h /usr/include/sys/sysmacros.h \
+  /usr/include/bits/semaphore.h /usr/include/gstreamer-0.10/gst/gst.h \
   /usr/include/gstreamer-0.10/gst/glib-compat.h \
   /usr/include/gstreamer-0.10/gst/gstenumtypes.h \
   /usr/include/gstreamer-0.10/gst/gstversion.h \
@@ -88,7 +91,7 @@ tag-scanner.o: tag-scanner.c tag-scanner.h player.h \
   /usr/include/libxml2/libxml/tree.h /usr/include/stdio.h \
   /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
   /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
-  /usr/include/bits/stdio.h /usr/include/libxml2/libxml/xmlstring.h \
+  /usr/include/libxml2/libxml/xmlstring.h \
   /usr/include/libxml2/libxml/xmlregexp.h \
   /usr/include/libxml2/libxml/dict.h /usr/include/libxml2/libxml/hash.h \
   /usr/include/libxml2/libxml/valid.h \
@@ -99,11 +102,8 @@ tag-scanner.o: tag-scanner.c tag-scanner.h player.h \
   /usr/include/libxml2/libxml/encoding.h /usr/include/iconv.h \
   /usr/include/libxml2/libxml/xmlIO.h \
   /usr/include/libxml2/libxml/globals.h /usr/include/libxml2/libxml/SAX.h \
-  /usr/include/stdlib.h /usr/include/sys/types.h /usr/include/endian.h \
-  /usr/include/bits/endian.h /usr/include/sys/select.h \
-  /usr/include/bits/select.h /usr/include/sys/sysmacros.h \
-  /usr/include/alloca.h /usr/include/libxml2/libxml/xlink.h \
-  /usr/include/libxml2/libxml/SAX2.h \
+  /usr/include/stdlib.h /usr/include/alloca.h \
+  /usr/include/libxml2/libxml/xlink.h /usr/include/libxml2/libxml/SAX2.h \
   /usr/include/libxml2/libxml/xmlmemory.h \
   /usr/include/libxml2/libxml/threads.h \
   /usr/include/gstreamer-0.10/gst/gstobject.h \
@@ -155,7 +155,7 @@ tag-scanner.o: tag-scanner.c tag-scanner.h player.h \
   /usr/include/gstreamer-0.10/gst/gstutils.h \
   /usr/include/gstreamer-0.10/gst/gstparse.h \
   /usr/include/gstreamer-0.10/gst/gstxml.h \
-  /usr/include/gstreamer-0.10/gst/gstcompat.h \
+  /usr/include/gstreamer-0.10/gst/gstcompat.h music-queue.h \
   /usr/include/gtk-2.0/gtk/gtk.h /usr/include/gtk-2.0/gdk/gdk.h \
   /usr/include/gtk-2.0/gdk/gdkapplaunchcontext.h \
   /usr/include/glib-2.0/gio/gio.h /usr/include/glib-2.0/gio/giotypes.h \
@@ -471,10 +471,8 @@ tag-scanner.o: tag-scanner.c tag-scanner.h player.h \
   /usr/include/gtk-2.0/gtk/gtkoldeditable.h \
   /usr/include/gtk-2.0/gtk/gtkoptionmenu.h \
   /usr/include/gtk-2.0/gtk/gtkpreview.h \
-  /usr/include/gtk-2.0/gtk/gtktipsquery.h /usr/include/semaphore.h \
-  /usr/include/bits/semaphore.h music-queue.h plist-reader.h \
-  /usr/include/string.h /usr/include/bits/string.h \
-  /usr/include/bits/string2.h \
+  /usr/include/gtk-2.0/gtk/gtktipsquery.h player.h plist-reader.h \
+  /usr/include/string.h \
   /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs.h \
   /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-acl.h \
   /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-result.h \
@@ -518,8 +516,6 @@ tag-scanner.o: tag-scanner.c tag-scanner.h player.h \
   /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-standard-callbacks.h
 
 tag-scanner.h:
-
-player.h:
 
 /usr/include/glib-2.0/glib-object.h:
 
@@ -725,6 +721,22 @@ player.h:
 
 /usr/include/glib-2.0/gobject/gvaluetypes.h:
 
+/usr/include/semaphore.h:
+
+/usr/include/sys/types.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/bits/semaphore.h:
+
 /usr/include/gstreamer-0.10/gst/gst.h:
 
 /usr/include/gstreamer-0.10/gst/glib-compat.h:
@@ -759,8 +771,6 @@ player.h:
 
 /usr/include/bits/sys_errlist.h:
 
-/usr/include/bits/stdio.h:
-
 /usr/include/libxml2/libxml/xmlstring.h:
 
 /usr/include/libxml2/libxml/xmlregexp.h:
@@ -790,18 +800,6 @@ player.h:
 /usr/include/libxml2/libxml/SAX.h:
 
 /usr/include/stdlib.h:
-
-/usr/include/sys/types.h:
-
-/usr/include/endian.h:
-
-/usr/include/bits/endian.h:
-
-/usr/include/sys/select.h:
-
-/usr/include/bits/select.h:
-
-/usr/include/sys/sysmacros.h:
 
 /usr/include/alloca.h:
 
@@ -922,6 +920,8 @@ player.h:
 /usr/include/gstreamer-0.10/gst/gstxml.h:
 
 /usr/include/gstreamer-0.10/gst/gstcompat.h:
+
+music-queue.h:
 
 /usr/include/gtk-2.0/gtk/gtk.h:
 
@@ -1605,19 +1605,11 @@ player.h:
 
 /usr/include/gtk-2.0/gtk/gtktipsquery.h:
 
-/usr/include/semaphore.h:
-
-/usr/include/bits/semaphore.h:
-
-music-queue.h:
+player.h:
 
 plist-reader.h:
 
 /usr/include/string.h:
-
-/usr/include/bits/string.h:
-
-/usr/include/bits/string2.h:
 
 /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs.h:
 

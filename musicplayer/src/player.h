@@ -6,6 +6,7 @@
 #include <glib-object.h>
 #include <gst/gst.h>
 #include <gtk/gtk.h>
+#include "tag-scanner.h"
 
 
 G_BEGIN_DECLS
@@ -39,17 +40,18 @@ typedef struct  {
 }mtrack;
 
 typedef struct {
-  GObject parent;
+     GObject parent;
 
      GstElement *play;
      GstBus *bus;
      gboolean isPlaying;
      GtkWidget *scroll;
      GstTagList *taglist;
-     mtrack *track;
+     metadata *track;
      GstElement* fake;
      gchar uri[1500];
      gboolean lock;
+     int idle;
      
 } GsPlayer;
 
@@ -70,7 +72,7 @@ void gs_pauseResume(GsPlayer *me);
 int gs_getLength(GsPlayer *me);
 gdouble gs_getPercentage(GsPlayer *me);
 gboolean gs_SeakFromPercent(GsPlayer *player,gfloat percent);
-mtrack * gs_get_tag(GsPlayer *player);
+metadata * gs_get_tag(GsPlayer *player);
 void gs_Set_Volume(GsPlayer *player, gdouble value);
 gdouble gs_Get_Volume(GsPlayer *player);
 void gs_loadFile(GsPlayer *me , char *location);

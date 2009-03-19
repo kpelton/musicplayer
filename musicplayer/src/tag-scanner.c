@@ -218,6 +218,9 @@ void ts_metadata_free(metadata *track)
 	       g_free(track->genre);
 	  if(track->album)
 	  g_free(track->genre);
+	  if(track->codec)
+	  g_free(track->codec);
+
 
      g_free(track);
      }
@@ -233,6 +236,7 @@ metadata * ts_metadata_new()
      track->artist=NULL;
      track->genre=NULL;
      track->album=NULL;
+     track->codec=NULL;
      return track;    
 }
 

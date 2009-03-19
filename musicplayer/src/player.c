@@ -1,6 +1,5 @@
 #include "player.h"
 #include <string.h>
-
 G_DEFINE_TYPE (GsPlayer, gs_player, G_TYPE_OBJECT)
 
 
@@ -16,6 +15,7 @@ static void gtk_widget_dispose (GObject *object);
 static void gtk_widget_finalize (GObject *object);
 static gboolean isPlaying(GsPlayer *me);
 static gboolean gs_checkEnd(gpointer data);
+gboolean gs_get_tags(GsPlayer *);
 
 typedef enum {
      TAGS,
@@ -75,7 +75,7 @@ gs_player_class_init (GsPlayerClass *klass)
 				     0 /* closure */,
 				     NULL /* accumulator */,
 				     NULL /* accumulator data */,
-				     g_cclosure_marshal_VOID__POINTER ,                            
+				     g_cclosure_marshal_VOID__POINTER,                            
 				     G_TYPE_NONE /* return_tpe */,
 				     1,
 				     G_TYPE_STRING);
@@ -105,7 +105,7 @@ gs_player_init (GsPlayer *me)
      g_timeout_add      (2000,
 				  gs_checkEnd,
 				  me);
-
+     
 
      me->track = NULL;
 }
@@ -113,39 +113,32 @@ gs_player_init (GsPlayer *me)
 GsPlayer*
 gs_player_new (void)
 {
-  return g_object_new (GS_TYPE_PLAYER, NULL);
+     GsPlayer* out;
+  out = g_object_new (GS_TYPE_PLAYER, NULL);
+
+ 
+   return out;
 }
 
 
 void gs_playFile(GsPlayer *me , char *location)
 {
      gst_element_set_state (me->play, GST_STATE_NULL);
+
+      ts_metadata_free(me->track);
+     me->track = ts_metadata_new();
      
-     freeTrack(me->track);
-     me->track = NULL;
+     strcpy(me->uri,location);
+         me->lock = FALSE;
+         
+	
+
+ 
      gst_bus_add_watch (me->bus, my_bus_callback, me);
-
-     
-     
-          
-     
-   
-    me->track = (mtrack *) g_malloc(sizeof(mtrack));
-    me->track->title=NULL;
-    me->track->artist=NULL;
-    me->track->genre=NULL;
-    me->track->codec=NULL;
-    me->track->duration = 0;
-
-    me->track->uri = strdup(location);
-
-     me->isPlaying == FALSE;
-     me->lock = FALSE;
-     
-     
      g_object_set (G_OBJECT (me->play), "uri",location, NULL);
      gst_element_set_state (me->play, GST_STATE_PLAYING);
      
+    
     
        
 }
@@ -200,11 +193,11 @@ mtrack * copyTrack(mtrack *track)
 
 void gs_loadFile(GsPlayer *me , char *location)
 {
-     me->isPlaying == FALSE;
-     gst_bus_add_watch (me->bus, my_bus_callback, me);
-     me->track = NULL;
-     g_object_set (G_OBJECT (me->play), "uri",location, NULL);
-     gst_element_set_state (me->play, GST_STATE_READY);
+     /* me->isPlaying == FALSE; */
+/*      gst_bus_add_watch (me->bus, my_bus_callback, me); */
+/*      me->track = NULL; */
+/*      g_object_set (G_OBJECT (me->play), "uri",location, NULL); */
+/*      gst_element_set_state (me->play, GST_STATE_READY) */;
     
 }
 
@@ -416,11 +409,9 @@ my_bus_callback (GstBus     *bus,
      gchar *tag;
      GstState old, new,pend;
      gchar *str;
-     GstMessage *peek;
-     mtrack *new_track;
-    
-     g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
-
+     mtrack * track;
+        
+     
      switch (GST_MESSAGE_TYPE (message)) {
      case GST_MESSAGE_ERROR: {
 	  GError *err;
@@ -441,34 +432,25 @@ my_bus_callback (GstBus     *bus,
 
 
 	  gst_message_parse_tag(message,&list);
-	 	  
+	 
+
 	  if(!gst_tag_list_is_empty(list)){
-	        gst_tag_list_foreach (list,gst_new_tags,player->track);
+	        gst_tag_list_foreach (list,gst_new_tags,player);
 	  }
 	  
 	  gst_tag_list_free (list);
-	  break;
 
-     case GST_MESSAGE_EOS:
-	  player->isPlaying=FALSE;
+	 
+	     
 	  
+     break;
+	       
+     case GST_MESSAGE_EOS:
+	 	  
 	  g_signal_emit (data, signals[EOS], 0 /* details */);
 	  
 	  break;
-     case GST_MESSAGE_STATE_CHANGED :
-	  gst_message_parse_state_changed(message,&old,&new,&pend);
 
-	  //emit signal here since tag scanning is finished
-	  if(new == GST_STATE_PLAYING && pend == GST_STATE_VOID_PENDING && !player->lock)
-
-	  {
-	       g_signal_emit (data, signals[NEWFILE],0,(gpointer)player->track);
-	       player->lock = TRUE;
-	  }
-	  
-
-
-	  break;
 
   default:
 
@@ -484,12 +466,10 @@ my_bus_callback (GstBus     *bus,
     
 }
 
-mtrack * gs_get_tag(GsPlayer *player){
+metadata * gs_get_tag(GsPlayer *player){
 
-     if(player->track)
-	  return player->track;
-     else
-	  return NULL;
+     return NULL;
+	
 
 }
 
@@ -499,9 +479,12 @@ static void gst_new_tags                (const GstTagList *list,
 {
      gchar *str;
      const GValue *date;
-     mtrack *track = (mtrack *)user_data;
+     GsPlayer *player = (GsPlayer *)user_data;
      guint dur;
-     
+     metadata *track = player->track;
+ 
+	   
+
 
      if(strcmp(tag,GST_TAG_TITLE) == 0){
 	  if(gst_tag_list_get_string (list, GST_TAG_TITLE, &str) == TRUE){
@@ -533,28 +516,50 @@ static void gst_new_tags                (const GstTagList *list,
 	       g_free(str);
 	  }
      }
-     else if(strcmp(tag,GST_TAG_DATE) == 0){
-	       if((date = gst_tag_list_get_value_index(list, GST_TAG_DATE,0)) != NULL){
-
-			 
-	       }
+     else if(strcmp(tag,GST_TAG_BITRATE) == 0){
+	       	      /*   player->idle = g_idle_add    (gs_get_tags, */
+/* 				   player); */
      }
      else if(strcmp(tag,GST_TAG_AUDIO_CODEC)== 0){
 	  if(gst_tag_list_get_string (list, GST_TAG_AUDIO_CODEC, &str) == TRUE){
 
+	      /*   player->idle = g_idle_add    (gs_get_tags, */
+/* 				   player); */
 	       track->codec = str;
 	  }
+	  
      }
-     else if(strcmp(tag,GST_TAG_DURATION)== 0){
-	  gst_tag_list_get_uint64(list,GST_TAG_DURATION,&(track->duration));
+    /*  else if(strcmp(tag,GST_TAG_DURATION)== 0){ */
+/* 	  gst_tag_list_get_uint64(list,GST_TAG_DURATION,&(track->duration)); */
 	      
-     }
+     
      else{
 
-
-
+	  player->idle = g_timeout_add    (2000,gs_get_tags,
+					   player);
+  
      }	 
 	  
-
+    
 }
 
+
+gboolean gs_get_tags(GsPlayer *player)
+{
+    
+	  if(!player->lock)
+	  { 
+	       player->track->uri = strdup(player->uri);
+	       g_signal_emit (player, signals[NEWFILE],0,player->track);
+	       player->lock = TRUE;
+	       return FALSE;
+	  }
+	  
+	  
+     else{
+	  return FALSE;
+
+     }
+
+     
+}

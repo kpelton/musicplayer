@@ -1,7 +1,7 @@
 /* music-main-window.c */
 
 #include "music-main-window.h"
-
+#include "tag-scanner.h"
 G_DEFINE_TYPE (MusicMainWindow, music_main_window, GTK_TYPE_WINDOW)
 
 static void init_widgets(MusicMainWindow *self);
@@ -11,7 +11,7 @@ static void mwindow_expander_activate(GtkExpander *expander,
 
 
 static void mwindow_new_file(GsPlayer *player,
-					gpointer p_track,gpointer data);
+					metadata * p_track,gpointer data);
 
 
 static void music_main_window_get_property (GObject *object, guint property_id,
@@ -200,17 +200,15 @@ static void mwindow_expander_activate(GtkExpander *expander,
 
 
 static void mwindow_new_file(GsPlayer *player,
-			     gpointer p_track,gpointer user_data)
+			     metadata* p_track,gpointer user_data)
 {
      MusicMainWindow *self = (MusicMainWindow *)user_data;
-     mtrack * track = (mtrack *) p_track;
      gchar title[200];
          
-     if(track->artist && track->title)
-	  g_sprintf(title,"%s - %s",track->artist,track->title);
-
+     g_printf("called!\n");
+     if(p_track->artist)
+	  sprintf(title,"%s - %s",p_track->artist, p_track->title);
      
-
-     gtk_window_set_title(GTK_WINDOW(self),title); 
+     gtk_window_set_title(GTK_WINDOW(self),title);
 
     }

@@ -87,7 +87,7 @@ player.o: player.c player.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/libxml2/libxml/tree.h /usr/include/stdio.h \
   /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
   /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
-  /usr/include/bits/stdio.h /usr/include/libxml2/libxml/xmlstring.h \
+  /usr/include/libxml2/libxml/xmlstring.h \
   /usr/include/libxml2/libxml/xmlregexp.h \
   /usr/include/libxml2/libxml/dict.h /usr/include/libxml2/libxml/hash.h \
   /usr/include/libxml2/libxml/valid.h \
@@ -470,8 +470,9 @@ player.o: player.c player.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/gtk-2.0/gtk/gtkoldeditable.h \
   /usr/include/gtk-2.0/gtk/gtkoptionmenu.h \
   /usr/include/gtk-2.0/gtk/gtkpreview.h \
-  /usr/include/gtk-2.0/gtk/gtktipsquery.h /usr/include/string.h \
-  /usr/include/bits/string.h /usr/include/bits/string2.h
+  /usr/include/gtk-2.0/gtk/gtktipsquery.h tag-scanner.h \
+  /usr/include/semaphore.h /usr/include/bits/semaphore.h \
+  /usr/include/string.h
 
 player.h:
 
@@ -712,8 +713,6 @@ player.h:
 /usr/include/bits/stdio_lim.h:
 
 /usr/include/bits/sys_errlist.h:
-
-/usr/include/bits/stdio.h:
 
 /usr/include/libxml2/libxml/xmlstring.h:
 
@@ -1559,8 +1558,10 @@ player.h:
 
 /usr/include/gtk-2.0/gtk/gtktipsquery.h:
 
+tag-scanner.h:
+
+/usr/include/semaphore.h:
+
+/usr/include/bits/semaphore.h:
+
 /usr/include/string.h:
-
-/usr/include/bits/string.h:
-
-/usr/include/bits/string2.h:

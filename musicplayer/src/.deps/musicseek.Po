@@ -147,7 +147,7 @@ musicseek.o: musicseek.c music-seek.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/pango-1.0/pango/pango-utils.h /usr/include/stdio.h \
   /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
   /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
-  /usr/include/bits/stdio.h /usr/lib/gtk-2.0/include/gdkconfig.h \
+  /usr/lib/gtk-2.0/include/gdkconfig.h \
   /usr/include/gtk-2.0/gdk/gdkdisplay.h \
   /usr/include/gtk-2.0/gdk/gdkevents.h \
   /usr/include/gtk-2.0/gdk/gdkcolor.h /usr/include/gtk-2.0/gdk/gdkdnd.h \
@@ -469,7 +469,8 @@ musicseek.o: musicseek.c music-seek.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/gstreamer-0.10/gst/gstutils.h \
   /usr/include/gstreamer-0.10/gst/gstparse.h \
   /usr/include/gstreamer-0.10/gst/gstxml.h \
-  /usr/include/gstreamer-0.10/gst/gstcompat.h
+  /usr/include/gstreamer-0.10/gst/gstcompat.h tag-scanner.h \
+  /usr/include/semaphore.h /usr/include/bits/semaphore.h
 
 music-seek.h:
 
@@ -844,8 +845,6 @@ music-seek.h:
 /usr/include/bits/stdio_lim.h:
 
 /usr/include/bits/sys_errlist.h:
-
-/usr/include/bits/stdio.h:
 
 /usr/lib/gtk-2.0/include/gdkconfig.h:
 
@@ -1558,3 +1557,9 @@ player.h:
 /usr/include/gstreamer-0.10/gst/gstxml.h:
 
 /usr/include/gstreamer-0.10/gst/gstcompat.h:
+
+tag-scanner.h:
+
+/usr/include/semaphore.h:
+
+/usr/include/bits/semaphore.h:

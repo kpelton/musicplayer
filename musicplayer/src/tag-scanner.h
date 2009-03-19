@@ -3,11 +3,10 @@
 #ifndef _TAG_SCANNER
 #define _TAG_SCANNER
 
-#include "player.h"
 #include <glib-object.h>
 
 #include <semaphore.h>
-
+#include <gst/gst.h>
 
 
 G_BEGIN_DECLS
@@ -35,6 +34,7 @@ typedef struct
      gchar *artist;
      gchar *genre;
      gchar *album;
+     gchar *codec;
      glong duration;
   
 }metadata;

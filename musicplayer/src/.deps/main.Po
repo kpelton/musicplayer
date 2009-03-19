@@ -148,7 +148,7 @@ main.o: main.c /usr/include/gtk-2.0/gtk/gtk.h \
   /usr/include/pango-1.0/pango/pango-utils.h /usr/include/stdio.h \
   /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
   /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
-  /usr/include/bits/stdio.h /usr/lib/gtk-2.0/include/gdkconfig.h \
+  /usr/lib/gtk-2.0/include/gdkconfig.h \
   /usr/include/gtk-2.0/gdk/gdkdisplay.h \
   /usr/include/gtk-2.0/gdk/gdkevents.h \
   /usr/include/gtk-2.0/gdk/gdkcolor.h /usr/include/gtk-2.0/gdk/gdkdnd.h \
@@ -845,8 +845,6 @@ main.o: main.c /usr/include/gtk-2.0/gtk/gtk.h \
 /usr/include/bits/stdio_lim.h:
 
 /usr/include/bits/sys_errlist.h:
-
-/usr/include/bits/stdio.h:
 
 /usr/lib/gtk-2.0/include/gdkconfig.h:
 
