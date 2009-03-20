@@ -6,27 +6,28 @@ music-main-window.o: music-main-window.c music-main-window.h \
   /usr/include/glib-2.0/glib/gtypes.h \
   /usr/lib/glib-2.0/include/glibconfig.h \
   /usr/include/glib-2.0/glib/gmacros.h \
-  /usr/lib/gcc/i486-linux-gnu/4.3.2/include/stddef.h \
-  /usr/lib/gcc/i486-linux-gnu/4.3.2/include-fixed/limits.h \
-  /usr/lib/gcc/i486-linux-gnu/4.3.2/include-fixed/syslimits.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/stddef.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include-fixed/limits.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include-fixed/syslimits.h \
   /usr/include/limits.h /usr/include/features.h /usr/include/sys/cdefs.h \
   /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
   /usr/include/gnu/stubs-32.h /usr/include/bits/posix1_lim.h \
   /usr/include/bits/local_lim.h /usr/include/linux/limits.h \
   /usr/include/bits/posix2_lim.h \
-  /usr/lib/gcc/i486-linux-gnu/4.3.2/include/float.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/float.h \
   /usr/include/glib-2.0/glib/garray.h \
   /usr/include/glib-2.0/glib/gasyncqueue.h \
   /usr/include/glib-2.0/glib/gthread.h \
   /usr/include/glib-2.0/glib/gerror.h /usr/include/glib-2.0/glib/gquark.h \
   /usr/include/glib-2.0/glib/gutils.h \
-  /usr/lib/gcc/i486-linux-gnu/4.3.2/include/stdarg.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/stdarg.h \
   /usr/include/glib-2.0/glib/gatomic.h \
   /usr/include/glib-2.0/glib/gbacktrace.h /usr/include/signal.h \
   /usr/include/bits/sigset.h /usr/include/bits/types.h \
   /usr/include/bits/typesizes.h /usr/include/bits/signum.h \
   /usr/include/time.h /usr/include/bits/siginfo.h \
   /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h \
+  /usr/include/asm/sigcontext.h /usr/include/asm/types.h \
   /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h \
   /usr/include/bits/sigthread.h /usr/include/glib-2.0/glib/gbase64.h \
   /usr/include/glib-2.0/glib/gbookmarkfile.h /usr/include/bits/time.h \
@@ -471,7 +472,48 @@ music-main-window.o: music-main-window.c music-main-window.h \
   /usr/include/gstreamer-0.10/gst/gstxml.h \
   /usr/include/gstreamer-0.10/gst/gstcompat.h tag-scanner.h \
   /usr/include/semaphore.h /usr/include/bits/semaphore.h music-queue.h \
-  plist-reader.h music-seek.h music-volume.h
+  plist-reader.h music-seek.h music-volume.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-acl.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-result.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-ace.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-address.h \
+  /usr/include/sys/socket.h /usr/include/sys/uio.h \
+  /usr/include/bits/uio.h /usr/include/bits/socket.h \
+  /usr/include/bits/sockaddr.h /usr/include/asm/socket.h \
+  /usr/include/asm/sockios.h /usr/include/netdb.h \
+  /usr/include/netinet/in.h /usr/include/stdint.h \
+  /usr/include/bits/wchar.h /usr/include/bits/in.h \
+  /usr/include/bits/byteswap.h /usr/include/rpc/netdb.h \
+  /usr/include/bits/netdb.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-async-ops.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-file-info.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-file-size.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-uri.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-find-directory.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-handle.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-context.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-cancellation.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-xfer.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-directory.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-dns-sd.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-drive.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-volume.h \
+  /usr/include/unistd.h /usr/include/bits/posix_opt.h \
+  /usr/include/bits/confname.h /usr/include/getopt.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-init.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-job-limit.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-mime-info-cache.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-mime-monitor.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-mime-utils.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-module-callback.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-monitor.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-ops.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-resolve.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-utils.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-volume-monitor.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-enum-types.h \
+  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-standard-callbacks.h
 
 music-main-window.h:
 
@@ -491,11 +533,11 @@ music-main-window.h:
 
 /usr/include/glib-2.0/glib/gmacros.h:
 
-/usr/lib/gcc/i486-linux-gnu/4.3.2/include/stddef.h:
+/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/stddef.h:
 
-/usr/lib/gcc/i486-linux-gnu/4.3.2/include-fixed/limits.h:
+/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include-fixed/limits.h:
 
-/usr/lib/gcc/i486-linux-gnu/4.3.2/include-fixed/syslimits.h:
+/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include-fixed/syslimits.h:
 
 /usr/include/limits.h:
 
@@ -517,7 +559,7 @@ music-main-window.h:
 
 /usr/include/bits/posix2_lim.h:
 
-/usr/lib/gcc/i486-linux-gnu/4.3.2/include/float.h:
+/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/float.h:
 
 /usr/include/glib-2.0/glib/garray.h:
 
@@ -531,7 +573,7 @@ music-main-window.h:
 
 /usr/include/glib-2.0/glib/gutils.h:
 
-/usr/lib/gcc/i486-linux-gnu/4.3.2/include/stdarg.h:
+/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/stdarg.h:
 
 /usr/include/glib-2.0/glib/gatomic.h:
 
@@ -554,6 +596,10 @@ music-main-window.h:
 /usr/include/bits/sigaction.h:
 
 /usr/include/bits/sigcontext.h:
+
+/usr/include/asm/sigcontext.h:
+
+/usr/include/asm/types.h:
 
 /usr/include/bits/sigstack.h:
 
@@ -1568,3 +1614,103 @@ plist-reader.h:
 music-seek.h:
 
 music-volume.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-acl.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-result.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-ace.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-address.h:
+
+/usr/include/sys/socket.h:
+
+/usr/include/sys/uio.h:
+
+/usr/include/bits/uio.h:
+
+/usr/include/bits/socket.h:
+
+/usr/include/bits/sockaddr.h:
+
+/usr/include/asm/socket.h:
+
+/usr/include/asm/sockios.h:
+
+/usr/include/netdb.h:
+
+/usr/include/netinet/in.h:
+
+/usr/include/stdint.h:
+
+/usr/include/bits/wchar.h:
+
+/usr/include/bits/in.h:
+
+/usr/include/bits/byteswap.h:
+
+/usr/include/rpc/netdb.h:
+
+/usr/include/bits/netdb.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-async-ops.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-file-info.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-file-size.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-uri.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-find-directory.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-handle.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-context.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-cancellation.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-xfer.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-directory.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-dns-sd.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-drive.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-volume.h:
+
+/usr/include/unistd.h:
+
+/usr/include/bits/posix_opt.h:
+
+/usr/include/bits/confname.h:
+
+/usr/include/getopt.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-init.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-job-limit.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-mime-info-cache.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-mime-monitor.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-mime-utils.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-module-callback.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-monitor.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-ops.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-resolve.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-utils.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-volume-monitor.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-enum-types.h:
+
+/usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-standard-callbacks.h:

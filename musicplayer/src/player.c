@@ -15,8 +15,9 @@ static void gtk_widget_dispose (GObject *object);
 static void gtk_widget_finalize (GObject *object);
 static gboolean isPlaying(GsPlayer *me);
 static gboolean gs_checkEnd(gpointer data);
+static void ts_event_loop(GsPlayer* self, GstBus *bus);
 gboolean gs_get_tags(GsPlayer *);
-
+static metadata * copyTrack(metadata *track);
 typedef enum {
      TAGS,
      ERROR,
@@ -78,7 +79,7 @@ gs_player_class_init (GsPlayerClass *klass)
 				     g_cclosure_marshal_VOID__POINTER,                            
 				     G_TYPE_NONE /* return_tpe */,
 				     1,
-				     G_TYPE_STRING);
+				     G_TYPE_POINTER);
 
 
      object_class->dispose = gtk_widget_dispose;
@@ -125,17 +126,18 @@ void gs_playFile(GsPlayer *me , char *location)
 {
      gst_element_set_state (me->play, GST_STATE_NULL);
 
-      ts_metadata_free(me->track);
-     me->track = ts_metadata_new();
-     
-     strcpy(me->uri,location);
-         me->lock = FALSE;
-	
-
- 
-     gst_bus_add_watch (me->bus, my_bus_callback, me);
+      
+    
+    
      g_object_set (G_OBJECT (me->play), "uri",location, NULL);
      gst_element_set_state (me->play, GST_STATE_PLAYING);
+
+     strcpy(me->uri,location);
+         me->lock = FALSE;
+	 //gst_bus_add_watch (me->bus, my_bus_callback, me);
+	 ts_event_loop(me,me->bus);
+	 
+    
      
     
     
@@ -161,14 +163,14 @@ void freeTrack(mtrack *track)
 }
 
 
-mtrack * copyTrack(mtrack *track)
+static metadata * copyTrack(metadata *track)
 {
-     mtrack * newTrack = NULL;
+     metadata * newTrack = NULL;
 
    
 
      if(track){
-	  newTrack = g_malloc(sizeof(mtrack));
+	  newTrack = ts_metadata_new();
 	 
 	  if(track->uri)
 	       newTrack->uri = strdup(track->uri);
@@ -295,6 +297,7 @@ static gint64 gs_PercentToTime(GsPlayer *me, gdouble percent){
      gchar test[200];
      gint64 sec;
 
+     
 
      //if(me->isPlaying == TRUE){
      if(isPlaying(me)){
@@ -393,7 +396,34 @@ gdouble gs_Get_Volume(GsPlayer *player)
 
 }
 
+static void ts_event_loop(GsPlayer* self, GstBus *bus)
+{
+     GstMessage *message;
+     gboolean val = FALSE;
+     message = gst_bus_timed_pop(bus,500000);
+     metadata *track;
 
+     track = ts_metadata_new();
+     self->track = track;
+     
+     while( val != TRUE && message != NULL)
+     {
+	  
+	  if(message != NULL)
+	  {
+	       val = my_bus_callback(bus,message,self);
+	      
+	       gst_message_unref(message);
+
+	  }
+	  
+	  message = gst_bus_timed_pop(bus,500000);
+     }
+
+     self->idle = g_idle_add    (gs_get_tags,
+				  self);
+     
+}
 
 static gboolean
 my_bus_callback (GstBus     *bus,
@@ -439,8 +469,13 @@ my_bus_callback (GstBus     *bus,
 	  
 	  gst_tag_list_free (list);
 
-	 
-	   	  
+	  if(player->track->codec != NULL)
+	  {
+	       return TRUE;
+	  }
+	  
+	  
+	  
      break;
 	       
      case GST_MESSAGE_EOS:
@@ -452,7 +487,7 @@ my_bus_callback (GstBus     *bus,
 
   default:
 
-       
+       return FALSE;
        
        /* unhandled message */
        break;
@@ -486,16 +521,17 @@ static void gst_new_tags                (const GstTagList *list,
 
      if(strcmp(tag,GST_TAG_TITLE) == 0){
 	  if(gst_tag_list_get_string (list, GST_TAG_TITLE, &str) == TRUE){
-	     track->title = str;
+	       track->title = strdup(str);
 	}
      }
      else if(strcmp(tag,GST_TAG_ARTIST) == 0){
 	  if(gst_tag_list_get_string (list, GST_TAG_ARTIST, &str) == TRUE){
-	       track->artist = str;
+	       track->artist = strdup(str);
 	  }
      }
      else if(strcmp(tag,GST_TAG_ALBUM) == 0){
 	  if(gst_tag_list_get_string (list, GST_TAG_ALBUM, &str) == TRUE){
+
 	       
 	       g_free(str);
 	  }
@@ -503,7 +539,7 @@ static void gst_new_tags                (const GstTagList *list,
      else if(strcmp(tag,GST_TAG_GENRE) == 0){
 
 	  if(gst_tag_list_get_string (list, GST_TAG_GENRE, &str) == TRUE){
-	       track->genre = str;
+	       track->genre =strdup( str);
 	  }
      }
      else if(strcmp(tag,GST_TAG_COMMENT) == 0){
@@ -522,9 +558,7 @@ static void gst_new_tags                (const GstTagList *list,
 
 	      /*   player->idle = g_idle_add    (gs_get_tags, */
 /* 				   player); */
-	       
-	       track->codec = str;
-	       
+	       track->codec = strdup(str);
 	  }
 	  
      }
@@ -537,24 +571,26 @@ static void gst_new_tags                (const GstTagList *list,
 	  
   
      }	 
-	
-    player->idle = g_timeout_add   (500,gs_get_tags,
-				      player);  
-	       
+	  
+    
 }
 
 
 gboolean gs_get_tags(GsPlayer *player)
 {
-    
-     if(!player->lock && isPlaying(player))
+     metadata *track;
+     
+     
+	  if(!player->lock)
 	  { 
 	       player->track->uri = strdup(player->uri);
-	    
-	       usleep(200000);
-	       g_signal_emit (player, signals[NEWFILE],0,player->track);
+	       track = copyTrack(player->track);
+	       g_signal_emit (player, signals[NEWFILE],0,track);
 	       player->lock = TRUE;
+	       ts_metadata_free(player->track);
+	       player->track = NULL;
 	       return FALSE;
+	  
 	  }
 	  
 	  

@@ -2,6 +2,10 @@
 
 #include "music-main-window.h"
 #include "tag-scanner.h"
+#include <libgnomevfs/gnome-vfs.h>
+#include <libgnomevfs/gnome-vfs-utils.h>
+
+
 G_DEFINE_TYPE (MusicMainWindow, music_main_window, GTK_TYPE_WINDOW)
 
 static void init_widgets(MusicMainWindow *self);
@@ -204,11 +208,34 @@ static void mwindow_new_file(GsPlayer *player,
 {
      MusicMainWindow *self = (MusicMainWindow *)user_data;
      gchar title[200];
-         
+     const gchar toke[] ="/";
+     gchar buffer[50];
+     gchar *out;
+     gint i;
+     gchar **tokens;
+
      g_printf("called!\n");
-     if(p_track->artist)
-	  sprintf(title,"%s - %s",p_track->artist, p_track->title);
+     if(p_track->artist){
+	 sprintf(title,"%s - %s",p_track->artist, p_track->title);
+	 gtk_window_set_title(GTK_WINDOW(self),title);
+     }
+     else
+     {
+	  g_strchomp((gchar *)p_track->uri);
+	  out = gnome_vfs_get_local_path_from_uri((gchar *)p_track->uri);
+
+	  tokens=g_strsplit(out,toke,10);
+
+
+	  for(i=1; tokens[i] != NULL; i++);
+
+	  gtk_window_set_title(GTK_WINDOW(self),(gpointer *)tokens[i-1]);
+ 
+	  g_strfreev(tokens);  
+	  g_free(out);
+
+     }
      
-     gtk_window_set_title(GTK_WINDOW(self),title);
+     ts_metadata_free(p_track);
 
     }

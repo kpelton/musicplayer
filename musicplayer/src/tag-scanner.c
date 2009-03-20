@@ -237,6 +237,7 @@ metadata * ts_metadata_new()
      track->genre=NULL;
      track->album=NULL;
      track->codec=NULL;
+     track->duration = 0;
      return track;    
 }
 
