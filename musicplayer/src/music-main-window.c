@@ -98,7 +98,7 @@ static void init_widgets(MusicMainWindow *self)
      gtk_container_add (GTK_CONTAINER (self), self->mainvbox);
 
      //song label
-     self->songlabel = gtk_label_new ("songlabel");
+     self->songlabel = gtk_label_new ("No file loaded");
      gtk_box_pack_start (GTK_BOX (self->mainvbox), self->songlabel, FALSE, FALSE,0);
 
      //seek widget
@@ -152,6 +152,7 @@ static void init_widgets(MusicMainWindow *self)
      gtk_window_set_default_size         (GTK_WINDOW(self),
 					  self->dwidth,
 					  self->dhight);
+     gtk_label_set_ellipsize(GTK_LABEL(self->songlabel),PANGO_ELLIPSIZE_END);
 
      
      //show all 
@@ -213,12 +214,14 @@ static void mwindow_new_file(GsPlayer *player,
      gchar *out;
      gint i;
      gchar **tokens;
-
-     g_printf("called!\n");
+ gchar output[1024];
      if(p_track->artist){
 	 sprintf(title,"%s - %s",p_track->artist, p_track->title);
 	 gtk_window_set_title(GTK_WINDOW(self),title);
-     }
+	 g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s - %s</span>",p_track->artist,p_track->title);
+	 gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
+}
+
      else
      {
 	  g_strchomp((gchar *)p_track->uri);
@@ -229,8 +232,10 @@ static void mwindow_new_file(GsPlayer *player,
 
 	  for(i=1; tokens[i] != NULL; i++);
 
-	  gtk_window_set_title(GTK_WINDOW(self),(gpointer *)tokens[i-1]);
+	  gtk_window_set_title(GTK_WINDOW(self),tokens[i-1]);
  
+	  g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s</span>",tokens[i-1]);
+	  gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
 	  g_strfreev(tokens);  
 	  g_free(out);
 
