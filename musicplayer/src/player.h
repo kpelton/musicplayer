@@ -52,6 +52,7 @@ typedef struct {
      gchar uri[1500];
      gboolean lock;
      int idle;
+     int count;
      
 } GsPlayer;
 

@@ -130,7 +130,6 @@ void gs_playFile(GsPlayer *me , char *location)
      
      strcpy(me->uri,location);
          me->lock = FALSE;
-         
 	
 
  
@@ -441,8 +440,7 @@ my_bus_callback (GstBus     *bus,
 	  gst_tag_list_free (list);
 
 	 
-	     
-	  
+	   	  
      break;
 	       
      case GST_MESSAGE_EOS:
@@ -498,7 +496,6 @@ static void gst_new_tags                (const GstTagList *list,
      }
      else if(strcmp(tag,GST_TAG_ALBUM) == 0){
 	  if(gst_tag_list_get_string (list, GST_TAG_ALBUM, &str) == TRUE){
-
 	       
 	       g_free(str);
 	  }
@@ -525,7 +522,9 @@ static void gst_new_tags                (const GstTagList *list,
 
 	      /*   player->idle = g_idle_add    (gs_get_tags, */
 /* 				   player); */
+	       
 	       track->codec = str;
+	       
 	  }
 	  
      }
@@ -535,21 +534,24 @@ static void gst_new_tags                (const GstTagList *list,
      
      else{
 
-	  player->idle = g_timeout_add    (2000,gs_get_tags,
-					   player);
+	  
   
      }	 
-	  
-    
+	
+    player->idle = g_timeout_add   (500,gs_get_tags,
+				      player);  
+	       
 }
 
 
 gboolean gs_get_tags(GsPlayer *player)
 {
     
-	  if(!player->lock)
+     if(!player->lock && isPlaying(player))
 	  { 
 	       player->track->uri = strdup(player->uri);
+	    
+	       usleep(200000);
 	       g_signal_emit (player, signals[NEWFILE],0,player->track);
 	       player->lock = TRUE;
 	       return FALSE;
