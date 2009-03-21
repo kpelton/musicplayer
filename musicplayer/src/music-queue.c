@@ -575,11 +575,15 @@ static void add(GtkWidget *widget,gpointer user_data)
 
 
      dialog = gtk_file_chooser_dialog_new ("Open File",
-				      NULL,
-				      GTK_FILE_CHOOSER_ACTION_OPEN,
-				      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-				      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-				      NULL);
+					   NULL,
+					   GTK_FILE_CHOOSER_ACTION_OPEN,
+					   GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+					   GTK_STOCK_OPEN,5,	   
+					   GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
+					   NULL);
+
+     //gtk_dialog_add_button (GTK_DIALOG(dialog),"gtk-open",5);
+
      
      g_object_set(G_OBJECT(dialog),"select-multiple",TRUE,NULL);
 
@@ -588,6 +592,7 @@ static void add(GtkWidget *widget,gpointer user_data)
      
      if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
      {
+	 
 	  list =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
 	
 	  gtk_widget_destroy (dialog);
