@@ -49,7 +49,7 @@ static void
 music_main_window_finalize (GObject *object)
 {
   
-
+     //unref tout
   MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);
   g_object_unref(G_OBJECT(self->player));
   g_object_unref(G_OBJECT(self->queue));
