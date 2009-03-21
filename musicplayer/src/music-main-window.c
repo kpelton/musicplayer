@@ -41,11 +41,19 @@ static void
 music_main_window_dispose (GObject *object)
 {
   G_OBJECT_CLASS (music_main_window_parent_class)->dispose (object);
+ 
+  gtk_exit(0);
 }
 
 static void
 music_main_window_finalize (GObject *object)
 {
+  
+
+  MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);
+  g_object_unref(G_OBJECT(self->player));
+  g_object_unref(G_OBJECT(self->queue));
+
   G_OBJECT_CLASS (music_main_window_parent_class)->finalize (object);
 }
 
@@ -177,10 +185,7 @@ static void init_widgets(MusicMainWindow *self)
       g_signal_connect(self->player, "new-file",
 		       G_CALLBACK(mwindow_new_file),
 			self);
-
       
-
-
       
 
 }

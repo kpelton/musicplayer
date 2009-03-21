@@ -5,28 +5,27 @@ musicseek.o: musicseek.c music-seek.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/glib-2.0/glib/gtypes.h \
   /usr/lib/glib-2.0/include/glibconfig.h \
   /usr/include/glib-2.0/glib/gmacros.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/stddef.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include-fixed/limits.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include-fixed/syslimits.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.2/include/stddef.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.2/include-fixed/limits.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.2/include-fixed/syslimits.h \
   /usr/include/limits.h /usr/include/features.h /usr/include/sys/cdefs.h \
   /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
   /usr/include/gnu/stubs-32.h /usr/include/bits/posix1_lim.h \
   /usr/include/bits/local_lim.h /usr/include/linux/limits.h \
   /usr/include/bits/posix2_lim.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/float.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.2/include/float.h \
   /usr/include/glib-2.0/glib/garray.h \
   /usr/include/glib-2.0/glib/gasyncqueue.h \
   /usr/include/glib-2.0/glib/gthread.h \
   /usr/include/glib-2.0/glib/gerror.h /usr/include/glib-2.0/glib/gquark.h \
   /usr/include/glib-2.0/glib/gutils.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/stdarg.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.2/include/stdarg.h \
   /usr/include/glib-2.0/glib/gatomic.h \
   /usr/include/glib-2.0/glib/gbacktrace.h /usr/include/signal.h \
   /usr/include/bits/sigset.h /usr/include/bits/types.h \
   /usr/include/bits/typesizes.h /usr/include/bits/signum.h \
   /usr/include/time.h /usr/include/bits/siginfo.h \
   /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h \
-  /usr/include/asm/sigcontext.h /usr/include/asm/types.h \
   /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h \
   /usr/include/bits/sigthread.h /usr/include/glib-2.0/glib/gbase64.h \
   /usr/include/glib-2.0/glib/gbookmarkfile.h /usr/include/bits/time.h \
@@ -147,6 +146,7 @@ musicseek.o: musicseek.c music-seek.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/pango-1.0/pango/pango-utils.h /usr/include/stdio.h \
   /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
   /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+  /usr/include/bits/stdio.h /usr/include/bits/stdio2.h \
   /usr/lib/gtk-2.0/include/gdkconfig.h \
   /usr/include/gtk-2.0/gdk/gdkdisplay.h \
   /usr/include/gtk-2.0/gdk/gdkevents.h \
@@ -417,8 +417,8 @@ musicseek.o: musicseek.c music-seek.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/stdlib.h /usr/include/sys/types.h /usr/include/endian.h \
   /usr/include/bits/endian.h /usr/include/sys/select.h \
   /usr/include/bits/select.h /usr/include/sys/sysmacros.h \
-  /usr/include/alloca.h /usr/include/libxml2/libxml/xlink.h \
-  /usr/include/libxml2/libxml/SAX2.h \
+  /usr/include/alloca.h /usr/include/bits/stdlib.h \
+  /usr/include/libxml2/libxml/xlink.h /usr/include/libxml2/libxml/SAX2.h \
   /usr/include/libxml2/libxml/xmlmemory.h \
   /usr/include/libxml2/libxml/threads.h \
   /usr/include/gstreamer-0.10/gst/gstobject.h \
@@ -490,11 +490,11 @@ music-seek.h:
 
 /usr/include/glib-2.0/glib/gmacros.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/stddef.h:
+/usr/lib/gcc/i486-linux-gnu/4.3.2/include/stddef.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include-fixed/limits.h:
+/usr/lib/gcc/i486-linux-gnu/4.3.2/include-fixed/limits.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include-fixed/syslimits.h:
+/usr/lib/gcc/i486-linux-gnu/4.3.2/include-fixed/syslimits.h:
 
 /usr/include/limits.h:
 
@@ -516,7 +516,7 @@ music-seek.h:
 
 /usr/include/bits/posix2_lim.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/float.h:
+/usr/lib/gcc/i486-linux-gnu/4.3.2/include/float.h:
 
 /usr/include/glib-2.0/glib/garray.h:
 
@@ -530,7 +530,7 @@ music-seek.h:
 
 /usr/include/glib-2.0/glib/gutils.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/stdarg.h:
+/usr/lib/gcc/i486-linux-gnu/4.3.2/include/stdarg.h:
 
 /usr/include/glib-2.0/glib/gatomic.h:
 
@@ -553,10 +553,6 @@ music-seek.h:
 /usr/include/bits/sigaction.h:
 
 /usr/include/bits/sigcontext.h:
-
-/usr/include/asm/sigcontext.h:
-
-/usr/include/asm/types.h:
 
 /usr/include/bits/sigstack.h:
 
@@ -845,6 +841,10 @@ music-seek.h:
 /usr/include/bits/stdio_lim.h:
 
 /usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+/usr/include/bits/stdio2.h:
 
 /usr/lib/gtk-2.0/include/gdkconfig.h:
 
@@ -1441,6 +1441,8 @@ player.h:
 /usr/include/sys/sysmacros.h:
 
 /usr/include/alloca.h:
+
+/usr/include/bits/stdlib.h:
 
 /usr/include/libxml2/libxml/xlink.h:
 

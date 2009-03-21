@@ -54,11 +54,11 @@ music_seek_new_with_adj_and_player(GtkAdjustment *ad,GsPlayer *player)
                   ValueChanged,
                  (gpointer)(me->player));
 
-     g_signal_connect ((gpointer) GTK_WIDGET(me), "format-value",
+  g_signal_connect ((gpointer) GTK_WIDGET(me), "format-value",
                   PrintTime,
                  (gpointer)(me->player));
 
-     g_timeout_add (200,ChangeScroll, me->player);
+  g_timeout_add (200,ChangeScroll, me->player);
   
   return curr;
   
@@ -74,7 +74,7 @@ static void ChangeScroll                     ( gpointer         user_data)
      
      curr= gs_getPercentage(player);
      
-     adj =(GtkAdjustment  *) gtk_adjustment_new (curr, 0, 100, 3, 10, 1);
+     adj =(GtkAdjustment  *) gtk_adjustment_new (curr, 0, 100, 3, 15, 1);
      
      gtk_range_set_adjustment(GTK_RANGE(player->scroll),GTK_ADJUSTMENT(adj));
 	 
@@ -114,8 +114,8 @@ GsPlayer *player = (GsPlayer *) user_data;
 
 
 if(!gs_SeakFromPercent(player,value) ||value > 100 || value <= 0){
-    g_print ("Seek failed!\n");
-    return FALSE;
+     g_print ("Seek failed!\n");
+     return FALSE;
      }
 
 return FALSE;
