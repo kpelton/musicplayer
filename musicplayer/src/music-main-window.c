@@ -97,9 +97,9 @@ static void init_widgets(MusicMainWindow *self)
      self->player = gs_player_new();
 
      // gtk_window_set_resizable (GTK_WINDOW(self),FALSE);
-
+		
      gtk_window_set_title (GTK_WINDOW (self), ("test"));
-
+	
      //add mainvbox to mainwindow
      self->mainvbox = gtk_vbox_new(FALSE,0);
 
@@ -219,7 +219,10 @@ static void mwindow_new_file(GsPlayer *player,
      gchar *out;
      gint i;
      gchar **tokens;
- gchar output[1024];
+	gchar output[1024];
+    
+    
+    	
      if(p_track->artist){
 	 sprintf(title,"%s - %s",p_track->artist, p_track->title);
 	 gtk_window_set_title(GTK_WINDOW(self),title);

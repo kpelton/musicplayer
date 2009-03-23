@@ -29,11 +29,11 @@ music_volume_new_with_player (GsPlayer *player)
      gtk_scale_button_set_value (GTK_SCALE_BUTTON(me),gs_Get_Volume(me->player));
 
       g_signal_connect (me, "value-changed",
-                  value_changed,
+                  (gpointer)value_changed,
 		   player);
 
      return GTK_WIDGET(me);
-  
+  	
 }
 
 GtkWidget*
@@ -41,7 +41,7 @@ music_volume_new(void)
 {
      GtkWidget *ret;
      MusicVolume *me;
-    return g_object_new (MUSIC_TYPE_VOLUME, NULL);
+ 	return g_object_new (MUSIC_TYPE_VOLUME, NULL);
     
        
 }

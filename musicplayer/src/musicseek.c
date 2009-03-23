@@ -51,14 +51,14 @@ music_seek_new_with_adj_and_player(GtkAdjustment *ad,GsPlayer *player)
     
 
   g_signal_connect ((gpointer) GTK_WIDGET(me), "change-value",
-                  ValueChanged,
+                  (gpointer)ValueChanged,
                  (gpointer)(me->player));
 
   g_signal_connect ((gpointer) GTK_WIDGET(me), "format-value",
-                  PrintTime,
+                  (gpointer)PrintTime,
                  (gpointer)(me->player));
 
-  g_timeout_add (200,ChangeScroll, me->player);
+  g_timeout_add (200,(gpointer)ChangeScroll, me->player);
   
   return curr;
   

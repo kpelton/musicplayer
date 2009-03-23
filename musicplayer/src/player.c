@@ -420,7 +420,7 @@ static void ts_event_loop(GsPlayer* self, GstBus *bus)
 	  message = gst_bus_timed_pop(bus,500000);
      }
 
-     self->idle = g_idle_add    (gs_get_tags,
+     self->idle = g_idle_add    ((gpointer)gs_get_tags,
 				  self);
      
 }
