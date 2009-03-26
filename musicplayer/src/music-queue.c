@@ -42,7 +42,6 @@ enum
 static void add (GtkWidget *widget,gpointer user_data);
 static void add_columns (MusicQueue *self);
 static void init_widgets (MusicQueue *self);
-static void foreach (gpointer data,gpointer user_data);
 //static void playfile (GtkTreeSelection *selection, gpointer data);
 static void nextFile (GsPlayer *player,gpointer user_data);
 static void
@@ -101,7 +100,7 @@ static gint sort_iter_compare_func_title(GtkTreeModel *model,
 					 gpointer      userdata);
 
 
-
+static void add_file(gpointer data,gpointer user_data);
 gboolean has_selected(gpointer user_data);
 
 static void set_font   (gpointer    callback_data,
@@ -510,7 +509,7 @@ onDragDataReceived(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 	 for(i=0; list[i] != NULL; i++)
 	 {
 	      //for each selected item
-	      foreach(list[i],self);
+	      add_file(list[i],self);
 	 }
 	 // gtk_drag_finish (context, TRUE, FALSE, time);
 
@@ -596,7 +595,7 @@ static void add(GtkWidget *widget,gpointer user_data)
 	  list =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
 	
 	  gtk_widget_destroy (dialog);
-	  g_slist_foreach (list,foreach,self);
+	  g_slist_foreach (list,add_file,self);
 	  g_slist_free (list);
      }
      else{
@@ -605,15 +604,22 @@ static void add(GtkWidget *widget,gpointer user_data)
 
      g_object_unref(self->ts);
  }
-
-static void foreach(gpointer data,gpointer user_data)
+void add_file_ext(gpointer data,gpointer user_data)
 {
-     MusicQueue *self = (MusicQueue *) user_data;
-     GtkTreeIter   iter;
-     gchar *out;			       
-     gchar **tokens;
-     const gchar toke[] ="/";
-     gchar buffer[50];
+	 MusicQueue *self = (MusicQueue *) user_data;
+	 self->ts = tag_scanner_new();
+	 add_file(data,user_data);   
+	 g_object_unref(self->ts) ;
+}
+//uri and musicqueuestatic void add_file(gpointer data,gpointer user_data);
+static void add_file(gpointer data,gpointer user_data)
+{
+	 MusicQueue *self = (MusicQueue *) user_data;
+	 GtkTreeIter   iter;
+	 gchar *out;			       
+	 gchar **tokens;
+	 const gchar toke[] ="/";
+	 gchar buffer[50];
      int i;
      metadata *md = NULL;
 

@@ -252,3 +252,13 @@ static void mwindow_new_file(GsPlayer *player,
      ts_metadata_free(p_track);
 
     }
+
+void music_main_play_file(MusicMainWindow *self,gchar * location)
+{
+	gchar *valid;
+	valid = gnome_vfs_make_uri_from_input(location);
+	add_file_ext(valid,self->queue);
+	gs_playFile(self->player,valid);
+	g_free(valid);
+}
+

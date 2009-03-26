@@ -53,7 +53,7 @@ typedef struct {
 GType music_main_window_get_type (void);
 
 GtkWidget * music_main_window_new (void);
-
+void music_main_play_file(MusicMainWindow *,gchar *);
 G_END_DECLS
 
 #endif /* _MUSIC_MAIN_WINDOW */
