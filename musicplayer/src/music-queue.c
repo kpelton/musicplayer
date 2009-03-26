@@ -659,7 +659,7 @@ static void add_file(gpointer data,gpointer user_data)
 			   
 			   
 		  {
-		  }
+		  
 	/*   ts_metadata_free(md); */
 /* 	  md=ts_parse_file_name((gchar *)data ); */
 /* 	  if(md) */
@@ -678,7 +678,7 @@ static void add_file(gpointer data,gpointer user_data)
 
 	  
       
-     
+	 }
      g_strfreev(tokens);  
    g_free(out);
    
