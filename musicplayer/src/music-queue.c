@@ -604,12 +604,7 @@ static void add(GtkWidget *widget,gpointer user_data)
      }     
 
      g_object_unref(self->ts);
-   
-         
-     // plist_reader_write_list("/home/kyle/test.xspf",list,self->read);
-    
-
-}
+ }
 
 static void foreach(gpointer data,gpointer user_data)
 {
@@ -643,22 +638,22 @@ static void foreach(gpointer data,gpointer user_data)
      
      tokens=g_strsplit(out,toke,10);
 
-
-     //take out the '/' in the uri
-     for(i=1; tokens[i] != NULL; i++);
-	 
-     if(md != NULL && md->title != NULL && md->artist !=NULL)
-     {
-	  
-	       gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title);
-	       gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist);
-	       ts_metadata_free(md);
-     }
-     else
-
-
-     {
-	  
+ if (tokens != NULL)
+	 {
+		  //take out the '/' in the ur
+		  for(i=1; tokens[i] != NULL; i++);
+		  
+		  if(md != NULL && md->title != NULL && md->artist !=NULL)
+		  {	  
+			   gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title);
+			   gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist);
+			   ts_metadata_free(md);
+		  }
+		  else
+			   
+			   
+		  {
+		  }
 	/*   ts_metadata_free(md); */
 /* 	  md=ts_parse_file_name((gchar *)data ); */
 /* 	  if(md) */
@@ -669,8 +664,7 @@ static void foreach(gpointer data,gpointer user_data)
 /* /\* 	  } *\/ */
 /* 	  else{ */
 	       gtk_list_store_set(self->store,&iter,COLUMN_TITLE,(gpointer *)tokens[i-1]); 
-	  
-     }
+	}
 
 	/* 	    
 		    
