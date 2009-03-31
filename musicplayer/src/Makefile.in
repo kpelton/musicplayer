@@ -142,8 +142,8 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-AM_CFLAGS = `pkg-config --cflags --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0` -Os		
-AM_LDFLAGS = `pkg-config --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0` -Os
+AM_CFLAGS = `pkg-config --cflags --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0` -g		
+AM_LDFLAGS = `pkg-config --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0` -g
 musicplayer_SOURCES = music-main-window.c musicseek.c player.c main.c music-queue.c music-volume.c  plist-reader.c tag-scanner.c music-queue.h  music-volume.h  plist-reader.h music-main-window.h music-seek.h player.h tag-scanner.h
 musicplayer_LDADD = $(INTI_LIBS)
 all: all-am

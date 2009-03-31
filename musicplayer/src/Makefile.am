@@ -1,7 +1,7 @@
 bin_PROGRAMS = musicplayer
 
-AM_CFLAGS = `pkg-config --cflags --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0` -Os		
-AM_LDFLAGS = `pkg-config --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0` -Os
+AM_CFLAGS = `pkg-config --cflags --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0` -g		
+AM_LDFLAGS = `pkg-config --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0` -g
 
 
 
