@@ -358,7 +358,7 @@ tag_scanner_init (TagScanner *self)
 
      //signals
      g_signal_connect (self->dec, "new-decoded-pad", G_CALLBACK (cb_newpad),self->fakesink);
-     
+    
 
 	
      //connect everything

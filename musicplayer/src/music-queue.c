@@ -186,12 +186,6 @@ music_queue_finalize (GObject *object)
      g_object_unref(self->read);
 }
   
-
-
-
-
-
-
 static void
 music_queue_class_init (MusicQueueClass *klass)
 {
@@ -203,11 +197,6 @@ music_queue_class_init (MusicQueueClass *klass)
      object_class->finalize = music_queue_finalize;
      object_class->get_property = music_queue_get_property;
      object_class->set_property = music_queue_set_property;
-
-
- 
-
-
 
 }
 static void foreach_xspf(gpointer data,gpointer user_data)
@@ -397,21 +386,19 @@ static void init_widgets(MusicQueue *self)
 
 
 //sorting
-sortable = GTK_TREE_SORTABLE(self->store);
+	sortable = GTK_TREE_SORTABLE(self->store);
 
 //artist
-gtk_tree_sortable_set_sort_func(sortable,SORTID_ARTIST, sort_iter_compare_func,
+	gtk_tree_sortable_set_sort_func(sortable,SORTID_ARTIST, sort_iter_compare_func,
                                     GINT_TO_POINTER(SORTID_ARTIST),NULL);
 
-gtk_tree_sortable_set_default_sort_func(sortable,sort_iter_compare_func,NULL,NULL);
+	gtk_tree_sortable_set_default_sort_func(sortable,sort_iter_compare_func,NULL,NULL);
 //title
 
-gtk_tree_sortable_set_sort_func(sortable,SORTID_TITLE, sort_iter_compare_func_title,
+	gtk_tree_sortable_set_sort_func(sortable,SORTID_TITLE, sort_iter_compare_func_title,
 				GINT_TO_POINTER(SORTID_TITLE),NULL);
 
-gtk_tree_sortable_set_default_sort_func(sortable,sort_iter_compare_func_title,NULL,NULL);
-
-
+	gtk_tree_sortable_set_default_sort_func(sortable,sort_iter_compare_func_title,NULL,NULL);
 }
 
 
@@ -655,408 +642,405 @@ static void add_file(gpointer data,gpointer user_data)
 			   gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist);
 			   ts_metadata_free(md);
 		  }
-		  else
-			   
-			   
-		  {
-		  
-	/*   ts_metadata_free(md); */
-/* 	  md=ts_parse_file_name((gchar *)data ); */
-/* 	  if(md) */
-/* 	  { */
-/* 	       gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title); */
-/* 	       gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist); */
-	       /* ts_metadata_free(md); */
-/* /\* 	  } *\/ */
-/* 	  else{ */
-	       gtk_list_store_set(self->store,&iter,COLUMN_TITLE,(gpointer *)tokens[i-1]); 
-	}
-
-	/* 	    
+		else
 		    
-/* 	       } */
-
-	  
-      
+		    
+		{
+		    
+		    /*   ts_metadata_free(md); */
+		    /* 	  md=ts_parse_file_name((gchar *)data ); */
+		    /* 	  if(md) */
+		    /* 	  { */
+		    /* 	       gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title); */
+		    /* 	       gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist); */
+		    /* ts_metadata_free(md); */
+		    /* /\* 	  } *\/ */
+		    /* 	  else{ */
+		    gtk_list_store_set(self->store,&iter,COLUMN_TITLE,(gpointer *)tokens[i-1]); 
+		}
+		
+		/* 	    
+		 
+		 /* 	       } */
+		 
+		 
+		 
 	 }
-     g_strfreev(tokens);  
-   g_free(out);
-   
-
+    g_strfreev(tokens);  
+    g_free(out);
+    
+    
 }
 
-      
+
 
 
 GtkWidget*
 music_queue_new (void)
 {
-     return (GTK_WIDGET(g_object_new (MUSIC_TYPE_QUEUE, NULL)));
+    return (GTK_WIDGET(g_object_new (MUSIC_TYPE_QUEUE, NULL)));
 }
 
 GtkWidget*
 music_queue_new_with_player(GsPlayer *player)
 {
-     MusicQueue *self;
-     self =g_object_new (MUSIC_TYPE_QUEUE, NULL);
-     self->player =player;
-
-     g_signal_connect (player, "eof",
-		       G_CALLBACK(nextFile),
-		       (gpointer)self);
-
-     g_object_set(G_OBJECT (self), "expand",TRUE ,NULL);
-
-
-     return GTK_WIDGET(self);
+    MusicQueue *self;
+    self =g_object_new (MUSIC_TYPE_QUEUE, NULL);
+    self->player =player;
+    
+    g_signal_connect (player, "eof",
+				  G_CALLBACK(nextFile),
+				  (gpointer)self);
+    
+    g_object_set(G_OBJECT (self), "expand",TRUE ,NULL);
+    
+    
+    return GTK_WIDGET(self);
 }
 static void nextFile              (GsPlayer      *player,
-                     gpointer         user_data)
+							gpointer         user_data)
 {
-     MusicQueue *self = (MusicQueue *) user_data;
-     GtkTreePath *path;
-     GtkTreeModel *model;
-
-     if (self->currid > 0)
-     {
-	  model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->treeview));
-	  
-	  gtk_tree_selection_unselect_iter(self->currselection,&self->curr);  
-	  if(gtk_tree_model_iter_next(model,&self->curr))
-	  {
-
-	       gtk_tree_selection_select_iter(self->currselection,&self->curr); 
-	       playfile(GTK_TREE_VIEW(self->treeview),gtk_tree_model_get_path(model,&self->curr),NULL,user_data);
-	  } 
-	  
-     }
+    MusicQueue *self = (MusicQueue *) user_data;
+    GtkTreePath *path;
+    GtkTreeModel *model;
+    
+    if (self->currid > 0)
+    {
+	   model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->treeview));
+	   
+	   gtk_tree_selection_unselect_iter(self->currselection,&self->curr);  
+	   if(gtk_tree_model_iter_next(model,&self->curr))
+	   {
+		  
+		  gtk_tree_selection_select_iter(self->currselection,&self->curr); 
+		  playfile(GTK_TREE_VIEW(self->treeview),gtk_tree_model_get_path(model,&self->curr),NULL,user_data);
+	   } 
+	   
+    }
 }
 
-     
+
 
 static void add_columns(MusicQueue *self)
 {
-     GtkCellRenderer *renderer;
-     GtkTreeViewColumn *column;
-     gchar font[200];
-     g_object_get(G_OBJECT(self),"font",font,NULL);
-
-
-
-     renderer = gtk_cell_renderer_text_new ();
-     g_object_set(G_OBJECT(renderer),"font",font,NULL);
-     column = gtk_tree_view_column_new_with_attributes ("Artist",
-						     renderer,
-						     "text",
-						     COLUMN_ARTIST,
-						     NULL);
-
-     gtk_tree_view_column_set_resizable(GTK_TREE_VIEW_COLUMN (column),TRUE);
-      
-     gtk_tree_view_append_column (GTK_TREE_VIEW(self->treeview), column);
-     //gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 5);
-
-     //set sortable
-     gtk_tree_view_column_set_sort_column_id(column,SORTID_ARTIST);
-
-     
-
-     renderer = gtk_cell_renderer_text_new ();
-     g_object_set(G_OBJECT(renderer),"ellipsize",PANGO_ELLIPSIZE_END,NULL);
-     
-     g_object_set(G_OBJECT(renderer),"font",font,NULL);
-
-
-     column = gtk_tree_view_column_new_with_attributes ("Title",
-						     renderer,
-						     "text",
-						     COLUMN_TITLE,
-						     NULL);
-     //gtk_tree_view_column_set_resizable(GTK_TREE_VIEW_COLUMN (column),TRUE);
-     
-     //gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 20);
-
-     //sort
-     gtk_tree_view_column_set_sort_column_id(column,SORTID_TITLE);
-
-     gtk_tree_view_append_column (GTK_TREE_VIEW(self->treeview), column);
-
-     renderer = gtk_cell_renderer_text_new ();
-     
-     
-     column = gtk_tree_view_column_new_with_attributes ("URI",
-						     renderer,
-						     "text",
-						     COLUMN_URI,
-						     NULL);
-     renderer = gtk_cell_renderer_text_new ();
-
-     
-     column = gtk_tree_view_column_new_with_attributes ("ID",
-						     renderer,
-						     "text",
-						     COLUMN_ID,
-						     NULL);
-     
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    gchar font[200];
+    g_object_get(G_OBJECT(self),"font",font,NULL);
     
-     
+    
+    
+    renderer = gtk_cell_renderer_text_new ();
+    g_object_set(G_OBJECT(renderer),"font",font,NULL);
+    column = gtk_tree_view_column_new_with_attributes ("Artist",
+											renderer,
+											"text",
+											COLUMN_ARTIST,
+											NULL);
+    
+    gtk_tree_view_column_set_resizable(GTK_TREE_VIEW_COLUMN (column),TRUE);
+    
+    gtk_tree_view_append_column (GTK_TREE_VIEW(self->treeview), column);
+    //gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 5);
+    
+    //set sortable
+    gtk_tree_view_column_set_sort_column_id(column,SORTID_ARTIST);
+    
+    
+    
+    renderer = gtk_cell_renderer_text_new ();
+    g_object_set(G_OBJECT(renderer),"ellipsize",PANGO_ELLIPSIZE_END,NULL);
+    
+    g_object_set(G_OBJECT(renderer),"font",font,NULL);
+    
+    
+    column = gtk_tree_view_column_new_with_attributes ("Title",
+											renderer,
+											"text",
+											COLUMN_TITLE,
+											NULL);
+    //gtk_tree_view_column_set_resizable(GTK_TREE_VIEW_COLUMN (column),TRUE);
+    
+    //gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 20);
+    
+    //sort
+    gtk_tree_view_column_set_sort_column_id(column,SORTID_TITLE);
+    
+    gtk_tree_view_append_column (GTK_TREE_VIEW(self->treeview), column);
+    
+    renderer = gtk_cell_renderer_text_new ();
+    
+    
+    column = gtk_tree_view_column_new_with_attributes ("URI",
+											renderer,
+											"text",
+											COLUMN_URI,
+											NULL);
+    renderer = gtk_cell_renderer_text_new ();
+    
+    
+    column = gtk_tree_view_column_new_with_attributes ("ID",
+											renderer,
+											"text",
+											COLUMN_ID,
+											NULL);
 
 }
 static void  rowchanged  (GtkTreeModel *tree_model,
-		      GtkTreePath  *path,
-		      GtkTreeIter  *iter,
-		      gpointer      user_data) 
+					 GtkTreePath  *path,
+					 GtkTreeIter  *iter,
+					 gpointer      user_data) 
 {
-     MusicQueue *self = (MusicQueue *) user_data;
-     gchar *id;
-//Curr was deleted
-
- if(self->changed)
-     {
-	  gtk_tree_model_get (tree_model, iter, COLUMN_ID, &id, -1);
-	  
-	       if(atoi(id) == self->currid)
-	       {
-		    self->curr = *iter;
-		    
-	       }
-	       
-	       g_free (id);
-	       self->changed = FALSE;
-     }
-
+    MusicQueue *self = (MusicQueue *) user_data;
+    gchar *id;
+    //Curr was deleted
+    
+    if(self->changed)
+    {
+	   gtk_tree_model_get (tree_model, iter, COLUMN_ID, &id, -1);
+	   
+	   if(atoi(id) == self->currid)
+	   {
+		  self->curr = *iter;
+		  
+	   }
+	   
+	   g_free (id);
+	   self->changed = FALSE;
+    }
+    
 }
 
 
 static gboolean grabfocuscb (GtkWidget *widget,
-			 GdkEventButton *event,
-			 gpointer user_data)
+					    GdkEventButton *event,
+					    gpointer user_data)
 {
-     MusicQueue *self = (MusicQueue *) user_data;
-     GtkWidget *menu;
-     GtkTreeModel *model;					      
-     
-     model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->treeview));
-     
-     gtk_tree_view_set_reorderable(GTK_TREE_VIEW(self->treeview),TRUE);
-
-     //we want our context menu since user right clicked
-     if (event->button == 3)
-     {
-	  if(has_selected(user_data))
-		      {
-			   menu = getcontextmenu(user_data);
-			   gtk_widget_show_all(menu);
-			   
-			   gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
+    MusicQueue *self = (MusicQueue *) user_data;
+    GtkWidget *menu;
+    GtkTreeModel *model;					      
+    
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->treeview));
+    
+    gtk_tree_view_set_reorderable(GTK_TREE_VIEW(self->treeview),TRUE);
+    
+    //we want our context menu since user right clicked
+    if (event->button == 3)
+    {
+	   if(has_selected(user_data))
+	   {
+		  menu = getcontextmenu(user_data);
+		  gtk_widget_show_all(menu);
+		  
+		  gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
 					  (event != NULL) ? event->button : 0,
 					  gdk_event_get_time((GdkEvent*)event));
-		      }
-	  }
-	  return FALSE;
+	   }
+    }
+    return FALSE;
 }
 
 
 static gboolean lostgrabfocuscb (GtkWidget *widget,
-			 GdkEventButton *event,
-			 gpointer user_data)
+						   GdkEventButton *event,
+						   gpointer user_data)
 {
-     MusicQueue *self = (MusicQueue *) user_data;
-     
-     if(!self->drag_started)
-     {
-	  gtk_drag_dest_unset (self->treeview);
-	  gtk_tree_view_set_reorderable(GTK_TREE_VIEW(self->treeview),FALSE);
-	  gtk_tree_view_enable_model_drag_dest (GTK_TREE_VIEW (self->treeview),
-						      targetentries, G_N_ELEMENTS (targetentries),
-						      GDK_ACTION_COPY | GDK_ACTION_MOVE);
-	  
-     }
-	  return FALSE;
-
+    MusicQueue *self = (MusicQueue *) user_data;
+    
+    if(!self->drag_started)
+    {
+	   gtk_drag_dest_unset (self->treeview);
+	   gtk_tree_view_set_reorderable(GTK_TREE_VIEW(self->treeview),FALSE);
+	   gtk_tree_view_enable_model_drag_dest (GTK_TREE_VIEW (self->treeview),
+									 targetentries, G_N_ELEMENTS (targetentries),
+									 GDK_ACTION_COPY | GDK_ACTION_MOVE);
+	   
+    }
+    return FALSE;
+    
 }
 
 
 static void dragbegin (GtkWidget *widget,
-			  GdkDragContext *contex,
-			 gpointer user_data)
+				   GdkDragContext *contex,
+				   gpointer user_data)
 
 {
-
-MusicQueue *self = (MusicQueue *) user_data;
-     self->drag_started = TRUE;
-
+    
+    MusicQueue *self = (MusicQueue *) user_data;
+    self->drag_started = TRUE;
+    
 }
 
 
 static void dragend (GtkWidget *widget,
-			  GdkDragContext *contex,
-			 gpointer user_data)
+				 GdkDragContext *contex,
+				 gpointer user_data)
 
 {
-
-     MusicQueue *self = (MusicQueue *) user_data;
-     self->drag_started = FALSE;
-     //gtk_drag_dest_unset (self->treeview);
-     //gtk_tree_view_set_reorderable(GTK_TREE_VIEW(self->treeview),FALSE);
-     
-     //bug:
-     // user has to have a row selected for external dnd to work
+    
+    MusicQueue *self = (MusicQueue *) user_data;
+    self->drag_started = FALSE;
+    //gtk_drag_dest_unset (self->treeview);
+    //gtk_tree_view_set_reorderable(GTK_TREE_VIEW(self->treeview),FALSE);
+    
+    //bug:
+    // user has to have a row selected for external dnd to work
 }
 
 
 static GtkWidget * getcontextmenu(gpointer user_data)
 {
-
-   GtkItemFactory *item_factory;
-   GtkWidget  *menu;
-   gint nmenu_items = sizeof (menu_items) / sizeof (menu_items[0]);
-
-   /* Same as before but don't bother with the accelerators */
-   item_factory = gtk_item_factory_new (GTK_TYPE_MENU, "<main>",
-                                        NULL);
-   gtk_item_factory_create_items (item_factory, nmenu_items, menu_items, user_data);
-   menu = gtk_item_factory_get_widget (item_factory, "<main>");
-
-   return menu;
-
+    
+    GtkItemFactory *item_factory;
+    GtkWidget  *menu;
+    gint nmenu_items = sizeof (menu_items) / sizeof (menu_items[0]);
+    
+    /* Same as before but don't bother with the accelerators */
+    item_factory = gtk_item_factory_new (GTK_TYPE_MENU, "<main>",
+								 NULL);
+    gtk_item_factory_create_items (item_factory, nmenu_items, menu_items, user_data);
+    menu = gtk_item_factory_get_widget (item_factory, "<main>");
+    
+    return menu;
+    
 }
 static gboolean remove_files_via_press(GtkWidget *widget,
-			 GdkEventKey *event,
-			 gpointer user_data)
+							    GdkEventKey *event,
+							    gpointer user_data)
 {
-
-     if(event->keyval == GDK_Delete && has_selected(user_data) == TRUE)
-	remove_files(user_data,0,widget);
-
-     return FALSE;
+    
+    if(event->keyval == GDK_Delete && has_selected(user_data) == TRUE)
+	   remove_files(user_data,0,widget);
+    
+    return FALSE;
 }  
 
 static void set_font   (gpointer    callback_data,
-			 guint       callback_action,
-			 GtkWidget  *widget)
+				    guint       callback_action,
+				    GtkWidget  *widget)
 {
-MusicQueue *self = (MusicQueue *) callback_data;
-
-/* GtkWidget *   font_window = gtk_font_selection_dialog_new       ("Select playlist font"); */
-
-/* gtk_widget_show(font_window); */
-
+    MusicQueue *self = (MusicQueue *) callback_data;
+    
+    /* GtkWidget *   font_window = gtk_font_selection_dialog_new       ("Select playlist font"); */
+    
+    /* gtk_widget_show(font_window); */
+    
 }
 
 static void remove_files(gpointer    callback_data,
-			 guint       callback_action,
-			 GtkWidget  *widget)
+					guint       callback_action,
+					GtkWidget  *widget)
 {
-     MusicQueue *self = (MusicQueue *) callback_data;
-     GList * rows;
-     GList * rowref_list = g_list_alloc();
-     gint i;
-     GtkTreeIter iter;
-     GtkTreePath *path;
-     GtkTreeModel *model;
-     gchar *id;
-     GtkTreeRowReference  *rowref;
-     
-
-     model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->treeview));
-     
-
-     rows = gtk_tree_selection_get_selected_rows(self->currselection,&model);
-
-      for(i = 0; i < g_list_length (rows); i++) 
-     {
-	  path = (GtkTreePath *) g_list_nth_data(rows,i);
-	  rowref = gtk_tree_row_reference_new(model, path);
-	  rowref_list = g_list_append(rowref_list, rowref);
-     }
-      for(i = 1; i < g_list_length (rowref_list); i++) 
-      {
+    MusicQueue *self = (MusicQueue *) callback_data;
+    GList * rows;
+    GList * rowref_list = g_list_alloc();
+    gint i;
+    GtkTreeIter iter;
+    GtkTreePath *path;
+    GtkTreeModel *model;
+    gchar *id;
+    GtkTreeRowReference  *rowref;
+    
+    
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->treeview));
+    
+    
+    rows = gtk_tree_selection_get_selected_rows(self->currselection,&model);
+    
+    for(i = 0; i < g_list_length (rows); i++) 
+    {
+	   path = (GtkTreePath *) g_list_nth_data(rows,i);
+	   rowref = gtk_tree_row_reference_new(model, path);
+	   rowref_list = g_list_append(rowref_list, rowref);
+    }
+    for(i = 1; i < g_list_length (rowref_list); i++) 
+    {
 	   path = gtk_tree_row_reference_get_path(
-		(GtkTreeRowReference*) 
-		g_list_nth_data(rowref_list,i));
-      	   gtk_tree_model_get_iter (model, &iter,path);
+									  (GtkTreeRowReference*) 
+									  g_list_nth_data(rowref_list,i));
+	   gtk_tree_model_get_iter (model, &iter,path);
 	   gtk_tree_model_get (model, &iter, COLUMN_ID, &id, -1);
 	   
 	   //last one was deleted or all was deleted
 	   if(atoi(id) == self->currid)
-	       {
-		    if(!gtk_tree_model_iter_next(model,&self->curr))
-		    {
+	   {
+		  if(!gtk_tree_model_iter_next(model,&self->curr))
+		  {
 			 //last one in tree view
 			 self->currid = -1;
-		    }
-		    else
-		    { //update the ID to the next one 
+		  }
+		  else
+		  { //update the ID to the next one 
 			 g_free(id);
 			 gtk_tree_model_get (model, &self->curr, 
-					     COLUMN_ID, &id, -1);    	 
+							 COLUMN_ID, &id, -1);    	 
 			 self->currid = atoi(id);
-		    }
-	       }
+		  }
+	   }
 	   gtk_list_store_remove(GTK_LIST_STORE(self->store),&iter);
-	       
-     }
-      //free everything
-      g_list_foreach(rowref_list, (GFunc) gtk_tree_row_reference_free, NULL);
-      g_list_free(rowref_list);
-      g_list_free(rows);
-      g_free(id);
- } 
+	   
+    }
+    //free everything
+    g_list_foreach(rowref_list, (GFunc) gtk_tree_row_reference_free, NULL);
+    g_list_free(rowref_list);
+    g_list_free(rows);
+    g_free(id);
+} 
 
 
 gboolean has_selected(gpointer user_data)
 {
-MusicQueue *self = (MusicQueue *) user_data;
-
-     GList *rows;
-     GtkTreeModel *model;
-     
-     model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->treeview));
-     rows = gtk_tree_selection_get_selected_rows(self->currselection,&model);	
-     
-     if(g_list_length(rows) > 0)
-     {	  
-	  return TRUE;
-     }
-     return FALSE;
+    MusicQueue *self = (MusicQueue *) user_data;
+    
+    GList *rows;
+    GtkTreeModel *model;
+    
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->treeview));
+    rows = gtk_tree_selection_get_selected_rows(self->currselection,&model);	
+    
+    if(g_list_length(rows) > 0)
+    {	  
+	   return TRUE;
+    }
+    return FALSE;
 }
 
 
 static GList* get_list(gpointer user_data)
 {
-     MusicQueue *self = (MusicQueue *) user_data;
-     metadata *track = NULL;
-     GtkTreeIter iter;
-     GList *list = NULL;
-     gchar *artist, *title, *uri;
-     
-     if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->store),&iter))
-	  {
-	       list = g_list_alloc();
-	       do
-	       {
-		    track = ts_metadata_new();
-		    
-		    gtk_tree_model_get (GTK_TREE_MODEL(self->store), 
-					&iter,COLUMN_TITLE, &title, -1); 
-		    
-		    track->title = title;
-		    gtk_tree_model_get (GTK_TREE_MODEL(self->store), 
-				       &iter,COLUMN_ARTIST, &artist, -1); 
-		    
-		    track->artist = artist;
-
-		    gtk_tree_model_get (GTK_TREE_MODEL(self->store), 
-					&iter,COLUMN_URI, &uri, -1);
-		    track->uri = uri;
-
-		   list =  g_list_append(list,(gpointer)track); 
-	       }while(gtk_tree_model_iter_next(
-			   GTK_TREE_MODEL(self->store),
-			   &iter));
-	  }
-	  
-	  return list;
-
+    MusicQueue *self = (MusicQueue *) user_data;
+    metadata *track = NULL;
+    GtkTreeIter iter;
+    GList *list = NULL;
+    gchar *artist, *title, *uri;
+    
+    if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->store),&iter))
+    {
+	   list = g_list_alloc();
+	   do
+	   {
+		  track = ts_metadata_new();
+		  
+		  gtk_tree_model_get (GTK_TREE_MODEL(self->store), 
+						  &iter,COLUMN_TITLE, &title, -1); 
+		  
+		  track->title = title;
+		  gtk_tree_model_get (GTK_TREE_MODEL(self->store), 
+						  &iter,COLUMN_ARTIST, &artist, -1); 
+		  
+		  track->artist = artist;
+		  
+		  gtk_tree_model_get (GTK_TREE_MODEL(self->store), 
+						  &iter,COLUMN_URI, &uri, -1);
+		  track->uri = uri;
+		  
+		  list =  g_list_append(list,(gpointer)track); 
+	   }while(gtk_tree_model_iter_next(
+								GTK_TREE_MODEL(self->store),
+								&iter));
+    }
+    
+    return list;
+    
 }

@@ -16,7 +16,13 @@ static void mwindow_expander_activate(GtkExpander *expander,
 
 static void mwindow_new_file(GsPlayer *player,
 					metadata * p_track,gpointer data);
+static void
+on_pause_released                (GtkButton       *button,
+                                        gpointer         user_data);
 
+static void
+on_play_released                       (GtkButton       *button,
+                                        gpointer         user_data);
 
 static void music_main_window_get_property (GObject *object, guint property_id,
 				GValue *value, GParamSpec *pspec)
@@ -175,20 +181,48 @@ static void init_widgets(MusicMainWindow *self)
      gtk_widget_show(self->queue);
      gtk_widget_show(expander);
 
-
-     //signals
-
-      g_signal_connect(expander, "activate",
-		       G_CALLBACK(mwindow_expander_activate),
-			self);
-
-      g_signal_connect(self->player, "new-file",
-		       G_CALLBACK(mwindow_new_file),
-			self);
-      
-      
-
+    
+    //signals
+    
+    g_signal_connect(expander, "activate",
+				 G_CALLBACK(mwindow_expander_activate),
+				 self);
+    
+    g_signal_connect(self->player, "new-file",
+				 G_CALLBACK(mwindow_new_file),
+				 self);
+    
+    g_signal_connect (self->pausebutton, "released",
+				  G_CALLBACK (on_pause_released),
+				  (gpointer)self->player);
+    
+    g_signal_connect (self->playbutton, "released",
+				  G_CALLBACK (on_play_released),
+				  (gpointer)self->player);
+    
 }
+
+static void
+on_pause_released                (GtkButton       *button,
+								gpointer         user_data)
+{
+    GsPlayer *player = (GsPlayer *) user_data;
+    
+    gs_pause(player);
+}
+
+
+static void
+on_play_released                       (GtkButton       *button,
+								gpointer         user_data)
+{
+    GsPlayer *player = (GsPlayer *) user_data;
+    
+    gs_pauseResume(player);
+}
+
+
+
 static void mwindow_expander_activate(GtkExpander *expander,
 			  gpointer     user_data)
 {
