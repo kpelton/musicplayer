@@ -46,11 +46,10 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_musicplayer_OBJECTS = interface.$(OBJEXT) \
-	music-main-window.$(OBJEXT) musicseek.$(OBJEXT) \
-	player.$(OBJEXT) main.$(OBJEXT) music-queue.$(OBJEXT) \
-	music-volume.$(OBJEXT) plist-reader.$(OBJEXT) \
-	tag-scanner.$(OBJEXT)
+am_musicplayer_OBJECTS = music-main-window.$(OBJEXT) \
+	musicseek.$(OBJEXT) player.$(OBJEXT) main.$(OBJEXT) \
+	music-queue.$(OBJEXT) music-volume.$(OBJEXT) \
+	plist-reader.$(OBJEXT) tag-scanner.$(OBJEXT)
 musicplayer_OBJECTS = $(am_musicplayer_OBJECTS)
 musicplayer_DEPENDENCIES =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -145,7 +144,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AM_CFLAGS = `pkg-config --cflags --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0` -Os		
 AM_LDFLAGS = `pkg-config --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0` -Os
-musicplayer_SOURCES = interface.c music-main-window.c musicseek.c player.c main.c music-queue.c music-volume.c  plist-reader.c tag-scanner.c interface.h music-queue.h  music-volume.h  plist-reader.h music-main-window.h music-seek.h player.h tag-scanner.h
+musicplayer_SOURCES = music-main-window.c musicseek.c player.c main.c music-queue.c music-volume.c  plist-reader.c tag-scanner.c music-queue.h  music-volume.h  plist-reader.h music-main-window.h music-seek.h player.h tag-scanner.h
 musicplayer_LDADD = $(INTI_LIBS)
 all: all-am
 
@@ -213,7 +212,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/music-main-window.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/music-queue.Po@am__quote@

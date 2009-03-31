@@ -1,6 +1,6 @@
 #include <gtk/gtk.h>
 
-#include "interface.h"
+
 
 #include "player.h"
 #include "music-queue.h"
