@@ -74,7 +74,7 @@ static void ChangeScroll                     ( gpointer         user_data)
      
      curr= gs_getPercentage(player);
      
-     adj =(GtkAdjustment  *) gtk_adjustment_new (curr, 0, 100, 3, 15, 1);
+     adj =(GtkAdjustment  *) gtk_adjustment_new (curr, 0, 100, 3, 10, 1);
      
      gtk_range_set_adjustment(GTK_RANGE(player->scroll),GTK_ADJUSTMENT(adj));
 	 
