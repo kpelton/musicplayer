@@ -298,7 +298,7 @@ static gint64 gs_PercentToTime(GsPlayer *me, gdouble percent){
      GstFormat fmt = GST_FORMAT_TIME;
      gint64  len;
      gchar test[200];
-     gint64 sec;
+     gint64 sec=0;
 
      
 
@@ -331,14 +331,16 @@ gboolean gs_CurrTime(GsPlayer *me, gchar *curr)
 
      //if(me->isPlaying == TRUE)
      if(isPlaying(me)){  
-	  
+	 
 	  if (gst_element_query_position (me->play, &fmt, &pos) && gst_element_query_duration (me->play, &fmt, &len))
 	  {
+		 
 	       gs_SecondsToReal(pos/1000000000.,real);
 	       gs_SecondsToReal(len/1000000000.,real2);
 	       g_sprintf(curr,"%s of %s" ,real,real2);
+		 return TRUE;
 	  }
-		return TRUE;
+		
 
      }	    
 

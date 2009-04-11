@@ -47,6 +47,7 @@ music_seek_new_with_adj_and_player(GtkAdjustment *ad,GsPlayer *player)
   me= MUSIC_SEEK(curr);
 
   gtk_range_set_adjustment(GTK_RANGE(curr),ad);
+    	gtk_range_set_update_policy(GTK_RANGE(me),GTK_UPDATE_DELAYED);
   me->player = player;
     
 
@@ -101,6 +102,7 @@ static gchar * PrintTime (GtkScale *scale,
 	  return str;
 	  // return NULL
 	       //  g_free(str);
+	    gs_pauseResume(player);
      }
 
 
@@ -110,14 +112,18 @@ static gboolean ValueChanged (GtkRange     *range,
 		       gdouble       value,
 		       gpointer      user_data)
 {
-GsPlayer *player = (GsPlayer *) user_data;
+	GsPlayer *player = (GsPlayer *) user_data;
 
 
-if(!gs_SeakFromPercent(player,value) ||value > 100 || value <= 0){
+
+   		 //gs_pause(player);
+
+
+ if(value > 100 || value <= 0 ||!gs_SeakFromPercent(player,value)) {
      g_print ("Seek failed!\n");
      return FALSE;
      }
-
+//}
 return FALSE;
 
 }
