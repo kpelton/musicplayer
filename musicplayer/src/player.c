@@ -25,10 +25,6 @@ typedef enum {
      NEWFILE
 }SIGNALS;
 
-
-
-
-#define NANO = 100000000.
 static void
 gtk_widget_dispose (GObject *object)
 {
@@ -283,7 +279,7 @@ static gboolean isPlaying(GsPlayer *me)
 {
      GstState curr;
     
-     gst_element_get_state(me->play,&curr,NULL,50000);
+     gst_element_get_state(me->play,&curr,NULL,GST_SECOND);
      
 	  if (curr == GST_STATE_PLAYING || curr == GST_STATE_PAUSED)
 	       return TRUE;
@@ -311,7 +307,7 @@ static gint64 gs_PercentToTime(GsPlayer *me, gdouble percent){
 
 	       // t = (gint64)(len-sec);
 
-	       gs_SecondsToReal(sec/1000000000.,test);
+	       gs_SecondsToReal(sec/GST_SECOND,test);
 	       
 	  }
      }
@@ -335,8 +331,8 @@ gboolean gs_CurrTime(GsPlayer *me, gchar *curr)
 	  if (gst_element_query_position (me->play, &fmt, &pos) && gst_element_query_duration (me->play, &fmt, &len))
 	  {
 		 
-	       gs_SecondsToReal(pos/1000000000.,real);
-	       gs_SecondsToReal(len/1000000000.,real2);
+	       gs_SecondsToReal(pos/GST_SECOND,real);
+	       gs_SecondsToReal(len/GST_SECOND,real2);
 	       g_sprintf(curr,"%s of %s" ,real,real2);
 		 return TRUE;
 	  }
