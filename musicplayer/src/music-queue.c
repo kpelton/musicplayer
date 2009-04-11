@@ -616,8 +616,7 @@ static void add_file(gpointer data,gpointer user_data)
      
      gtk_list_store_append(self->store, &iter);
 
-     g_strchomp((gchar *)data);
-     out = gnome_vfs_get_local_path_from_uri((gchar *)data);
+    
 
      // gtk_list_store_set(self->store,&iter,COLUMN_TITLE,out,-1);    
      gtk_list_store_set(self->store,&iter,COLUMN_URI,data,-1);  
@@ -628,47 +627,41 @@ static void add_file(gpointer data,gpointer user_data)
      //get meta data info
      md=ts_get_metadata(data,self->ts);
      //printf("%s\n",(gchar *)data);
-     
-     tokens=g_strsplit(out,toke,10);
-
- if (tokens != NULL)
-	 {
-		  //take out the '/' in the ur
-		  for(i=1; tokens[i] != NULL; i++);
-		  
-		  if(md != NULL && md->title != NULL && md->artist !=NULL)
-		  {	  
-			   gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title);
-			   gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist);
-			   ts_metadata_free(md);
-		  }
-		else
+     if(md != NULL && md->title != NULL && md->artist !=NULL)
+     {	  
+	  gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title);
+	  gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist);
+	   ts_metadata_free(md);
+     }
+     else
+     {
+	  g_strchomp((gchar *)data);
+	  out = gnome_vfs_get_local_path_from_uri((gchar *)data);
+	  tokens=g_strsplit(out,toke,10);
+	  
+	  if (tokens != NULL)
+	  {
+	       //take out the '/' in the ur
+	       for(i=1; tokens[i] != NULL; i++);
+	       
 		    
-		    
-		{
-		    
-		    /*   ts_metadata_free(md); */
-		    /* 	  md=ts_parse_file_name((gchar *)data ); */
-		    /* 	  if(md) */
-		    /* 	  { */
-		    /* 	       gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title); */
-		    /* 	       gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist); */
-		    /* ts_metadata_free(md); */
-		    /* /\* 	  } *\/ */
-		    /* 	  else{ */
-		    gtk_list_store_set(self->store,&iter,COLUMN_TITLE,(gpointer *)tokens[i-1]); 
-		}
+	       /*   ts_metadata_free(md); */
+	       /* 	  md=ts_parse_file_name((gchar *)data ); */
+	       /* 	  if(md) */
+	       /* 	  { */
+	       /* 	       gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title); */
+	       /* 	       gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist); */
+	       /* ts_metadata_free(md); */
+	       /* /\* 	  } *\/ */
+	       /* 	  else{ */
+	       gtk_list_store_set(self->store,&iter,COLUMN_TITLE,(gpointer *)tokens[i-1]); 
+	  }
 		
-		/* 	    
-		 
-		 /* 	       } */
-		 
-		 
-		 
-	 }
+				 
+	 
     g_strfreev(tokens);  
     g_free(out);
-    
+     }
     
 }
 
