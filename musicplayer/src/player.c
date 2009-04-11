@@ -182,6 +182,9 @@ static metadata * copyTrack(metadata *track)
 	       newTrack->genre =strdup (track->genre);
 	  if(track->codec)
 	       newTrack->codec =strdup (track->codec);
+	  if(track->album)
+	       newTrack->album =strdup (track->album);
+	    
 	  
         }
 
@@ -400,7 +403,7 @@ static void ts_event_loop(GsPlayer* self, GstBus *bus)
 {
      GstMessage *message;
      gboolean val = FALSE;
-     message = gst_bus_timed_pop(bus,500000);
+     message = gst_bus_timed_pop(bus,GST_SECOND/3);
      metadata *track;
 
      track = ts_metadata_new();
@@ -417,7 +420,7 @@ static void ts_event_loop(GsPlayer* self, GstBus *bus)
 
 	  }
 	  
-	  message = gst_bus_timed_pop(bus,500000);
+	  message = gst_bus_timed_pop(bus,GST_SECOND/3);
      }
 
      self->idle = g_idle_add    ((gpointer)gs_get_tags,
@@ -440,14 +443,14 @@ my_bus_callback (GstBus     *bus,
      gchar *str;
      mtrack * track;
         
-     
+     // g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
      switch (GST_MESSAGE_TYPE (message)) {
      case GST_MESSAGE_ERROR: {
 	  GError *err;
 	  gchar *debug;
 	  
 	 
-	  
+	 
 	  
 	  gst_message_parse_error (message, &err, &debug);
 	  g_print ("Error: %s\n", err->message);
@@ -469,7 +472,7 @@ my_bus_callback (GstBus     *bus,
 	  
 	  gst_tag_list_free (list);
 
-	  if(player->track->codec != NULL)
+	  if(player->track->duration != 0 || player->track->codec != NULL)
 	  {
 	       return TRUE;
 	  }
@@ -494,7 +497,7 @@ my_bus_callback (GstBus     *bus,
      }
      
      
-     return TRUE;
+     return FALSE;
 
     
 }
@@ -522,24 +525,29 @@ static void gst_new_tags                (const GstTagList *list,
      if(strcmp(tag,GST_TAG_TITLE) == 0){
 	  if(gst_tag_list_get_string (list, GST_TAG_TITLE, &str) == TRUE){
 	       track->title = strdup(str);
+		    g_free(str);
 	}
      }
      else if(strcmp(tag,GST_TAG_ARTIST) == 0){
 	  if(gst_tag_list_get_string (list, GST_TAG_ARTIST, &str) == TRUE){
 	       track->artist = strdup(str);
+		    g_free(str);
 	  }
      }
      else if(strcmp(tag,GST_TAG_ALBUM) == 0){
 	  if(gst_tag_list_get_string (list, GST_TAG_ALBUM, &str) == TRUE){
 
-	       
-	       g_free(str);
+	       track->album = strdup(str);
+		    g_free(str);
+			       
 	  }
      }
      else if(strcmp(tag,GST_TAG_GENRE) == 0){
 
 	  if(gst_tag_list_get_string (list, GST_TAG_GENRE, &str) == TRUE){
 	       track->genre =strdup( str);
+		    g_free(str);
+	
 	  }
      }
      else if(strcmp(tag,GST_TAG_COMMENT) == 0){
@@ -559,14 +567,15 @@ static void gst_new_tags                (const GstTagList *list,
 	      /*   player->idle = g_idle_add    (gs_get_tags, */
 /* 				   player); */
 	       track->codec = strdup(str);
+		    g_free(str);
 	  }
 	  
      }
-    /*  else if(strcmp(tag,GST_TAG_DURATION)== 0){ */
-/* 	  gst_tag_list_get_uint64(list,GST_TAG_DURATION,&(track->duration)); */
+      else if(strcmp(tag,GST_TAG_DURATION)== 0){ 
+	  gst_tag_list_get_uint64(list,GST_TAG_DURATION,&(track->duration)); 
 	      
      
-     else{
+	 }else{
 
 	  
   

@@ -262,6 +262,7 @@ static void mwindow_new_file(GsPlayer *player,
 	 gtk_window_set_title(GTK_WINDOW(self),title);
 	 g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s - %s</span>",p_track->artist,p_track->title);
 	 gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
+	    
 }
 
      else

@@ -217,9 +217,9 @@ void ts_metadata_free(metadata *track)
 	  if(track->genre)
 	       g_free(track->genre);
 	  if(track->album)
-	  g_free(track->genre);
+	  	  g_free(track->album);
 	  if(track->codec)
-	  g_free(track->codec);
+	  	  g_free(track->codec);
 
 
      g_free(track);

@@ -35,7 +35,7 @@ typedef struct
      gchar *genre;
      gchar *album;
      gchar *codec;
-     glong duration;
+     guint64 duration;
   
 }metadata;
 
