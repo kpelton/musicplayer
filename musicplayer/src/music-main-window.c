@@ -135,14 +135,14 @@ static void init_widgets(MusicMainWindow *self)
      
 
 
-     //Hbox and buttons
+     //Hbox and buttons albumlabel
 
     self->mainhbox = gtk_hbox_new (FALSE, 0);
 
     self->pausebutton = gtk_button_new_from_stock ("gtk-media-pause");
     self->playbutton  = gtk_button_new_from_stock ("gtk-media-play");
     self->volumebutton = music_volume_new_with_player(self->player);
-
+    self->albumlabel = gtk_label_new ("");
 
     
     //packing of hbox expander in vbox
@@ -154,6 +154,7 @@ static void init_widgets(MusicMainWindow *self)
      gtk_box_pack_start (GTK_BOX (self->mainhbox), self->pausebutton, FALSE,FALSE,0);
      gtk_box_pack_start (GTK_BOX (self->mainhbox), self->playbutton, FALSE, FALSE,0);
      gtk_box_pack_start (GTK_BOX (self->mainhbox), self->volumebutton, FALSE, FALSE,0);
+     gtk_box_pack_start (GTK_BOX (self->mainhbox), self->albumlabel, TRUE, TRUE,10);
 
      //properties
      
@@ -167,8 +168,8 @@ static void init_widgets(MusicMainWindow *self)
 					  self->dwidth,
 					  self->dhight);
      gtk_label_set_ellipsize(GTK_LABEL(self->songlabel),PANGO_ELLIPSIZE_END);
-
-     
+     gtk_label_set_ellipsize(GTK_LABEL(self->albumlabel),PANGO_ELLIPSIZE_END);
+    
      //show all 
 
      gtk_widget_show(self->mainvbox);
@@ -235,9 +236,12 @@ static void mwindow_expander_activate(GtkExpander *expander,
 	  gtk_window_resize  (GTK_WINDOW(self),
 			      self->dwidth,
 			      500); 
-     }else//undo expanded
+	    gtk_widget_show(self->albumlabel);
+	     gtk_label_set_ellipsize(GTK_LABEL(self->albumlabel),PANGO_ELLIPSIZE_END);
+     }else//undo expande
      {
 	  gtk_window_set_resizable (GTK_WINDOW(self),FALSE);
+	    gtk_widget_hide(self->albumlabel);
 
      }     
 }
@@ -254,19 +258,26 @@ static void mwindow_new_file(GsPlayer *player,
      gint i;
      gchar **tokens;
 	gchar output[1024];
+     gchar output2[1024];
     
     
-    	
-     if(p_track->artist){
-	 sprintf(title,"%s - %s",p_track->artist, p_track->title);
-	 gtk_window_set_title(GTK_WINDOW(self),title);
-	 g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s - %s</span>",p_track->artist,p_track->title);
-	 gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
-	    
-}
-
-     else
-     {
+    
+    if(p_track->artist){
+	   sprintf(title,"%s - %s",p_track->artist, p_track->title);
+	   gtk_window_set_title(GTK_WINDOW(self),title);
+	   g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s - %s</span>",p_track->artist,p_track->title);
+	   gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
+	   if(p_track->album)
+	   {
+		  g_sprintf(output,"<span style=\"italic\" size=\"small\">from:%s</span>",p_track->album);
+		  gtk_label_set_markup(GTK_LABEL(self->albumlabel),output);
+	   }else{
+		  g_sprintf(output,"<span style=\"italic\" size=\"small\">from:unknown</span>");
+		  gtk_label_set_markup(GTK_LABEL(self->albumlabel),output);
+	   }
+    }
+    else
+    {
 	  g_strchomp((gchar *)p_track->uri);
 	  out = gnome_vfs_get_local_path_from_uri((gchar *)p_track->uri);
 
@@ -281,6 +292,9 @@ static void mwindow_new_file(GsPlayer *player,
 	  gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
 	  g_strfreev(tokens);  
 	  g_free(out);
+
+	    g_sprintf(output,"<span style=\"italic\" size=\"small\">from:unknown</span>");
+		    gtk_label_set_markup(GTK_LABEL(self->albumlabel),output);
 
      }
      

@@ -34,11 +34,13 @@ typedef struct {
      GtkWidget *mainvbox;
      GtkWidget *mainhbox;
      GtkWidget *songlabel;
+    	GtkWidget *albumlabel;
      GtkWidget *musicseek;
      GtkWidget *queue;
      GtkWidget *pausebutton;
      GtkWidget *playbutton;
      GtkWidget *volumebutton;
+    	
      gint dhight;
      gint dwidth;
 
