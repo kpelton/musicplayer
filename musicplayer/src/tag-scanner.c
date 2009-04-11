@@ -94,7 +94,7 @@ static void ts_event_loop(TagScanner * self, GstBus *bus, metadata *data)
 {
      GstMessage *message;
      gboolean val = FALSE;
-     message = gst_bus_timed_pop(bus,500000);
+     message = gst_bus_timed_pop(bus,GST_SECOND/3);
      
      while( val != TRUE && message != NULL)
      {
@@ -107,7 +107,7 @@ static void ts_event_loop(TagScanner * self, GstBus *bus, metadata *data)
 
 	  }
 	  
-	  message = gst_bus_timed_pop(bus,500000);
+	  message = gst_bus_timed_pop(bus,GST_SECOND/3);
      }
 
      
@@ -117,7 +117,7 @@ static gboolean isPlaying(TagScanner *self)
 {
      GstState curr;
     
-     gst_element_get_state(self->pipeline,&curr,NULL,500000);
+     gst_element_get_state(self->pipeline,&curr,NULL,GST_SECOND/3);
      
 	  if (curr == GST_STATE_PLAYING)
 	       return TRUE;
