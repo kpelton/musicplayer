@@ -271,9 +271,9 @@ static void mwindow_new_file(GsPlayer *player,
 	   {
 		  g_sprintf(output,"<span style=\"italic\" size=\"small\">from:%s</span>",p_track->album);
 		  gtk_label_set_markup(GTK_LABEL(self->albumlabel),output);
+		  gtk_widget_show(self->albumlabel);
 	   }else{
-		  g_sprintf(output,"<span style=\"italic\" size=\"small\">from:unknown</span>");
-		  gtk_label_set_markup(GTK_LABEL(self->albumlabel),output);
+		   gtk_widget_hide(self->albumlabel);
 	   }
     }
     else
@@ -293,9 +293,7 @@ static void mwindow_new_file(GsPlayer *player,
 	  g_strfreev(tokens);  
 	  g_free(out);
 
-	    g_sprintf(output,"<span style=\"italic\" size=\"small\">from:unknown</span>");
-		    gtk_label_set_markup(GTK_LABEL(self->albumlabel),output);
-
+	   gtk_widget_hide(self->albumlabel);
      }
      
      ts_metadata_free(p_track);
