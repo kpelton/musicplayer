@@ -273,7 +273,7 @@ static void mwindow_new_file(GsPlayer *player,
 		  gtk_label_set_markup(GTK_LABEL(self->albumlabel),output);
 		  gtk_widget_show(self->albumlabel);
 	   }else{
-		   gtk_widget_hide(self->albumlabel);
+		  gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
 	   }
     }
     else
@@ -293,7 +293,7 @@ static void mwindow_new_file(GsPlayer *player,
 	  g_strfreev(tokens);  
 	  g_free(out);
 
-	   gtk_widget_hide(self->albumlabel);
+	   gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
      }
      
      ts_metadata_free(p_track);
