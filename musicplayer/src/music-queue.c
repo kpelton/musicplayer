@@ -621,13 +621,13 @@ static void add_file(gpointer data,gpointer user_data)
     
 
      // gtk_list_store_set(self->store,&iter,COLUMN_TITLE,out,-1);    
-     gtk_list_store_set(self->store,&iter,COLUMN_URI,data,-1);  
+     gtk_list_store_set(self->store,&iter,COLUMN_URI,valid,-1);  
 
      sprintf(buffer,"%i",self->i);
      gtk_list_store_set(self->store,&iter,COLUMN_ID,buffer,-1);  
      
      //get meta data info
-     md=ts_get_metadata(data,self->ts);
+     md=ts_get_metadata(valid,self->ts);
      //printf("%s\n",(gchar *)data);
      if(md != NULL && md->title != NULL && md->artist !=NULL)
      {	  
