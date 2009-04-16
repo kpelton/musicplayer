@@ -637,7 +637,7 @@ static void add_file(gpointer data,gpointer user_data)
      }
      else
      {
-	  g_strchomp((gchar *)data);
+	  g_strchomp((gchar *)valid);
 	  out = gnome_vfs_get_local_path_from_uri(valid);
 	  tokens=g_strsplit(out,toke,10);
 	  
