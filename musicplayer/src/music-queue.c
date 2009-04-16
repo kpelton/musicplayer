@@ -607,12 +607,14 @@ static void add_file(gpointer data,gpointer user_data)
 	 gchar **tokens;
 	 const gchar toke[] ="/";
 	 gchar buffer[50];
-     int i;
-     metadata *md = NULL;
+    	 gchar *valid;
+      int i;
+      metadata *md = NULL;
 
      self->i++;
 
      
+	valid = gnome_vfs_make_uri_from_input((gchar *)data);
      
      gtk_list_store_append(self->store, &iter);
 
@@ -636,7 +638,7 @@ static void add_file(gpointer data,gpointer user_data)
      else
      {
 	  g_strchomp((gchar *)data);
-	  out = gnome_vfs_get_local_path_from_uri((gchar *)data);
+	  out = gnome_vfs_get_local_path_from_uri(valid);
 	  tokens=g_strsplit(out,toke,10);
 	  
 	  if (tokens != NULL)
@@ -661,6 +663,7 @@ static void add_file(gpointer data,gpointer user_data)
 	 
     g_strfreev(tokens);  
     g_free(out);
+    g_free(valid);
      }
     
 }
