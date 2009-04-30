@@ -1,6 +1,6 @@
 #include "player.h"
 #include <string.h>
-G_DEFINE_TYPE (GsPlayer, gs_player, G_TYPE_OBJECT)
+ G_DEFINE_TYPE (GsPlayer, gs_player, G_TYPE_OBJECT)
 
 
 static void gs_SecondsToReal(float fseconds, char *str);
