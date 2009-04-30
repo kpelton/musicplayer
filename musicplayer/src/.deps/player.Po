@@ -5,28 +5,27 @@ player.o: player.c player.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/glib-2.0/glib/gtypes.h \
   /usr/lib/glib-2.0/include/glibconfig.h \
   /usr/include/glib-2.0/glib/gmacros.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/stddef.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include-fixed/limits.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include-fixed/syslimits.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.3/include/stddef.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.3/include-fixed/limits.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.3/include-fixed/syslimits.h \
   /usr/include/limits.h /usr/include/features.h /usr/include/sys/cdefs.h \
   /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
   /usr/include/gnu/stubs-32.h /usr/include/bits/posix1_lim.h \
   /usr/include/bits/local_lim.h /usr/include/linux/limits.h \
   /usr/include/bits/posix2_lim.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/float.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.3/include/float.h \
   /usr/include/glib-2.0/glib/garray.h \
   /usr/include/glib-2.0/glib/gasyncqueue.h \
   /usr/include/glib-2.0/glib/gthread.h \
   /usr/include/glib-2.0/glib/gerror.h /usr/include/glib-2.0/glib/gquark.h \
   /usr/include/glib-2.0/glib/gutils.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/stdarg.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.3/include/stdarg.h \
   /usr/include/glib-2.0/glib/gatomic.h \
   /usr/include/glib-2.0/glib/gbacktrace.h /usr/include/signal.h \
   /usr/include/bits/sigset.h /usr/include/bits/types.h \
   /usr/include/bits/typesizes.h /usr/include/bits/signum.h \
   /usr/include/time.h /usr/include/bits/siginfo.h \
   /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h \
-  /usr/include/asm/sigcontext.h /usr/include/asm/types.h \
   /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h \
   /usr/include/bits/sigthread.h /usr/include/glib-2.0/glib/gbase64.h \
   /usr/include/glib-2.0/glib/gbookmarkfile.h /usr/include/bits/time.h \
@@ -40,7 +39,8 @@ player.o: player.c player.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/glib-2.0/glib/gfileutils.h \
   /usr/include/glib-2.0/glib/ghash.h /usr/include/glib-2.0/glib/ghook.h \
   /usr/include/glib-2.0/glib/giochannel.h \
-  /usr/include/glib-2.0/glib/gmain.h /usr/include/glib-2.0/glib/gslist.h \
+  /usr/include/glib-2.0/glib/gmain.h /usr/include/glib-2.0/glib/gpoll.h \
+  /usr/include/glib-2.0/glib/gslist.h \
   /usr/include/glib-2.0/glib/gstring.h \
   /usr/include/glib-2.0/glib/gunicode.h \
   /usr/include/glib-2.0/glib/gkeyfile.h \
@@ -87,7 +87,8 @@ player.o: player.c player.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/libxml2/libxml/tree.h /usr/include/stdio.h \
   /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
   /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
-  /usr/include/bits/stdio.h /usr/include/libxml2/libxml/xmlstring.h \
+  /usr/include/bits/stdio.h /usr/include/bits/stdio2.h \
+  /usr/include/libxml2/libxml/xmlstring.h \
   /usr/include/libxml2/libxml/xmlregexp.h \
   /usr/include/libxml2/libxml/dict.h /usr/include/libxml2/libxml/hash.h \
   /usr/include/libxml2/libxml/valid.h \
@@ -99,9 +100,10 @@ player.o: player.c player.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/libxml2/libxml/xmlIO.h \
   /usr/include/libxml2/libxml/globals.h /usr/include/libxml2/libxml/SAX.h \
   /usr/include/stdlib.h /usr/include/sys/types.h /usr/include/endian.h \
-  /usr/include/bits/endian.h /usr/include/sys/select.h \
-  /usr/include/bits/select.h /usr/include/sys/sysmacros.h \
-  /usr/include/alloca.h /usr/include/libxml2/libxml/xlink.h \
+  /usr/include/bits/endian.h /usr/include/bits/byteswap.h \
+  /usr/include/sys/select.h /usr/include/bits/select.h \
+  /usr/include/sys/sysmacros.h /usr/include/alloca.h \
+  /usr/include/bits/stdlib.h /usr/include/libxml2/libxml/xlink.h \
   /usr/include/libxml2/libxml/SAX2.h \
   /usr/include/libxml2/libxml/xmlmemory.h \
   /usr/include/libxml2/libxml/threads.h \
@@ -304,6 +306,7 @@ player.o: player.c player.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/gtk-2.0/gtk/gtkaccessible.h \
   /usr/include/gtk-2.0/gtk/gtkaction.h \
   /usr/include/gtk-2.0/gtk/gtkactiongroup.h \
+  /usr/include/gtk-2.0/gtk/gtkactivatable.h \
   /usr/include/gtk-2.0/gtk/gtkalignment.h \
   /usr/include/gtk-2.0/gtk/gtkarrow.h \
   /usr/include/gtk-2.0/gtk/gtkaspectframe.h \
@@ -403,6 +406,7 @@ player.o: player.c player.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/gtk-2.0/gtk/gtkmodules.h \
   /usr/include/gtk-2.0/gtk/gtkmountoperation.h \
   /usr/include/gtk-2.0/gtk/gtknotebook.h \
+  /usr/include/gtk-2.0/gtk/gtkorientable.h \
   /usr/include/gtk-2.0/gtk/gtkpagesetup.h \
   /usr/include/gtk-2.0/gtk/gtkpapersize.h \
   /usr/include/gtk-2.0/gtk/gtkplug.h /usr/include/gtk-2.0/gtk/gtksocket.h \
@@ -473,7 +477,7 @@ player.o: player.c player.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/gtk-2.0/gtk/gtktipsquery.h tag-scanner.h \
   /usr/include/semaphore.h /usr/include/bits/semaphore.h \
   /usr/include/string.h /usr/include/bits/string.h \
-  /usr/include/bits/string2.h
+  /usr/include/bits/string2.h /usr/include/bits/string3.h
 
 player.h:
 
@@ -493,11 +497,11 @@ player.h:
 
 /usr/include/glib-2.0/glib/gmacros.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/stddef.h:
+/usr/lib/gcc/i486-linux-gnu/4.3.3/include/stddef.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include-fixed/limits.h:
+/usr/lib/gcc/i486-linux-gnu/4.3.3/include-fixed/limits.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include-fixed/syslimits.h:
+/usr/lib/gcc/i486-linux-gnu/4.3.3/include-fixed/syslimits.h:
 
 /usr/include/limits.h:
 
@@ -519,7 +523,7 @@ player.h:
 
 /usr/include/bits/posix2_lim.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/float.h:
+/usr/lib/gcc/i486-linux-gnu/4.3.3/include/float.h:
 
 /usr/include/glib-2.0/glib/garray.h:
 
@@ -533,7 +537,7 @@ player.h:
 
 /usr/include/glib-2.0/glib/gutils.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.1/include/stdarg.h:
+/usr/lib/gcc/i486-linux-gnu/4.3.3/include/stdarg.h:
 
 /usr/include/glib-2.0/glib/gatomic.h:
 
@@ -556,10 +560,6 @@ player.h:
 /usr/include/bits/sigaction.h:
 
 /usr/include/bits/sigcontext.h:
-
-/usr/include/asm/sigcontext.h:
-
-/usr/include/asm/types.h:
 
 /usr/include/bits/sigstack.h:
 
@@ -602,6 +602,8 @@ player.h:
 /usr/include/glib-2.0/glib/giochannel.h:
 
 /usr/include/glib-2.0/glib/gmain.h:
+
+/usr/include/glib-2.0/glib/gpoll.h:
 
 /usr/include/glib-2.0/glib/gslist.h:
 
@@ -717,6 +719,8 @@ player.h:
 
 /usr/include/bits/stdio.h:
 
+/usr/include/bits/stdio2.h:
+
 /usr/include/libxml2/libxml/xmlstring.h:
 
 /usr/include/libxml2/libxml/xmlregexp.h:
@@ -753,6 +757,8 @@ player.h:
 
 /usr/include/bits/endian.h:
 
+/usr/include/bits/byteswap.h:
+
 /usr/include/sys/select.h:
 
 /usr/include/bits/select.h:
@@ -760,6 +766,8 @@ player.h:
 /usr/include/sys/sysmacros.h:
 
 /usr/include/alloca.h:
+
+/usr/include/bits/stdlib.h:
 
 /usr/include/libxml2/libxml/xlink.h:
 
@@ -1211,6 +1219,8 @@ player.h:
 
 /usr/include/gtk-2.0/gtk/gtkactiongroup.h:
 
+/usr/include/gtk-2.0/gtk/gtkactivatable.h:
+
 /usr/include/gtk-2.0/gtk/gtkalignment.h:
 
 /usr/include/gtk-2.0/gtk/gtkarrow.h:
@@ -1417,6 +1427,8 @@ player.h:
 
 /usr/include/gtk-2.0/gtk/gtknotebook.h:
 
+/usr/include/gtk-2.0/gtk/gtkorientable.h:
+
 /usr/include/gtk-2.0/gtk/gtkpagesetup.h:
 
 /usr/include/gtk-2.0/gtk/gtkpapersize.h:
@@ -1572,3 +1584,5 @@ tag-scanner.h:
 /usr/include/bits/string.h:
 
 /usr/include/bits/string2.h:
+
+/usr/include/bits/string3.h:

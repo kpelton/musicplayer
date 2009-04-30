@@ -26,10 +26,7 @@ G_BEGIN_DECLS
   (G_TYPE_INSTANCE_GET_CLASS ((obj), MUSIC_TYPE_VOLUME, MusicVolumeClass))
 
 
-struct _GtkVolumeButton
-{
-  GtkScaleButton  parent;
-};
+
 
 typedef struct {
      GtkVolumeButton parent;

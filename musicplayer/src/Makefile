@@ -144,7 +144,11 @@ sysconfdir = ${prefix}/etc
 target_alias = 
 AM_CFLAGS = `pkg-config --cflags --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0` -g		
 AM_LDFLAGS = `pkg-config --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0` -g
-musicplayer_SOURCES = music-main-window.c musicseek.c player.c main.c music-queue.c music-volume.c  plist-reader.c tag-scanner.c music-queue.h  music-volume.h  plist-reader.h music-main-window.h music-seek.h player.h tag-scanner.h
+musicplayer_SOURCES = music-main-window.c musicseek.c player.c main.c music-queue.c music-volume.c  plist-reader.c tag-scanner.c music-queue.h  music-volume.h  plist-reader.h music-main-window.h music-seek.h player.h tag-scanner.h \
+	main.o  Makefile  Makefile.am  Makefile.in  music-main-window.o\
+	musicplayer  music-queue.o  musicseek.o  music-volume.o       \
+	player.o  plist-reader.o  tag-scanner.o
+
 musicplayer_LDADD = $(INTI_LIBS)
 all: all-am
 

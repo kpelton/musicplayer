@@ -4,6 +4,7 @@
 #include "tag-scanner.h"
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
+#include <gconf/gconf-client.h>
 
 
 G_DEFINE_TYPE (MusicMainWindow, music_main_window, GTK_TYPE_WINDOW)
@@ -12,7 +13,9 @@ static void init_widgets(MusicMainWindow *self);
 
 static void mwindow_expander_activate(GtkExpander *expander,
 				      gpointer     user_data);
-
+void            on_size_allocate                      (GtkWidget     *widget,
+                                             			           GtkAllocation *allocation,
+                                                      			  gpointer       user_data) ;
 
 static void mwindow_new_file(GsPlayer *player,
 					metadata * p_track,gpointer data);
@@ -54,13 +57,15 @@ music_main_window_dispose (GObject *object)
 static void
 music_main_window_finalize (GObject *object)
 {
-  
-     //unref tout
-  MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);
-  g_object_unref(G_OBJECT(self->player));
-  g_object_unref(G_OBJECT(self->queue));
 
-  G_OBJECT_CLASS (music_main_window_parent_class)->finalize (object);
+	  //unref tout
+	  MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);
+	  g_object_unref(G_OBJECT(self->player));
+	  g_object_unref(G_OBJECT(self->queue));
+
+	  g_object_unref(G_OBJECT(self->client));		
+
+	  G_OBJECT_CLASS (music_main_window_parent_class)->finalize (object);
 }
 
 static void
@@ -79,11 +84,21 @@ music_main_window_class_init (MusicMainWindowClass *klass)
 static void
 music_main_window_init (MusicMainWindow *self)
 {
-
+  
      init_widgets(self);
 
 
+		
+  self->client = gconf_client_get_default ();
 
+	  //was expanded when they quit last time 
+  if(gconf_client_get_bool (self->client,"/apps/musicplayer/expanded",NULL))
+	  {
+            
+			 mwindow_expander_activate(GTK_EXPANDER(self->expander),self);	
+			 gtk_expander_set_expanded(GTK_EXPANDER(self->expander),TRUE);
+			 self->expanded=TRUE;
+	  }
 }
 
 GtkWidget*
@@ -95,7 +110,7 @@ music_main_window_new (void)
 static void init_widgets(MusicMainWindow *self)
 {
 
-     GtkWidget *expander;
+   
      gint dwidth;
      gint dhight;
 
@@ -129,9 +144,9 @@ static void init_widgets(MusicMainWindow *self)
      
      //expander
 
-     expander = gtk_expander_new("Play List");
+     self->expander = gtk_expander_new("Play List");
 
-     gtk_container_add (GTK_CONTAINER (expander), self->queue);
+     gtk_container_add (GTK_CONTAINER (self->expander), self->queue);
      
 
 
@@ -148,7 +163,7 @@ static void init_widgets(MusicMainWindow *self)
     //packing of hbox expander in vbox
 
     gtk_box_pack_start (GTK_BOX (self->mainvbox), self->mainhbox, FALSE, FALSE,0);
-    gtk_box_pack_start (GTK_BOX (self->mainvbox), expander, TRUE, TRUE,1);
+    gtk_box_pack_start (GTK_BOX (self->mainvbox), self->expander, TRUE, TRUE,1);
 
     //pack into hbox
      gtk_box_pack_start (GTK_BOX (self->mainhbox), self->pausebutton, FALSE,FALSE,0);
@@ -180,12 +195,12 @@ static void init_widgets(MusicMainWindow *self)
      gtk_widget_show(self->pausebutton);
      gtk_widget_show(self->volumebutton);
      gtk_widget_show(self->queue);
-     gtk_widget_show(expander);
+     gtk_widget_show(self->expander);
 
     
     //signals
     
-    g_signal_connect(expander, "activate",
+    g_signal_connect(self->expander, "activate",
 				 G_CALLBACK(mwindow_expander_activate),
 				 self);
     
@@ -200,6 +215,11 @@ static void init_widgets(MusicMainWindow *self)
     g_signal_connect (self->playbutton, "released",
 				  G_CALLBACK (on_play_released),
 				  (gpointer)self->player);
+	  
+	  self->signum = g_signal_connect (self, "size-allocate",
+				  															  G_CALLBACK(on_size_allocate),
+				  															 (gpointer)self);
+			 
     
 }
 
@@ -228,20 +248,42 @@ static void mwindow_expander_activate(GtkExpander *expander,
 			  gpointer     user_data)
 {
      MusicMainWindow *self = (MusicMainWindow *)user_data;
-     
+     gint width;
+	  gint height;
+
+	  
      if(!gtk_expander_get_expanded(expander))
      {
 	  gtk_window_set_resizable (GTK_WINDOW(self),TRUE);
+      height =gconf_client_get_int(self->client,"/apps/musicplayer/main_height",NULL);
+	   width =gconf_client_get_int(self->client,"/apps/musicplayer/main_width",NULL);
+		 gconf_client_set_bool (self->client,"/apps/musicplayer/expanded",TRUE,NULL);
+			 //if we are not running for the first time and we have a key in gconf
+			 if( width && height)
+			 {
+					gtk_window_resize  (GTK_WINDOW(self),
+					                    width,
+					                    height);
+			 }
+			 else
+			 {
 
-	  gtk_window_resize  (GTK_WINDOW(self),
-			      self->dwidth,
-			      500); 
-	    gtk_widget_show(self->albumlabel);
-	     gtk_label_set_ellipsize(GTK_LABEL(self->albumlabel),PANGO_ELLIPSIZE_END);
-     }else//undo expande
-     {
-	  gtk_window_set_resizable (GTK_WINDOW(self),FALSE);
-	    gtk_widget_hide(self->albumlabel);
+					gtk_window_resize  (GTK_WINDOW(self),
+					                    self->dwidth,
+					                    500); 
+			 }
+
+			 gtk_widget_show(self->albumlabel);
+			 gtk_label_set_ellipsize(GTK_LABEL(self->albumlabel),PANGO_ELLIPSIZE_END);
+
+			 self->expanded = TRUE;
+
+	  }else//undo expande
+	  {
+			  gconf_client_set_bool (self->client,"/apps/musicplayer/expanded",FALSE,NULL);
+			 gtk_window_set_resizable (GTK_WINDOW(self),FALSE);
+			 gtk_widget_hide(self->albumlabel);
+			 self->expanded = FALSE;
 
      }     
 }
@@ -309,3 +351,23 @@ void music_main_play_file(MusicMainWindow *self,gchar * location)
 	g_free(valid);
 }
 
+void            on_size_allocate                      (GtkWidget     *widget,
+                                             			           GtkAllocation *allocation,
+                                                      			  gpointer       user_data)  
+{
+
+		MusicMainWindow *self = (MusicMainWindow *)user_data;
+
+	  	if(self->expanded)
+	  {
+	   		gconf_client_set_int                (self->client,
+                                                        "/apps/musicplayer/main_width",
+                                                         allocation->width,
+                                                         NULL);
+	    		gconf_client_set_int                (self->client,
+                                                        "/apps/musicplayer/main_height",
+                                                         allocation->height,
+                                                         NULL);
+	  }
+	
+}

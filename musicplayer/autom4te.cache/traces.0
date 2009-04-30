@@ -215,7 +215,7 @@ m4trace:configure.in:6: -1- AC_SUBST([am__untar])
 m4trace:configure.in:6: -1- AC_SUBST_TRACE([am__untar])
 m4trace:configure.in:6: -1- m4_pattern_allow([^am__untar$])
 m4trace:configure.in:9: -1- _m4_warn([obsolete], [The macro `AC_ISC_POSIX' is obsolete.
-You should run autoupdate.], [../../lib/autoconf/specific.m4:461: AC_ISC_POSIX is expanded from...
+You should run autoupdate.], [../../lib/autoconf/specific.m4:464: AC_ISC_POSIX is expanded from...
 configure.in:9: the top level])
 m4trace:configure.in:9: -1- AC_SUBST([CC])
 m4trace:configure.in:9: -1- AC_SUBST_TRACE([CC])
