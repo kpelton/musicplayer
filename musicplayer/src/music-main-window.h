@@ -31,24 +31,24 @@ G_BEGIN_DECLS
   (G_TYPE_INSTANCE_GET_CLASS ((obj), MUSIC_TYPE_MAIN_WINDOW, MusicMainWindowClass))
 
 typedef struct {
-  GtkWindow parent;
-     GsPlayer *player;
-     GtkWidget *mainvbox;
-     GtkWidget *mainhbox;
-     GtkWidget *songlabel;
-    	GtkWidget *albumlabel;
-     GtkWidget *musicseek;
-     GtkWidget *queue;
-     GtkWidget *pausebutton;
-     GtkWidget *playbutton;
-     GtkWidget *volumebutton;
-	    GtkWidget *expander;
+    GtkWindow parent;
+    GsPlayer *player;
+    GtkWidget *mainvbox;
+    GtkWidget *mainhbox;
+    GtkWidget *songlabel;
+    GtkWidget *albumlabel;
+    GtkWidget *musicseek;
+    GtkWidget *queue;
+    GtkWidget *pausebutton;
+    GtkWidget *playbutton;
+    GtkWidget *volumebutton;
+    GtkWidget *expander;
     GConfClient* client;
-     gint dhight;
-     gint dwidth;
-	  gint signum;
-	  gboolean expanded;
-
+    gint dhight;
+    gint dwidth;
+    gint signum;
+    gboolean expanded;
+    
 } MusicMainWindow;
 
 

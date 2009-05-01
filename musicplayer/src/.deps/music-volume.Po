@@ -474,7 +474,17 @@ music-volume.o: music-volume.c music-volume.h \
   /usr/include/gstreamer-0.10/gst/gstparse.h \
   /usr/include/gstreamer-0.10/gst/gstxml.h \
   /usr/include/gstreamer-0.10/gst/gstcompat.h tag-scanner.h \
-  /usr/include/semaphore.h /usr/include/bits/semaphore.h
+  /usr/include/semaphore.h /usr/include/bits/semaphore.h \
+  /usr/include/gconf/2/gconf/gconf-client.h \
+  /usr/include/gconf/2/gconf/gconf.h \
+  /usr/include/gconf/2/gconf/gconf-schema.h \
+  /usr/include/gconf/2/gconf/gconf-value.h \
+  /usr/include/gconf/2/gconf/gconf-error.h \
+  /usr/include/gconf/2/gconf/gconf-engine.h \
+  /usr/include/gconf/2/gconf/gconf-error.h \
+  /usr/include/gconf/2/gconf/gconf-enum-types.h \
+  /usr/include/gconf/2/gconf/gconf-listeners.h \
+  /usr/include/gconf/2/gconf/gconf-changeset.h
 
 music-volume.h:
 
@@ -1575,3 +1585,23 @@ tag-scanner.h:
 /usr/include/semaphore.h:
 
 /usr/include/bits/semaphore.h:
+
+/usr/include/gconf/2/gconf/gconf-client.h:
+
+/usr/include/gconf/2/gconf/gconf.h:
+
+/usr/include/gconf/2/gconf/gconf-schema.h:
+
+/usr/include/gconf/2/gconf/gconf-value.h:
+
+/usr/include/gconf/2/gconf/gconf-error.h:
+
+/usr/include/gconf/2/gconf/gconf-engine.h:
+
+/usr/include/gconf/2/gconf/gconf-error.h:
+
+/usr/include/gconf/2/gconf/gconf-enum-types.h:
+
+/usr/include/gconf/2/gconf/gconf-listeners.h:
+
+/usr/include/gconf/2/gconf/gconf-changeset.h:

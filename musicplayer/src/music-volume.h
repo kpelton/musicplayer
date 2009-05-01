@@ -5,7 +5,7 @@
 
 #include <gtk/gtk.h>
 #include "player.h"
-
+#include <gconf/gconf-client.h>
 G_BEGIN_DECLS
 
 #define MUSIC_TYPE_VOLUME music_volume_get_type()
