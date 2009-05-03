@@ -13,7 +13,7 @@ static void gst_new_tags                (const GstTagList *list,
 				    gpointer user_data);
 static void gtk_widget_dispose (GObject *object);
 static void gtk_widget_finalize (GObject *object);
-static gboolean isPlaying(GsPlayer *me);
+
 static gboolean gs_checkEnd(gpointer data);
 static void ts_event_loop(GsPlayer* self, GstBus *bus);
 gboolean gs_get_tags(GsPlayer *);
@@ -221,7 +221,7 @@ gboolean gs_getLength(GsPlayer *me)
        gint64 pos, len;
 
        
-       if(isPlaying(me)){ 
+       if(isPlaying(me) || isPaused(me)){ 
 	    if (gst_element_query_position (me->play, &fmt, &pos)
 		&& gst_element_query_duration (me->play, &fmt, &len)) {
 		 g_print ("Time: %" GST_TIME_FORMAT " / %" GST_TIME_FORMAT "\r",
@@ -241,7 +241,7 @@ static gboolean gs_checkEnd(gpointer data)
      gdouble pos;
 
 
-     if (isPlaying(me))
+     if (isPlaying(me) || isPaused(me))
 	  {	     
 	       pos= gs_getPercentage(me);
 	       //check to see if file is done
@@ -261,7 +261,7 @@ gdouble gs_getPercentage(GsPlayer *me)
      float pos2,len2;
  
      //if(me->isPlaying == TRUE){
-     if(isPlaying(me)){
+     if(isPlaying(me) || isPaused(me)){
 	  if (gst_element_query_position (me->play, &fmt, &pos)
 	      && gst_element_query_duration (me->play, &fmt, &len)) {
 	       pos2=pos;
@@ -275,19 +275,33 @@ return 0;
 }
 
 
-static gboolean isPlaying(GsPlayer *me)
+gboolean isPlaying(GsPlayer *me)
 {
      GstState curr;
     
      gst_element_get_state(me->play,&curr,NULL,GST_SECOND);
      
-	  if (curr == GST_STATE_PLAYING || curr == GST_STATE_PAUSED)
+	  if (curr == GST_STATE_PLAYING)
 	       return TRUE;
-	       
-	  
-	  
+	       	    
      return FALSE;
 }
+
+gboolean isPaused(GsPlayer *me)
+{
+     GstState curr;
+    
+     gst_element_get_state(me->play,&curr,NULL,GST_SECOND);
+     
+	  if (curr == GST_STATE_PAUSED)
+	       return TRUE;
+	       	    
+     return FALSE;
+}
+
+
+
+
 static gint64 gs_PercentToTime(GsPlayer *me, gdouble percent){
 
      gint64 t=0;
@@ -299,7 +313,7 @@ static gint64 gs_PercentToTime(GsPlayer *me, gdouble percent){
      
 
      //if(me->isPlaying == TRUE){
-     if(isPlaying(me)){
+     if(isPlaying(me) || isPaused(me)  ){
 	       if(gst_element_query_duration (me->play, &fmt, &len)){
 	  
 	       //convert percent to fraction before
@@ -326,7 +340,7 @@ gboolean gs_CurrTime(GsPlayer *me, gchar *curr)
      
 
      //if(me->isPlaying == TRUE)
-     if(isPlaying(me)){  
+     if(isPlaying(me) || isPaused(me)){  
 	 
 	  if (gst_element_query_position (me->play, &fmt, &pos) && gst_element_query_duration (me->play, &fmt, &len))
 	  {

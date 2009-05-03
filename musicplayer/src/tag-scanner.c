@@ -14,7 +14,7 @@ G_DEFINE_TYPE (TagScanner, tag_scanner, G_TYPE_OBJECT)
 
 //#define GET_PRIVATE(o)					/		
 //    (G_TYPE_INSTANCE_GET_PRIVATE ((o), TAG_TYPE_SCANNER, TagScannerPrivate))
-static gboolean isPlaying(TagScanner *self);
+//static gboolean isPlaying(TagScanner *self);
 static void ts_event_loop(TagScanner * self, GstBus *bus, metadata *data);
 
 static gboolean
@@ -113,19 +113,19 @@ static void ts_event_loop(TagScanner * self, GstBus *bus, metadata *data)
      
 }
 
-static gboolean isPlaying(TagScanner *self)
-{
-     GstState curr;
+//~ static gboolean isPlaying(TagScanner *self)
+//~ {
+     //~ GstState curr;
     
-     gst_element_get_state(self->pipeline,&curr,NULL,GST_SECOND/3);
+     //~ gst_element_get_state(self->pipeline,&curr,NULL,GST_SECOND/3);
      
-	  if (curr == GST_STATE_PLAYING)
-	       return TRUE;
+	  //~ if (curr == GST_STATE_PLAYING)
+	       //~ return TRUE;
 	       
 	  
 	  
-     return FALSE;
-}
+     //~ return FALSE;
+//~ }
 
 metadata * ts_get_metadata(gchar * uri,TagScanner * self){
 

@@ -228,8 +228,10 @@ on_pause_released                (GtkButton       *button,
 								gpointer         user_data)
 {
     GsPlayer *player = (GsPlayer *) user_data;
-    
-    gs_pause(player);
+    if (isPlaying(player))
+    		gs_pause(player);
+    else
+	   gs_pauseResume(player);
 }
 
 
