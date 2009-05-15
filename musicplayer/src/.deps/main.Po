@@ -476,7 +476,6 @@ main.o: main.c /usr/include/gtk-2.0/gtk/gtk.h \
   /usr/include/gstreamer-0.10/gst/gstxml.h \
   /usr/include/gstreamer-0.10/gst/gstcompat.h tag-scanner.h \
   /usr/include/semaphore.h /usr/include/bits/semaphore.h music-queue.h \
-  plist-reader.h music-main-window.h \
   /usr/include/gconf/2/gconf/gconf-client.h \
   /usr/include/gconf/2/gconf/gconf.h \
   /usr/include/gconf/2/gconf/gconf-schema.h \
@@ -486,8 +485,8 @@ main.o: main.c /usr/include/gtk-2.0/gtk/gtk.h \
   /usr/include/gconf/2/gconf/gconf-error.h \
   /usr/include/gconf/2/gconf/gconf-enum-types.h \
   /usr/include/gconf/2/gconf/gconf-listeners.h \
-  /usr/include/gconf/2/gconf/gconf-changeset.h music-seek.h \
-  music-volume.h
+  /usr/include/gconf/2/gconf/gconf-changeset.h plist-reader.h \
+  music-main-window.h music-seek.h music-volume.h
 
 /usr/include/gtk-2.0/gtk/gtk.h:
 
@@ -1591,10 +1590,6 @@ tag-scanner.h:
 
 music-queue.h:
 
-plist-reader.h:
-
-music-main-window.h:
-
 /usr/include/gconf/2/gconf/gconf-client.h:
 
 /usr/include/gconf/2/gconf/gconf.h:
@@ -1614,6 +1609,10 @@ music-main-window.h:
 /usr/include/gconf/2/gconf/gconf-listeners.h:
 
 /usr/include/gconf/2/gconf/gconf-changeset.h:
+
+plist-reader.h:
+
+music-main-window.h:
 
 music-seek.h:
 

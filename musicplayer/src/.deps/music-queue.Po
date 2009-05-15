@@ -395,7 +395,17 @@ music-queue.o: music-queue.c music-queue.h \
   /usr/include/gtk-2.0/gtk/gtkoldeditable.h \
   /usr/include/gtk-2.0/gtk/gtkoptionmenu.h \
   /usr/include/gtk-2.0/gtk/gtkpreview.h \
-  /usr/include/gtk-2.0/gtk/gtktipsquery.h player.h \
+  /usr/include/gtk-2.0/gtk/gtktipsquery.h \
+  /usr/include/gconf/2/gconf/gconf-client.h \
+  /usr/include/gconf/2/gconf/gconf.h \
+  /usr/include/gconf/2/gconf/gconf-schema.h \
+  /usr/include/gconf/2/gconf/gconf-value.h \
+  /usr/include/gconf/2/gconf/gconf-error.h \
+  /usr/include/gconf/2/gconf/gconf-engine.h \
+  /usr/include/gconf/2/gconf/gconf-error.h \
+  /usr/include/gconf/2/gconf/gconf-enum-types.h \
+  /usr/include/gconf/2/gconf/gconf-listeners.h \
+  /usr/include/gconf/2/gconf/gconf-changeset.h player.h \
   /usr/include/gstreamer-0.10/gst/gst.h \
   /usr/include/gstreamer-0.10/gst/glib-compat.h \
   /usr/include/gstreamer-0.10/gst/gstenumtypes.h \
@@ -1426,6 +1436,26 @@ music-queue.h:
 /usr/include/gtk-2.0/gtk/gtkpreview.h:
 
 /usr/include/gtk-2.0/gtk/gtktipsquery.h:
+
+/usr/include/gconf/2/gconf/gconf-client.h:
+
+/usr/include/gconf/2/gconf/gconf.h:
+
+/usr/include/gconf/2/gconf/gconf-schema.h:
+
+/usr/include/gconf/2/gconf/gconf-value.h:
+
+/usr/include/gconf/2/gconf/gconf-error.h:
+
+/usr/include/gconf/2/gconf/gconf-engine.h:
+
+/usr/include/gconf/2/gconf/gconf-error.h:
+
+/usr/include/gconf/2/gconf/gconf-enum-types.h:
+
+/usr/include/gconf/2/gconf/gconf-listeners.h:
+
+/usr/include/gconf/2/gconf/gconf-changeset.h:
 
 player.h:
 

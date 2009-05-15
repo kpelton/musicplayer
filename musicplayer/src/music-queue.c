@@ -32,8 +32,8 @@ enum
 {
   PROP_0,
 
-  PROP_FONT,
-  PROP_CONTINUE,
+  PROP_MUSICQUEUE_FONT,
+  PROP_MUSICQUEUE_LASTDIR
   
 };
 
@@ -130,14 +130,20 @@ music_queue_get_property (GObject *object, guint property_id,
 {
      
      MusicQueue *self = MUSIC_QUEUE(object);
-     
-  switch (property_id) {
 
- 
+	switch (property_id) {
+		case PROP_MUSICQUEUE_FONT:
+			g_value_set_string (value, self->font);
+			break;
 
-  default:
-    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-  }
+		case PROP_MUSICQUEUE_LASTDIR:
+			g_value_set_string (value, self->lastdir);
+			break;
+
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+	}
 }
 
 
@@ -148,8 +154,17 @@ music_queue_set_property (GObject *object, guint property_id,
      MusicQueue *self = MUSIC_QUEUE(object);
   switch (property_id) {
 
-  
+   case PROP_MUSICQUEUE_FONT:
+      g_free (self->font);
+		  self->font = g_value_dup_string (value);   
+	break;	
+	
+	case PROP_MUSICQUEUE_LASTDIR:
+      g_free (self->lastdir);
+      self->lastdir = g_value_dup_string (value);
 
+	break;
+	
 
   
   default:
@@ -171,7 +186,9 @@ music_queue_finalize (GObject *object)
 {
      MusicQueue *self = MUSIC_QUEUE(object);
      GList *list;
-     
+    
+	 gchar *font;
+	
      
 
      if((list = get_list(self)) != NULL)
@@ -181,9 +198,20 @@ music_queue_finalize (GObject *object)
      }
      G_OBJECT_CLASS (music_queue_parent_class)->finalize (object);
      
+	 g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
+	
+	//save all the props we want to gconf
+	gconf_client_set_string              (self->client,
+	                                    "/apps/musicplayer/font",
+	                                    font,
+	                                    NULL);
+	
 
-     g_object_unref(self->store);
+	g_object_unref(self->client);	
+	g_free(font);
+	g_object_unref(self->store);
      g_object_unref(self->read);
+	 
 }
   
 static void
@@ -197,6 +225,29 @@ music_queue_class_init (MusicQueueClass *klass)
      object_class->finalize = music_queue_finalize;
      object_class->get_property = music_queue_get_property;
      object_class->set_property = music_queue_set_property;
+
+	  pspec = g_param_spec_string ("musicqueue-font",
+                               "font",
+                               "Set font face",
+                               NULL /* default value */,
+                               G_PARAM_READWRITE);
+	
+  	g_object_class_install_property (object_class,
+                                   PROP_MUSICQUEUE_FONT,
+                                   pspec);
+
+	
+	pspec = g_param_spec_string ("musicqueue-lastdir",
+                               "lastdir",
+                               "Set last directory opened",
+                               NULL /* default value */,
+                               G_PARAM_READWRITE);
+	
+  	g_object_class_install_property (object_class,
+                                   PROP_MUSICQUEUE_LASTDIR,
+                                   pspec);
+
+
 
 }
 static void foreach_xspf(gpointer data,gpointer user_data)
@@ -264,7 +315,10 @@ static void
 music_queue_init (MusicQueue *self)
 {
 
-     g_object_set(G_OBJECT (self), "font","verdanna bold 7",NULL);
+     g_object_set(G_OBJECT (self), "musicqueue-font","verdanna bold 7",NULL);
+	 g_object_set(G_OBJECT (self), "musicqueue-lastdir",g_get_home_dir(),NULL);
+		gchar *font;	
+	
      init_widgets(self);
      self->changed =FALSE;
      self->i=0;
@@ -274,9 +328,9 @@ music_queue_init (MusicQueue *self)
 
      music_queue_read_xspf("/home/kyle/test.xspf",self);
      
-     
+     self->client = gconf_client_get_default();
 
-}
+} 
 
 
 
@@ -542,31 +596,32 @@ static void playfile (GtkTreeView *treeview,
 static void add(GtkWidget *widget,gpointer user_data)
 {
 
-     MusicQueue *self = (MusicQueue *) user_data;
+	MusicQueue *self = (MusicQueue *) user_data;
 
-     GtkWidget *dialog;
-     gboolean b = TRUE;
-     GSList *list;
-     GtkFileFilter *filter;
+	GtkWidget *dialog;
+	gboolean b = TRUE;
+	GSList *list;
+	GtkFileFilter *filter;
+	gchar *lastdir = NULL;	
+
+	filter = gtk_file_filter_new ();
+
+	gtk_file_filter_set_name(filter,"Music Files");  
+	gtk_file_filter_add_pattern(filter,"*.mp3");
+	gtk_file_filter_add_pattern(filter,"*.flac");
+	gtk_file_filter_add_pattern(filter,"*.ogg");
+	gtk_file_filter_add_pattern(filter,"*.wma");
 
 
-     filter = gtk_file_filter_new ();
+	g_object_get(G_OBJECT(self),"musicqueue-lastdir",&lastdir,NULL);	
 
-     gtk_file_filter_set_name(filter,"Music Files");  
-     gtk_file_filter_add_pattern(filter,"*.mp3");
-     gtk_file_filter_add_pattern(filter,"*.flac");
-     gtk_file_filter_add_pattern(filter,"*.ogg");
-     gtk_file_filter_add_pattern(filter,"*.wma");
-
-
-
-     dialog = gtk_file_chooser_dialog_new ("Open File",
-					   NULL,
-					   GTK_FILE_CHOOSER_ACTION_OPEN,
-					   GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-					   GTK_STOCK_OPEN,5,	   
-					   GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
-					   NULL);
+	dialog = gtk_file_chooser_dialog_new ("Open File",
+	                                      NULL,
+	                                      GTK_FILE_CHOOSER_ACTION_OPEN,
+	                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+	                                      GTK_STOCK_OPEN,5,	   
+	                                      GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
+	                                      NULL);
 
      //gtk_dialog_add_button (GTK_DIALOG(dialog),"gtk-open",5);
 
@@ -575,12 +630,17 @@ static void add(GtkWidget *widget,gpointer user_data)
 
      gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog),filter);
      self->ts = tag_scanner_new();
-     
+     gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (dialog),lastdir);
      if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
      {
 	 
 	  list =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
-	
+	//set our last dir to one they chose
+		 g_object_set(G_OBJECT(self),"musicqueue-lastdir",
+		              gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog))
+		              ,NULL);	
+		 		
+		
 	  gtk_widget_destroy (dialog);
 	  g_slist_foreach (list,add_file,self);
 	  g_slist_free (list);
@@ -588,7 +648,7 @@ static void add(GtkWidget *widget,gpointer user_data)
      else{
      gtk_widget_destroy (dialog);
      }     
-
+	 g_free(lastdir);
      g_object_unref(self->ts);
  }
 void add_file_ext(gpointer data,gpointer user_data)
@@ -721,13 +781,13 @@ static void add_columns(MusicQueue *self)
 {
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
-    gchar font[200];
-    g_object_get(G_OBJECT(self),"font",font,NULL);
+    gchar *font = NULL;
+    g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
     
-    
+    printf("font:%s\n",font);
     
     renderer = gtk_cell_renderer_text_new ();
-    g_object_set(G_OBJECT(renderer),"font",font,NULL);
+    g_object_set(G_OBJECT(renderer),"font",self->font,NULL);
     column = gtk_tree_view_column_new_with_attributes ("Artist",
 											renderer,
 											"text",
@@ -918,9 +978,9 @@ static void set_font   (gpointer    callback_data,
 {
     MusicQueue *self = (MusicQueue *) callback_data;
     
-    /* GtkWidget *   font_window = gtk_font_selection_dialog_new       ("Select playlist font"); */
+    GtkWidget *   font_window = gtk_font_selection_dialog_new       ("Select playlist font"); 
     
-    /* gtk_widget_show(font_window); */
+    gtk_widget_show(font_window); 
     
 }
 

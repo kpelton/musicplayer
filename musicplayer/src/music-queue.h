@@ -5,10 +5,11 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include <gconf/gconf-client.h>
 #include "player.h"
 #include "tag-scanner.h"
 #include "plist-reader.h"
-#include "music-queue.h"
+
 
 
 G_BEGIN_DECLS
@@ -31,24 +32,26 @@ G_BEGIN_DECLS
   (G_TYPE_INSTANCE_GET_CLASS ((obj), MUSIC_TYPE_QUEUE, MusicQueueClass))
 
 typedef struct {
-     GtkVBoxClass parent;
-     GtkWidget* vbox;
-     GtkWidget* hbox;
-     GtkWidget* treeview;
-     GtkWidget* openbutton;
-     GtkWidget* scrolledwindow;
-     GtkListStore *store;
-     GsPlayer *player;
-     GtkTreeIter  curr;
-     GtkTreeSelection *currselection;
-     GtkTreePath *path;
-     gboolean changed;
-     guint i;
-     gint currid;
-     gboolean drag_started;
-     TagScanner *ts;
-     PlistReader *read;
-     gchar *font;
+	GtkVBoxClass parent;
+	GtkWidget* vbox;
+	GtkWidget* hbox;
+	GtkWidget* treeview;
+	GtkWidget* openbutton;
+	GtkWidget* scrolledwindow;
+	GtkListStore *store;
+	GsPlayer *player;
+	GtkTreeIter  curr;
+	GtkTreeSelection *currselection;
+	GtkTreePath *path;
+	gboolean changed;
+	guint i;
+	gint currid;
+	gboolean drag_started;
+	TagScanner *ts;
+	PlistReader *read;
+	gchar *font;
+	gchar *lastdir;
+	GConfClient* client;
 } MusicQueue;
 
 typedef struct {

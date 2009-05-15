@@ -327,7 +327,8 @@ static void mwindow_new_file(GsPlayer *player,
 
 	  tokens=g_strsplit(out,toke,10);
 
-
+  if(tokens)
+		{
 	  for(i=1; tokens[i] != NULL; i++);
 
 	  gtk_window_set_title(GTK_WINDOW(self),tokens[i-1]);
@@ -338,6 +339,7 @@ static void mwindow_new_file(GsPlayer *player,
 	  g_free(out);
 
 	   gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
+		}
      }
      
      ts_metadata_free(p_track);
@@ -366,7 +368,7 @@ void            on_size_allocate                      (GtkWidget     *widget,
                                                         "/apps/musicplayer/main_width",
                                                          allocation->width,
                                                          NULL);
-	    		gconf_client_set_int                (self->client,
+	    	gconf_client_set_int                (self->client,
                                                         "/apps/musicplayer/main_height",
                                                          allocation->height,
                                                          NULL);
