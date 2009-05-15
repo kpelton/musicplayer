@@ -37,6 +37,7 @@ gtk_widget_finalize (GObject *object)
      GsPlayer *player =GS_PLAYER(object);
 
      g_object_unref(player->play);
+	 g_object_unref(player->gconf);
 }
 
 static void
@@ -89,6 +90,10 @@ gs_player_init (GsPlayer *me)
 {
      
      me->play = gst_element_factory_make ("playbin", "playbin");
+	 me->gconf = gst_element_factory_make("gconfaudiosink","audio-sink");
+	
+	 g_object_set(G_OBJECT(me->play),"audio-sink",me->gconf,NULL);
+	 	
      me->isPlaying = FALSE;
      
      me->bus = gst_pipeline_get_bus (GST_PIPELINE (me->play));

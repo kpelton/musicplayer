@@ -48,7 +48,7 @@ typedef struct {
      GtkWidget *scroll;
      GstTagList *taglist;
      metadata *track;
-     GstElement* fake;
+	 GstElement *gconf;
      gchar uri[1500];
      gboolean lock;
      int idle;
