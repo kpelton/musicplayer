@@ -33,8 +33,8 @@ enum
   PROP_0,
 
   PROP_MUSICQUEUE_FONT,
-  PROP_MUSICQUEUE_LASTDIR
-  
+  PROP_MUSICQUEUE_LASTDIR,
+  PROP_MUSICQUEUE_REPEAT
 };
 
 
@@ -594,8 +594,8 @@ static void playfile (GtkTreeView *treeview,
 }
 void music_queue_play_selected (MusicQueue *self)
 {
- 	playfile(self->treeview,self->path,
-	          NULL,(gpointer)self);
+ //	playfile(self->treeview,self->path,
+//	          NULL,(gpointer)self);
 }
 
 
@@ -764,20 +764,31 @@ static void nextFile              (GsPlayer      *player,
 							gpointer         user_data)
 {
     MusicQueue *self = (MusicQueue *) user_data;
-    GtkTreePath *path;
-    GtkTreeModel *model;
-    
-    if (self->currid > 0)
-    {
-	   model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->treeview));
-	   
-	   gtk_tree_selection_unselect_iter(self->currselection,&self->curr);  
-	   if(gtk_tree_model_iter_next(model,&self->curr))
-	   {
-		  
-		  gtk_tree_selection_select_iter(self->currselection,&self->curr); 
-		  playfile(GTK_TREE_VIEW(self->treeview),gtk_tree_model_get_path(model,&self->curr),NULL,user_data);
-	   } 
+	GtkTreePath *path;
+	GtkTreeModel *model;
+	GtkTreeIter iter;
+
+	if (self->currid > 0)
+	{
+		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->treeview));
+
+		gtk_tree_selection_unselect_iter(self->currselection,&self->curr);  
+		if(gtk_tree_model_iter_next(model,&self->curr))
+		{
+			//there is a next file 
+			gtk_tree_selection_select_iter(self->currselection,&self->curr); 
+			playfile(GTK_TREE_VIEW(self->treeview),gtk_tree_model_get_path(model,&self->curr),NULL,user_data);
+		} else{
+			//repeat code
+			if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->store),&iter))
+			{
+				gtk_tree_selection_select_iter(self->currselection,&iter); 
+				playfile(GTK_TREE_VIEW(self->treeview),gtk_tree_model_get_path(model,&iter),NULL,user_data);
+			}
+
+
+		}
+		
 	   
     }
 }
