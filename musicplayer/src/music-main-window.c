@@ -214,7 +214,7 @@ static void init_widgets(MusicMainWindow *self)
     
     g_signal_connect (self->playbutton, "released",
 				  G_CALLBACK (on_play_released),
-				  (gpointer)self->player);
+				  (gpointer)self);
 	  
 	  self->signum = g_signal_connect (self, "size-allocate",
 				  															  G_CALLBACK(on_size_allocate),
@@ -239,10 +239,13 @@ static void
 on_play_released                       (GtkButton       *button,
 								gpointer         user_data)
 {
-    GsPlayer *player = (GsPlayer *) user_data;
-    
-    gs_pauseResume(player);
-}
+    MusicMainWindow *self = (MusicMainWindow *)user_data;
+    if (isPaused (self->player))	
+	    	gs_pauseResume(self->player);
+	//else
+      //     	music_queue_play_selected (self->queue);
+        
+}	
 
 
 
@@ -256,92 +259,92 @@ static void mwindow_expander_activate(GtkExpander *expander,
 	  
      if(!gtk_expander_get_expanded(expander))
      {
-	  gtk_window_set_resizable (GTK_WINDOW(self),TRUE);
-      height =gconf_client_get_int(self->client,"/apps/musicplayer/main_height",NULL);
-	   width =gconf_client_get_int(self->client,"/apps/musicplayer/main_width",NULL);
+		 gtk_window_set_resizable (GTK_WINDOW(self),TRUE);
+		 height =gconf_client_get_int(self->client,"/apps/musicplayer/main_height",NULL);
+		 width =gconf_client_get_int(self->client,"/apps/musicplayer/main_width",NULL);
 		 gconf_client_set_bool (self->client,"/apps/musicplayer/expanded",TRUE,NULL);
-			 //if we are not running for the first time and we have a key in gconf
-			 if( width && height)
-			 {
-					gtk_window_resize  (GTK_WINDOW(self),
-					                    width,
-					                    height);
-			 }
-			 else
-			 {
+		 //if we are not running for the first time and we have a key in gconf
+		 if( width && height)
+		 {
+			 gtk_window_resize  (GTK_WINDOW(self),
+			                     width,
+			                     height);
+		 }
+		 else
+		 {
 
-					gtk_window_resize  (GTK_WINDOW(self),
-					                    self->dwidth,
-					                    500); 
-			 }
+			 gtk_window_resize  (GTK_WINDOW(self),
+			                     self->dwidth,
+			                     500); 
+		 }
 
-			 gtk_widget_show(self->albumlabel);
-			 gtk_label_set_ellipsize(GTK_LABEL(self->albumlabel),PANGO_ELLIPSIZE_END);
+		 gtk_widget_show(self->albumlabel);
+		 gtk_label_set_ellipsize(GTK_LABEL(self->albumlabel),PANGO_ELLIPSIZE_END);
 
-			 self->expanded = TRUE;
+		 self->expanded = TRUE;
 
-	  }else//undo expande
-	  {
-			  gconf_client_set_bool (self->client,"/apps/musicplayer/expanded",FALSE,NULL);
-			 gtk_window_set_resizable (GTK_WINDOW(self),FALSE);
-			 gtk_widget_hide(self->albumlabel);
-			 self->expanded = FALSE;
+	 }else//undo expande
+	{
+		gconf_client_set_bool (self->client,"/apps/musicplayer/expanded",FALSE,NULL);
+		gtk_window_set_resizable (GTK_WINDOW(self),FALSE);
+		gtk_widget_hide(self->albumlabel);
+		self->expanded = FALSE;
 
-     }     
+	}     
 }
 
 
 static void mwindow_new_file(GsPlayer *player,
 			     metadata* p_track,gpointer user_data)
 {
-     MusicMainWindow *self = (MusicMainWindow *)user_data;
-     gchar title[200];
-     const gchar toke[] ="/";
-     gchar buffer[50];
-     gchar *out;
-     gint i;
-     gchar **tokens;
+	MusicMainWindow *self = (MusicMainWindow *)user_data;
+	gchar title[200];
+	const gchar toke[] ="/";
+	gchar buffer[50];
+	gchar *out;
+	gint i;
+	gchar **tokens;
 	gchar output[1024];
-     gchar output2[1024];
-    
-    
-    
-    if(p_track->artist){
-	   sprintf(title,"%s - %s",p_track->artist, p_track->title);
-	   gtk_window_set_title(GTK_WINDOW(self),title);
-	   g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s - %s</span>",p_track->artist,p_track->title);
-	   gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
-	   if(p_track->album)
-	   {
-		  g_sprintf(output,"<span style=\"italic\" size=\"small\">from:%s</span>",p_track->album);
-		  gtk_label_set_markup(GTK_LABEL(self->albumlabel),output);
-		  gtk_widget_show(self->albumlabel);
-	   }else{
-		  gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
-	   }
-    }
-    else
-    {
-	  g_strchomp((gchar *)p_track->uri);
-	  out = gnome_vfs_get_local_path_from_uri((gchar *)p_track->uri);
+	gchar output2[1024];
 
-	  tokens=g_strsplit(out,toke,10);
 
-  if(tokens)
+
+	if(p_track->artist){
+		sprintf(title,"%s - %s",p_track->artist, p_track->title);
+		gtk_window_set_title(GTK_WINDOW(self),title);
+		g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s - %s</span>",p_track->artist,p_track->title);
+		gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
+		if(p_track->album)
 		{
-	  for(i=1; tokens[i] != NULL; i++);
-
-	  gtk_window_set_title(GTK_WINDOW(self),tokens[i-1]);
- 
-	  g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s</span>",tokens[i-1]);
-	  gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
-	  g_strfreev(tokens);  
-	  g_free(out);
-
-	   gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
+			g_sprintf(output,"<span style=\"italic\" size=\"small\">from:%s</span>",p_track->album);
+			gtk_label_set_markup(GTK_LABEL(self->albumlabel),output);
+			gtk_widget_show(self->albumlabel);
+		}else{
+			gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
 		}
-     }
-     
+	}
+	else
+	{
+		g_strchomp((gchar *)p_track->uri);
+		out = gnome_vfs_get_local_path_from_uri((gchar *)p_track->uri);
+
+		tokens=g_strsplit(out,toke,10);
+
+		if(tokens)
+		{
+			for(i=1; tokens[i] != NULL; i++);
+
+			gtk_window_set_title(GTK_WINDOW(self),tokens[i-1]);
+
+			g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s</span>",tokens[i-1]);
+			gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
+			g_strfreev(tokens);  
+			g_free(out);
+
+			gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
+		}
+	}
+	
      ts_metadata_free(p_track);
 
     }

@@ -63,6 +63,7 @@ GType music_queue_get_type (void);
 GtkWidget* music_queue_new (void);
 GtkWidget* music_queue_new_with_player(GsPlayer *player);
 void add_file_ext(gpointer data,gpointer user_data);
+void music_queue_play_selected (MusicQueue *self);
 G_END_DECLS
 
 #endif /* _MUSIC_QUEUE */

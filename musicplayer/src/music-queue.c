@@ -566,9 +566,9 @@ onDragDataReceived(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 
 
 static void playfile (GtkTreeView *treeview,
-		      GtkTreePath        *path,
-		      GtkTreeViewColumn  *col,
-		      gpointer data)
+                      GtkTreePath        *path,
+                      GtkTreeViewColumn  *col,
+                      gpointer data)
 	
 {
      MusicQueue *self = (MusicQueue *) data;
@@ -592,6 +592,13 @@ static void playfile (GtkTreeView *treeview,
 		g_free(id);
         }
 }
+void music_queue_play_selected (MusicQueue *self)
+{
+ 	playfile(self->treeview,self->path,
+	          NULL,(gpointer)self);
+}
+
+
 
 static void add(GtkWidget *widget,gpointer user_data)
 {
