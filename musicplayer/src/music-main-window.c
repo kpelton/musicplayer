@@ -49,9 +49,9 @@ music_main_window_set_property (GObject *object, guint property_id,
 static void
 music_main_window_dispose (GObject *object)
 {
-  G_OBJECT_CLASS (music_main_window_parent_class)->dispose (object);
+  //G_OBJECT_CLASS (music_main_window_parent_class)->dispose (object);
  
-  gtk_exit(0);
+ gtk_exit(0);
 }
 
 static void
@@ -60,12 +60,12 @@ music_main_window_finalize (GObject *object)
 
 	  //unref tout
 	  MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);
-	  g_object_unref(G_OBJECT(self->player));
+	 g_object_unref(G_OBJECT(self->player));
 	  g_object_unref(G_OBJECT(self->queue));
 
-	  g_object_unref(G_OBJECT(self->client));		
+	 g_object_unref(G_OBJECT(self->client));		
 
-	  G_OBJECT_CLASS (music_main_window_parent_class)->finalize (object);
+	 G_OBJECT_CLASS (music_main_window_parent_class)->finalize (object);
 }
 
 static void

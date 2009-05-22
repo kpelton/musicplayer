@@ -52,6 +52,8 @@ typedef struct {
 	gchar *font;
 	gchar *lastdir;
 	GConfClient* client;
+	gboolean repeat;
+	
 } MusicQueue;
 
 typedef struct {

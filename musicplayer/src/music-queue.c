@@ -107,6 +107,11 @@ static void set_font   (gpointer    callback_data,
 			 guint       callback_action,
 			GtkWidget  *widget);
 
+static void set_repeat   (gpointer    callback_data,
+			 guint       callback_action,
+			GtkWidget  *widget);
+
+
 static GList * get_list(gpointer user_data);
 
 const static  GtkTargetEntry targetentries[] =
@@ -120,7 +125,10 @@ const static  GtkTargetEntry targetentries[] =
 static GtkItemFactoryEntry menu_items[] = {
   
      { "/Remove",    "", remove_files,    0, "<StockItem>", GTK_STOCK_DELETE },
-  { "/Select Font",    "", set_font,   0, "<StockItem>", GTK_STOCK_SELECT_FONT }
+	 { "/Repeat Playlist","",set_repeat,0,"<CheckItem>",NULL},
+	 { "/Select Font",    "", set_font,   0, "<StockItem>", GTK_STOCK_SELECT_FONT }
+	 
+	
 };
 
 
@@ -140,6 +148,9 @@ music_queue_get_property (GObject *object, guint property_id,
 			g_value_set_string (value, self->lastdir);
 			break;
 
+		case PROP_MUSICQUEUE_REPEAT:
+			g_value_set_boolean (value, self->repeat);
+			break;
 
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -164,7 +175,12 @@ music_queue_set_property (GObject *object, guint property_id,
       self->lastdir = g_value_dup_string (value);
 
 	break;
-	
+
+	case PROP_MUSICQUEUE_REPEAT:
+      self->repeat = g_value_get_boolean (value);
+
+	break;
+		  
 
   
   default:
@@ -186,10 +202,10 @@ music_queue_finalize (GObject *object)
 {
      MusicQueue *self = MUSIC_QUEUE(object);
      GList *list;
-    
+     gboolean repeat;	
 	 gchar *font;
 	
-     
+    
 
      if((list = get_list(self)) != NULL)
      {
@@ -199,12 +215,18 @@ music_queue_finalize (GObject *object)
      G_OBJECT_CLASS (music_queue_parent_class)->finalize (object);
      
 	 g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
+	 g_object_get(G_OBJECT(self),"musicqueue-repeat",&repeat,NULL);
 	
 	//save all the props we want to gconf
 	gconf_client_set_string              (self->client,
 	                                    "/apps/musicplayer/font",
 	                                    font,
 	                                    NULL);
+
+	gconf_client_set_bool           (self->client,
+	                                    "/apps/musicplayer/repeat",
+	                                    repeat,
+	                                 	NULL);
 	
 
 	g_object_unref(self->client);	
@@ -246,6 +268,18 @@ music_queue_class_init (MusicQueueClass *klass)
   	g_object_class_install_property (object_class,
                                    PROP_MUSICQUEUE_LASTDIR,
                                    pspec);
+
+	pspec = g_param_spec_boolean ("musicqueue-repeat",
+                               "repeat",
+                               "Set the playlist to repeat",
+                               FALSE /* default value */,
+                               G_PARAM_READWRITE);
+	
+  	g_object_class_install_property (object_class,
+                                   PROP_MUSICQUEUE_REPEAT,
+                                   pspec);
+
+	
 
 
 
@@ -314,7 +348,7 @@ static void music_queue_read_xspf(gchar *location,MusicQueue *self)
 static void
 music_queue_init (MusicQueue *self)
 {
-
+ //need to pull in gconf stuff here
      g_object_set(G_OBJECT (self), "musicqueue-font","verdanna bold 7",NULL);
 	 g_object_set(G_OBJECT (self), "musicqueue-lastdir",g_get_home_dir(),NULL);
 		gchar *font;	
@@ -768,6 +802,11 @@ static void nextFile              (GsPlayer      *player,
 	GtkTreeModel *model;
 	GtkTreeIter iter;
 
+	gboolean test;	
+
+ 	g_object_get(G_OBJECT(self),"musicqueue-repeat",&test,NULL);
+
+	
 	if (self->currid > 0)
 	{
 		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->treeview));
@@ -779,8 +818,8 @@ static void nextFile              (GsPlayer      *player,
 			gtk_tree_selection_select_iter(self->currselection,&self->curr); 
 			playfile(GTK_TREE_VIEW(self->treeview),gtk_tree_model_get_path(model,&self->curr),NULL,user_data);
 		} else{
-			//repeat code
-			if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->store),&iter))
+			//repeat code check to make sure property is true
+			if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->store),&iter) && test)
 			{
 				gtk_tree_selection_select_iter(self->currselection,&iter); 
 				playfile(GTK_TREE_VIEW(self->treeview),gtk_tree_model_get_path(model,&iter),NULL,user_data);
@@ -841,7 +880,8 @@ static void add_columns(MusicQueue *self)
     gtk_tree_view_column_set_sort_column_id(column,SORTID_TITLE);
     
     gtk_tree_view_append_column (GTK_TREE_VIEW(self->treeview), column);
-    
+
+	
     renderer = gtk_cell_renderer_text_new ();
     
     
@@ -1001,6 +1041,23 @@ static void set_font   (gpointer    callback_data,
     gtk_widget_show(font_window); 
     
 }
+static void set_repeat   (gpointer    callback_data,
+				    guint       callback_action,
+				    GtkWidget  *widget)
+{
+	MusicQueue *self = (MusicQueue *) callback_data;
+	gboolean test;	
+
+ 	g_object_get(G_OBJECT(self),"musicqueue-repeat",&test,NULL);
+
+		if(!test)
+			g_object_set(G_OBJECT(self),"musicqueue-repeat",TRUE,NULL);
+		else
+			g_object_set(G_OBJECT(self),"musicqueue-repeat",FALSE,NULL);
+
+}
+
+
 
 static void remove_files(gpointer    callback_data,
 					guint       callback_action,

@@ -28,7 +28,7 @@ typedef enum {
 static void
 gtk_widget_dispose (GObject *object)
 {
-  
+	G_OBJECT_CLASS (gs_player_parent_class)->dispose (object);
   
 }
 static void
@@ -36,8 +36,9 @@ gtk_widget_finalize (GObject *object)
 {
      GsPlayer *player =GS_PLAYER(object);
 
-     g_object_unref(player->play);
-	 g_object_unref(player->gconf);
+    g_object_unref(player->play);
+	g_object_unref(player->gconf);
+	G_OBJECT_CLASS (gs_player_parent_class)->finalize (object);
 }
 
 static void
