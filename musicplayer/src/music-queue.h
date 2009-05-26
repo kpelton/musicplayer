@@ -38,6 +38,8 @@ typedef struct {
 	GtkWidget* treeview;
 	GtkWidget* openbutton;
 	GtkWidget* scrolledwindow;
+	GtkWidget *menu;
+	GtkWidget *delete;
 	GtkListStore *store;
 	GsPlayer *player;
 	GtkTreeIter  curr;

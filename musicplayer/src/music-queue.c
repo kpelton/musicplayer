@@ -81,9 +81,8 @@ static void dragbegin (GtkWidget *widget,
 
 static GtkWidget * getcontextmenu(gpointer user_data);
 
-static void remove_files(gpointer    callback_data,
-			 guint       callback_action,
-			 GtkWidget  *widget);
+static void remove_files(GtkMenuItem *item, gpointer    
+                         	callback_data);
 
 static gboolean remove_files_via_press(GtkWidget *widget,
 			 GdkEventKey *key,
@@ -106,11 +105,8 @@ gboolean has_selected(gpointer user_data);
 static void set_font   (gpointer    callback_data,
 			 guint       callback_action,
 			GtkWidget  *widget);
-
-static void set_repeat   (gpointer    callback_data,
-			 guint       callback_action,
-			GtkWidget  *widget);
-
+static void set_repeat   (GtkCheckMenuItem *widget,
+                          	gpointer user_data);
 
 static GList * get_list(gpointer user_data);
 
@@ -120,16 +116,6 @@ const static  GtkTargetEntry targetentries[] =
      { "text/plain",    0, TARGET_STRING }
 };
 
-
-
-static GtkItemFactoryEntry menu_items[] = {
-  
-     { "/Remove",    "", remove_files,    0, "<StockItem>", GTK_STOCK_DELETE },
-	 { "/Repeat Playlist","",set_repeat,0,"<CheckItem>",NULL},
-	 { "/Select Font",    "", set_font,   0, "<StockItem>", GTK_STOCK_SELECT_FONT }
-	 
-	
-};
 
 
 static void
@@ -162,30 +148,28 @@ static void
 music_queue_set_property (GObject *object, guint property_id,
                               const GValue *value, GParamSpec *pspec)
 {
-     MusicQueue *self = MUSIC_QUEUE(object);
-  switch (property_id) {
+	MusicQueue *self = MUSIC_QUEUE(object);
+	switch (property_id) {
 
-   case PROP_MUSICQUEUE_FONT:
-      g_free (self->font);
-		  self->font = g_value_dup_string (value);   
-	break;	
-	
-	case PROP_MUSICQUEUE_LASTDIR:
-      g_free (self->lastdir);
-      self->lastdir = g_value_dup_string (value);
+		case PROP_MUSICQUEUE_FONT:
+			g_free (self->font);
+			self->font = g_value_dup_string (value);   
+			break;	
 
-	break;
+		case PROP_MUSICQUEUE_LASTDIR:
+			g_free (self->lastdir);
+			self->lastdir = g_value_dup_string (value);
 
-	case PROP_MUSICQUEUE_REPEAT:
-      self->repeat = g_value_get_boolean (value);
+			break;
 
-	break;
-		  
+		case PROP_MUSICQUEUE_REPEAT:
+			self->repeat = g_value_get_boolean (value);
 
-  
-  default:
-    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-  }
+			break;
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+	}
 }
 
 
@@ -204,82 +188,82 @@ music_queue_finalize (GObject *object)
      GList *list;
      gboolean repeat;	
 	 gchar *font;
-	
-    
 
-     if((list = get_list(self)) != NULL)
-     {
-	  plist_reader_write_list("/home/kyle/test.xspf",list,self->read);
-	  g_list_free(list);
-     }
-     G_OBJECT_CLASS (music_queue_parent_class)->finalize (object);
-     
-	 g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
-	 g_object_get(G_OBJECT(self),"musicqueue-repeat",&repeat,NULL);
-	
+
+
+	if((list = get_list(self)) != NULL)
+	{
+		plist_reader_write_list("/home/kyle/test.xspf",list,self->read);
+		g_list_free(list);
+	}
+	G_OBJECT_CLASS (music_queue_parent_class)->finalize (object);
+
+	g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
+	g_object_get(G_OBJECT(self),"musicqueue-repeat",&repeat,NULL);
+
 	//save all the props we want to gconf
 	gconf_client_set_string              (self->client,
-	                                    "/apps/musicplayer/font",
-	                                    font,
-	                                    NULL);
+	                                      "/apps/musicplayer/font",
+	                                      font,
+	                                      NULL);
 
 	gconf_client_set_bool           (self->client,
-	                                    "/apps/musicplayer/repeat",
-	                                    repeat,
-	                                 	NULL);
-	
+	                                 "/apps/musicplayer/repeat",
+	                                 repeat,
+	                                 NULL);
+
 
 	g_object_unref(self->client);	
 	g_free(font);
 	g_object_unref(self->store);
-     g_object_unref(self->read);
-	 
+	g_object_unref(self->read);
+
 }
   
 static void
 music_queue_class_init (MusicQueueClass *klass)
 {
-     GObjectClass *object_class = G_OBJECT_CLASS (klass);
-     
-     GParamSpec *pspec;
-     
-     object_class->dispose = music_queue_dispose;
-     object_class->finalize = music_queue_finalize;
-     object_class->get_property = music_queue_get_property;
-     object_class->set_property = music_queue_set_property;
+	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-	  pspec = g_param_spec_string ("musicqueue-font",
-                               "font",
-                               "Set font face",
-                               NULL /* default value */,
-                               G_PARAM_READWRITE);
-	
-  	g_object_class_install_property (object_class,
-                                   PROP_MUSICQUEUE_FONT,
-                                   pspec);
+	GParamSpec *pspec;
 
-	
+	object_class->dispose = music_queue_dispose;
+	object_class->finalize = music_queue_finalize;
+	object_class->get_property = music_queue_get_property;
+	object_class->set_property = music_queue_set_property;
+
+	pspec = g_param_spec_string ("musicqueue-font",
+	                             "font",
+	                             "Set font face",
+	                             NULL /* default value */,
+	                             G_PARAM_READWRITE);
+
+	g_object_class_install_property (object_class,
+	                                 PROP_MUSICQUEUE_FONT,
+	                                 pspec);
+
+
 	pspec = g_param_spec_string ("musicqueue-lastdir",
-                               "lastdir",
-                               "Set last directory opened",
-                               NULL /* default value */,
-                               G_PARAM_READWRITE);
-	
-  	g_object_class_install_property (object_class,
-                                   PROP_MUSICQUEUE_LASTDIR,
-                                   pspec);
+	                             "lastdir",
+	                             "Set last directory opened",
+	                             NULL /* default value */,
+	                             G_PARAM_READWRITE);
+
+	g_object_class_install_property (object_class,
+	                                 PROP_MUSICQUEUE_LASTDIR,
+	                                 pspec);
 
 	pspec = g_param_spec_boolean ("musicqueue-repeat",
-                               "repeat",
-                               "Set the playlist to repeat",
-                               FALSE /* default value */,
-                               G_PARAM_READWRITE);
-	
-  	g_object_class_install_property (object_class,
-                                   PROP_MUSICQUEUE_REPEAT,
-                                   pspec);
+	                              "repeat",
+	                              "Set the playlist to repeat",
+	                              FALSE /* default value */,
+	                              G_PARAM_READWRITE);
 
-	
+	g_object_class_install_property (object_class,
+	                                 PROP_MUSICQUEUE_REPEAT,
+	                                 pspec);
+
+
 
 
 
@@ -287,52 +271,52 @@ music_queue_class_init (MusicQueueClass *klass)
 static void foreach_xspf(gpointer data,gpointer user_data)
 {
 
-     metadata *track = (metadata *)data;
-     MusicQueue *self = (MusicQueue *)user_data;
-     GtkTreeIter iter;
-     gchar *out;
-     gchar **tokens;
-     const gchar toke[] ="/";
-     gchar buffer[50];
-     int i;
-     
-     if(data)
-     {
-	  self->i++;
- 
-	  gtk_list_store_append(self->store, &iter);
+	metadata *track = (metadata *)data;
+	MusicQueue *self = (MusicQueue *)user_data;
+	GtkTreeIter iter;
+	gchar *out;
+	gchar **tokens;
+	const gchar toke[] ="/";
+	gchar buffer[50];
+	int i;
 
-	  g_strchomp((gchar *)track->uri);
-	  out = gnome_vfs_get_local_path_from_uri((gchar *)track->uri);
+	if(data)
+	{
+		self->i++;
 
+		gtk_list_store_append(self->store, &iter);
 
-	  gtk_list_store_set(self->store,&iter,COLUMN_URI,track->uri,-1);  
-
-	  sprintf(buffer,"%i",self->i);
-	  gtk_list_store_set(self->store,&iter,COLUMN_ID,buffer,-1);  
-    
-     
-	  tokens=g_strsplit(out,toke,10);
+		g_strchomp((gchar *)track->uri);
+		out = gnome_vfs_get_local_path_from_uri((gchar *)track->uri);
 
 
-	  //take out the '/' in the uri
-	  for(i=1; tokens[i] != NULL; i++);
-	 
-	  if(track->title != NULL && track->artist !=NULL)
-	  {	
-	       gtk_list_store_set(self->store,&iter,COLUMN_TITLE,track->title);
-	       gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,track->artist);
-	  }
-	  else
-	  {
-	       //without
-	       gtk_list_store_set(self->store,&iter,COLUMN_TITLE,(gpointer *)tokens[i-1]);   
-	  }  
-     
-	  ts_metadata_free(track);
-	  g_strfreev(tokens);  
-	  g_free(out);
-     }
+		gtk_list_store_set(self->store,&iter,COLUMN_URI,track->uri,-1);  
+
+		sprintf(buffer,"%i",self->i);
+		gtk_list_store_set(self->store,&iter,COLUMN_ID,buffer,-1);  
+
+
+		tokens=g_strsplit(out,toke,10);
+		
+
+		 //take out the '/' in the uri
+		 for(i=1; tokens[i] != NULL; i++);
+
+		 if(track->title != NULL && track->artist !=NULL)
+		 {	
+			 gtk_list_store_set(self->store,&iter,COLUMN_TITLE,track->title);
+			 gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,track->artist);
+		 }
+		 else
+		 {
+			 //without
+			 gtk_list_store_set(self->store,&iter,COLUMN_TITLE,(gpointer *)tokens[i-1]);   
+		 }  
+
+		 ts_metadata_free(track);
+		 g_strfreev(tokens);  
+		 g_free(out);
+	 }
 }
 
 static void music_queue_read_xspf(gchar *location,MusicQueue *self)
@@ -372,7 +356,7 @@ static void init_widgets(MusicQueue *self)
 {
      GtkTreeSelection *select;
      GtkTreeSortable *sortable;
-
+	 
 
 
 
@@ -411,43 +395,43 @@ static void init_widgets(MusicQueue *self)
 
 //signals
 
-     g_signal_connect ((gpointer) self->openbutton, "released",
-		       G_CALLBACK (add),
-		       (self));
-     g_signal_connect (G_OBJECT (self->treeview), "row-activated",
-		       G_CALLBACK (playfile),
-		       self);
-     
-     g_signal_connect (G_OBJECT (self->store), "row-changed",
-		       G_CALLBACK (rowchanged),
-		       self);
+	g_signal_connect ((gpointer) self->openbutton, "released",
+	                  G_CALLBACK (add),
+	                  (self));
+	g_signal_connect (G_OBJECT (self->treeview), "row-activated",
+	                  G_CALLBACK (playfile),
+	                  self);
 
-     g_signal_connect (G_OBJECT (self->treeview), "button_press_event",
-			 G_CALLBACK (grabfocuscb),
-			 self);
+	g_signal_connect (G_OBJECT (self->store), "row-changed",
+	                  G_CALLBACK (rowchanged),
+	                  self);
 
-      g_signal_connect (G_OBJECT (self->treeview), "key_press_event",
-			 G_CALLBACK (remove_files_via_press),
-			 self);
+	g_signal_connect (G_OBJECT (self->treeview), "button_press_event",
+	                  G_CALLBACK (grabfocuscb),
+	                  self);
 
-
-     g_signal_connect (G_OBJECT (self->treeview), "button_release_event",
-		       G_CALLBACK (lostgrabfocuscb),
-			 self);
-     
-     g_signal_connect (G_OBJECT (self->treeview), "drag_begin",
-		       G_CALLBACK (dragbegin), 
-		       self);
-     
-     g_signal_connect (G_OBJECT (self->treeview), "drag_end",
-		       G_CALLBACK (dragend), 
-		       self);
- 
-     g_signal_connect(self->treeview, "drag_data_received",
-                  G_CALLBACK(onDragDataReceived),
-			self);
+	g_signal_connect (G_OBJECT (self->treeview), "key_press_event",
+	                  G_CALLBACK (remove_files_via_press),
+	                  self);
 
 
+	g_signal_connect (G_OBJECT (self->treeview), "button_release_event",
+	                  G_CALLBACK (lostgrabfocuscb),
+	                  self);
+
+	g_signal_connect (G_OBJECT (self->treeview), "drag_begin",
+	                  G_CALLBACK (dragbegin), 
+	                  self);
+
+	g_signal_connect (G_OBJECT (self->treeview), "drag_end",
+	                  G_CALLBACK (dragend), 
+	                  self);
+
+	g_signal_connect(self->treeview, "drag_data_received",
+	                 G_CALLBACK(onDragDataReceived),
+	                 self);
+
+	
      
 //set policy
      
@@ -487,6 +471,11 @@ static void init_widgets(MusicQueue *self)
 				GINT_TO_POINTER(SORTID_TITLE),NULL);
 
 	gtk_tree_sortable_set_default_sort_func(sortable,sort_iter_compare_func_title,NULL,NULL);
+
+
+	self->menu = getcontextmenu(self);
+	gtk_widget_show_all(self->menu);
+	gtk_menu_attach_to_widget(GTK_MENU(self->menu),self->treeview,NULL);
 }
 
 
@@ -702,72 +691,72 @@ void add_file_ext(gpointer data,gpointer user_data)
 //uri and musicqueuestatic void add_file(gpointer data,gpointer user_data);
 static void add_file(gpointer data,gpointer user_data)
 {
-	 MusicQueue *self = (MusicQueue *) user_data;
-	 GtkTreeIter   iter;
-	 gchar *out;			       
-	 gchar **tokens;
-	 const gchar toke[] ="/";
-	 gchar buffer[50];
-    	 gchar *valid;
-      int i;
-      metadata *md = NULL;
+	MusicQueue *self = (MusicQueue *) user_data;
+	GtkTreeIter   iter;
+	gchar *out;			       
+	gchar **tokens;
+	const gchar toke[] ="/";
+	gchar buffer[50];
+	gchar *valid;
+	int i;
+	metadata *md = NULL;
 
-     self->i++;
+	self->i++;
 
-     
+
 	valid = gnome_vfs_make_uri_from_input((gchar *)data);
-     
-     gtk_list_store_append(self->store, &iter);
 
-    
+	gtk_list_store_append(self->store, &iter);
 
-     // gtk_list_store_set(self->store,&iter,COLUMN_TITLE,out,-1);    
-     gtk_list_store_set(self->store,&iter,COLUMN_URI,valid,-1);  
 
-     sprintf(buffer,"%i",self->i);
-     gtk_list_store_set(self->store,&iter,COLUMN_ID,buffer,-1);  
-     
-     //get meta data info
-     md=ts_get_metadata(valid,self->ts);
-     //printf("%s\n",(gchar *)data);
-     if(md != NULL && md->title != NULL && md->artist !=NULL)
-     {	  
-	  gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title);
-	  gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist);
-	   ts_metadata_free(md);
-     }
-     else
-     {
-	  g_strchomp((gchar *)valid);
-	  out = gnome_vfs_get_local_path_from_uri(valid);
-	  tokens=g_strsplit(out,toke,10);
-	  
-	  if (tokens != NULL)
-	  {
-	       //take out the '/' in the ur
-	       for(i=1; tokens[i] != NULL; i++);
-	       
-		    
-	       /*   ts_metadata_free(md); */
-	       /* 	  md=ts_parse_file_name((gchar *)data ); */
-	       /* 	  if(md) */
-	       /* 	  { */
-	       /* 	       gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title); */
-	       /* 	       gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist); */
-	       /* ts_metadata_free(md); */
-	       /* /\* 	  } *\/ */
-	       /* 	  else{ */
-	       gtk_list_store_set(self->store,&iter,COLUMN_TITLE,(gpointer *)tokens[i-1]); 
-	  }
-		
-				 
-	 
-    g_strfreev(tokens);  
-    g_free(out);
-    g_free(valid);
-     }
-    
-}
+
+	// gtk_list_store_set(self->store,&iter,COLUMN_TITLE,out,-1);    
+	gtk_list_store_set(self->store,&iter,COLUMN_URI,valid,-1);  
+
+	sprintf(buffer,"%i",self->i);
+	gtk_list_store_set(self->store,&iter,COLUMN_ID,buffer,-1);  
+
+	//get meta data info
+	md=ts_get_metadata(valid,self->ts);
+	//printf("%s\n",(gchar *)data);
+	if(md != NULL && md->title != NULL && md->artist !=NULL)
+	{	  
+		gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title);
+		gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist);
+		ts_metadata_free(md);
+	}
+	else
+	{
+		g_strchomp((gchar *)valid);
+		out = gnome_vfs_get_local_path_from_uri(valid);
+		tokens=g_strsplit(out,toke,10);
+
+		if (tokens != NULL)
+		{
+			//take out the '/' in the ur
+			for(i=1; tokens[i] != NULL; i++);
+
+
+			/*   ts_metadata_free(md); */
+			/* 	  md=ts_parse_file_name((gchar *)data ); */
+			/* 	  if(md) */
+			/* 	  { */
+			/* 	       gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title); */
+			/* 	       gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist); */
+			/* ts_metadata_free(md); */
+			/* /\* 	  } *\/ */
+			/* 	  else{ */
+			gtk_list_store_set(self->store,&iter,COLUMN_TITLE,(gpointer *)tokens[i-1]); 
+			}
+
+
+
+			 g_strfreev(tokens);  
+			 g_free(out);
+			 g_free(valid);
+		}
+
+	}
 
 
 
@@ -795,18 +784,18 @@ music_queue_new_with_player(GsPlayer *player)
     return GTK_WIDGET(self);
 }
 static void nextFile              (GsPlayer      *player,
-							gpointer         user_data)
+                                   gpointer         user_data)
 {
-    MusicQueue *self = (MusicQueue *) user_data;
+	MusicQueue *self = (MusicQueue *) user_data;
 	GtkTreePath *path;
 	GtkTreeModel *model;
 	GtkTreeIter iter;
 
 	gboolean test;	
 
- 	g_object_get(G_OBJECT(self),"musicqueue-repeat",&test,NULL);
+	g_object_get(G_OBJECT(self),"musicqueue-repeat",&test,NULL);
 
-	
+
 	if (self->currid > 0)
 	{
 		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->treeview));
@@ -827,9 +816,9 @@ static void nextFile              (GsPlayer      *player,
 
 
 		}
-		
-	   
-    }
+
+
+	}
 }
 
 
@@ -937,20 +926,20 @@ static gboolean grabfocuscb (GtkWidget *widget,
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->treeview));
     
     gtk_tree_view_set_reorderable(GTK_TREE_VIEW(self->treeview),TRUE);
+
+	if((event->button ==3) && (event->type == GDK_BUTTON_PRESS))
+	{
+		if(has_selected(user_data))
+			gtk_widget_set_sensitive(self->delete,TRUE);
+		else
+			gtk_widget_set_sensitive(self->delete,FALSE);
+			
+		gtk_menu_popup(GTK_MENU(self->menu),NULL,NULL,NULL,NULL,event->button,event->time);
+		return TRUE;
+	}
     
-    //we want our context menu since user right clicked
-    if (event->button == 3)
-    {
-	   if(has_selected(user_data))
-	   {
-		  menu = getcontextmenu(user_data);
-		  gtk_widget_show_all(menu);
-		  
-		  gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
-					  (event != NULL) ? event->button : 0,
-					  gdk_event_get_time((GdkEvent*)event));
-	   }
-    }
+    
+
     return FALSE;
 }
 
@@ -1007,15 +996,33 @@ static GtkWidget * getcontextmenu(gpointer user_data)
 {
     
     GtkItemFactory *item_factory;
-    GtkWidget  *menu;
-    gint nmenu_items = sizeof (menu_items) / sizeof (menu_items[0]);
-    
-    /* Same as before but don't bother with the accelerators */
-    item_factory = gtk_item_factory_new (GTK_TYPE_MENU, "<main>",
-								 NULL);
-    gtk_item_factory_create_items (item_factory, nmenu_items, menu_items, user_data);
-    menu = gtk_item_factory_get_widget (item_factory, "<main>");
-    
+    GtkWidget  *menu,*font,*repeat;
+
+	MusicQueue *self = (MusicQueue *) user_data;
+	
+	menu = gtk_menu_new();
+
+		
+    self->delete = gtk_image_menu_item_new_from_stock(GTK_STOCK_DELETE,NULL);
+	font   = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_FONT,NULL);
+	repeat =  gtk_check_menu_item_new_with_label("Repeat");
+
+	g_signal_connect (G_OBJECT (self->delete), "activate",
+	                  G_CALLBACK (remove_files),
+	                  user_data);
+	g_signal_connect (G_OBJECT (font), "activate",
+	                  G_CALLBACK (set_font),
+	                  user_data);
+	g_signal_connect (G_OBJECT (repeat), "activate",
+	                  G_CALLBACK (set_repeat),
+	                  user_data);
+
+	gtk_menu_shell_append (GTK_MENU_SHELL(menu),self->delete);
+	gtk_menu_shell_append (GTK_MENU_SHELL(menu),font);
+	gtk_menu_shell_append (GTK_MENU_SHELL(menu),repeat);
+
+
+	
     return menu;
     
 }
@@ -1025,7 +1032,7 @@ static gboolean remove_files_via_press(GtkWidget *widget,
 {
     
     if(event->keyval == GDK_Delete && has_selected(user_data) == TRUE)
-	   remove_files(user_data,0,widget);
+	   remove_files(NULL,user_data);
     
     return FALSE;
 }  
@@ -1041,27 +1048,34 @@ static void set_font   (gpointer    callback_data,
     gtk_widget_show(font_window); 
     
 }
-static void set_repeat   (gpointer    callback_data,
-				    guint       callback_action,
-				    GtkWidget  *widget)
+static void set_repeat   (GtkCheckMenuItem *widget,
+                          	gpointer user_data
+				   		)
 {
-	MusicQueue *self = (MusicQueue *) callback_data;
+	MusicQueue *self = (MusicQueue *) user_data;
 	gboolean test;	
 
  	g_object_get(G_OBJECT(self),"musicqueue-repeat",&test,NULL);
 
-		if(!test)
+		if(!test){
 			g_object_set(G_OBJECT(self),"musicqueue-repeat",TRUE,NULL);
-		else
+			gtk_check_menu_item_set_active (widget,TRUE);
+		}
+		else{
 			g_object_set(G_OBJECT(self),"musicqueue-repeat",FALSE,NULL);
+			gtk_check_menu_item_set_active (widget,FALSE);
+		}
+	
+	
+
+
 
 }
 
 
 
-static void remove_files(gpointer    callback_data,
-					guint       callback_action,
-					GtkWidget  *widget)
+static void remove_files(GtkMenuItem *item, gpointer    
+                         	callback_data)
 {
     MusicQueue *self = (MusicQueue *) callback_data;
     GList * rows;
@@ -1126,13 +1140,16 @@ gboolean has_selected(gpointer user_data)
     
     GList *rows;
     GtkTreeModel *model;
-    
+     self->currselection = gtk_tree_view_get_selection (GTK_TREE_VIEW (self->treeview));
+
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->treeview));
     rows = gtk_tree_selection_get_selected_rows(self->currselection,&model);	
     
-    if(g_list_length(rows) > 0)
-    {	  
+    if(rows)
+    {	
+		g_list_free(rows);
 	   return TRUE;
+		
     }
     return FALSE;
 }
