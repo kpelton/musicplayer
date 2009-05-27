@@ -935,7 +935,7 @@ static gboolean grabfocuscb (GtkWidget *widget,
 			gtk_widget_set_sensitive(self->delete,FALSE);
 			
 		gtk_menu_popup(GTK_MENU(self->menu),NULL,NULL,NULL,NULL,event->button,event->time);
-		return TRUE;
+		return FALSE;
 	}
     
     
