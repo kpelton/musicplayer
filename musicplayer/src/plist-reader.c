@@ -8,10 +8,10 @@
 
 G_DEFINE_TYPE (PlistReader, plist_reader, G_TYPE_OBJECT)
 
-static void foreach(gpointer data,gpointer user_data);
+static void foreach_xspf(gpointer data,gpointer user_data);
 static void plist_xspf_add_file(xmlNode *nptr ,metadata *track);
 
-static void process_tracks(xmlNode *nptr ,GList **list);
+static void process_xspf_tracks(xmlNode *nptr ,GList **list);
 static void plist_reader_get_property (GObject *object, guint property_id,
                               GValue *value, GParamSpec *pspec)
 
@@ -67,7 +67,7 @@ gboolean plist_xspf_read(gchar *location,GList **list,PlistReader *self)
 	      {
 		   if (nptr2->type == XML_ELEMENT_NODE &&
 		       !xmlStrcmp(nptr2->name, (xmlChar *)"trackList")){
-			process_tracks(nptr2,list);
+			process_xspf_tracks(nptr2,list);
 			
 		   }
 	      }
@@ -77,7 +77,7 @@ gboolean plist_xspf_read(gchar *location,GList **list,PlistReader *self)
 
 }
 
-static void process_tracks(xmlNode *nptr ,GList **list)
+static void process_xspf_tracks(xmlNode *nptr ,GList **list)
 {
      metadata *track = NULL;
 
@@ -142,7 +142,7 @@ gboolean plist_reader_write_list(gchar *location,GList * list,PlistReader *self)
      xmlAddChild(self->rootnode, self->tracklist);
      
      
-     g_list_foreach(list,foreach,self);
+     g_list_foreach(list,foreach_xspf,self);
 	  
      
      xmlSaveFormatFileEnc(location, self->doc, "UTF-8", 1);
@@ -156,7 +156,7 @@ gboolean plist_reader_write_list(gchar *location,GList * list,PlistReader *self)
  
 }
 
-static void foreach(gpointer data,gpointer user_data)
+static void foreach_xspf(gpointer data,gpointer user_data)
 {
      metadata *track = (metadata *) data;
      PlistReader *self = (PlistReader *) user_data;
