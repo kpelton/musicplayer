@@ -46,7 +46,6 @@ typedef struct {
      GstElement *dec;
      GstElement *fakesink;
      GstBus *bus;
-     sem_t sem;
      metadata *track;
      gboolean already_found;
 } TagScanner;

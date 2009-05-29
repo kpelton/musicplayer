@@ -25,7 +25,7 @@ main (int argc, char *argv[])
   mainwindow = music_main_window_new ();
   gtk_widget_show (mainwindow);
 
-  g_object_set(G_OBJECT (mainwindow), "title","squid",NULL);
+  g_object_set(G_OBJECT (mainwindow), "title","squid player",NULL);
 
  if (argc >1) //command line arugment to file
 	music_main_play_file(MUSIC_MAIN_WINDOW(mainwindow),argv[1]);

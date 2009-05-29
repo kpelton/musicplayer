@@ -332,10 +332,17 @@ static void music_queue_read_xspf(gchar *location,MusicQueue *self)
 static void
 music_queue_init (MusicQueue *self)
 {
+	gboolean repeat=FALSE;
+		gchar *font;
  //need to pull in gconf stuff here
      g_object_set(G_OBJECT (self), "musicqueue-font","verdanna bold 7",NULL);
 	 g_object_set(G_OBJECT (self), "musicqueue-lastdir",g_get_home_dir(),NULL);
-		gchar *font;	
+
+	 self->client = gconf_client_get_default();
+
+	repeat=gconf_client_get_bool (self->client,"/apps/musicplayer/repeat",NULL);
+		
+	 g_object_set(G_OBJECT (self), "musicqueue-repeat",repeat,NULL);
 	
      init_widgets(self);
      self->changed =FALSE;
@@ -346,7 +353,13 @@ music_queue_init (MusicQueue *self)
 
      music_queue_read_xspf("/home/kyle/test.xspf",self);
      
-     self->client = gconf_client_get_default();
+    
+	 
+	  
+      
+			
+	  
+	
 
 } 
 
@@ -997,7 +1010,8 @@ static GtkWidget * getcontextmenu(gpointer user_data)
     
     GtkItemFactory *item_factory;
     GtkWidget  *menu,*font,*repeat;
-
+	gboolean test;
+	
 	MusicQueue *self = (MusicQueue *) user_data;
 	
 	menu = gtk_menu_new();
@@ -1007,6 +1021,12 @@ static GtkWidget * getcontextmenu(gpointer user_data)
 	font   = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_FONT,NULL);
 	repeat =  gtk_check_menu_item_new_with_label("Repeat");
 
+
+	g_object_get(G_OBJECT(self),"musicqueue-repeat",&test,NULL);
+
+	   	if(test)
+	   		gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(repeat),TRUE);
+	
 	g_signal_connect (G_OBJECT (self->delete), "activate",
 	                  G_CALLBACK (remove_files),
 	                  user_data);
@@ -1021,8 +1041,8 @@ static GtkWidget * getcontextmenu(gpointer user_data)
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),font);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),repeat);
 
-
 	
+	   
     return menu;
     
 }
