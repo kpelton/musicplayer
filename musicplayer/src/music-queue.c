@@ -12,6 +12,7 @@ enum
 {
   COLUMN_ARTIST,
   COLUMN_TITLE,
+  COLUMN_SONG,
   COLUMN_URI,
   COLUMN_ID,
   N_COLUMNS,
@@ -277,7 +278,7 @@ static void foreach_xspf(gpointer data,gpointer user_data)
 	gchar *out;
 	gchar **tokens;
 	const gchar toke[] ="/";
-	gchar buffer[50];
+	gchar buffer[60000];
 	int i;
 
 	if(data)
@@ -304,13 +305,17 @@ static void foreach_xspf(gpointer data,gpointer user_data)
 
 		 if(track->title != NULL && track->artist !=NULL)
 		 {	
-			 gtk_list_store_set(self->store,&iter,COLUMN_TITLE,track->title);
-			 gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,track->artist);
+			 gtk_list_store_set(self->store,&iter,COLUMN_TITLE,track->title,-1);
+			 gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,track->artist,-1);
+			 sprintf(buffer,"%s - %s",track->artist,track->title);
+			 
+		gtk_list_store_set(self->store,&iter,COLUMN_SONG,buffer,-1);
+			 
 		 }
 		 else
 		 {
 			 //without
-			 gtk_list_store_set(self->store,&iter,COLUMN_TITLE,(gpointer *)tokens[i-1]);   
+			 gtk_list_store_set(self->store,&iter,COLUMN_SONG,(gpointer *)tokens[i-1]);   
 		 }  
 
 		 ts_metadata_free(track);
@@ -353,14 +358,7 @@ music_queue_init (MusicQueue *self)
 
      music_queue_read_xspf("/home/kyle/test.xspf",self);
      
-    
-	 
-	  
-      
-			
-	  
-	
-
+  
 } 
 
 
@@ -381,7 +379,7 @@ static void init_widgets(MusicQueue *self)
      
      gtk_widget_show (self->scrolledwindow);
 
-     self->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING);
+     self->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,-1);
 
     
 
@@ -708,8 +706,10 @@ static void add_file(gpointer data,gpointer user_data)
 	GtkTreeIter   iter;
 	gchar *out;			       
 	gchar **tokens;
+	gchar **tokens2;
 	const gchar toke[] ="/";
-	gchar buffer[50];
+	const gchar toke2[] =".";
+	gchar buffer[60000];
 	gchar *valid;
 	int i;
 	metadata *md = NULL;
@@ -734,8 +734,12 @@ static void add_file(gpointer data,gpointer user_data)
 	//printf("%s\n",(gchar *)data);
 	if(md != NULL && md->title != NULL && md->artist !=NULL)
 	{	  
-		gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title);
-		gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist);
+		gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title,-1);
+		gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist,-1);
+		
+	   	sprintf(buffer,"%s - %s",md->artist,md->title);
+			gtk_list_store_set(self->store,&iter,COLUMN_SONG,buffer,-1);
+		
 		ts_metadata_free(md);
 	}
 	else
@@ -747,29 +751,20 @@ static void add_file(gpointer data,gpointer user_data)
 		if (tokens != NULL)
 		{
 			//take out the '/' in the ur
-			for(i=1; tokens[i] != NULL; i++);
+			for(i=1; tokens[i] != NULL; i++);			
 
+			//take out the file extension;
+			tokens2=g_strsplit(tokens[i-1],toke2,2);
+			gtk_list_store_set(self->store,&iter,COLUMN_SONG,(gpointer *)tokens2[0]);
 
-			/*   ts_metadata_free(md); */
-			/* 	  md=ts_parse_file_name((gchar *)data ); */
-			/* 	  if(md) */
-			/* 	  { */
-			/* 	       gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title); */
-			/* 	       gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist); */
-			/* ts_metadata_free(md); */
-			/* /\* 	  } *\/ */
-			/* 	  else{ */
-			gtk_list_store_set(self->store,&iter,COLUMN_TITLE,(gpointer *)tokens[i-1]); 
-			}
-
-
-
-			 g_strfreev(tokens);  
-			 g_free(out);
-			 g_free(valid);
 		}
-
+		g_strfreev(tokens);  
+		g_strfreev(tokens2);  
+		g_free(out);
+		g_free(valid);
 	}
+
+}
 
 
 
@@ -855,11 +850,11 @@ static void add_columns(MusicQueue *self)
     
     gtk_tree_view_column_set_resizable(GTK_TREE_VIEW_COLUMN (column),TRUE);
     
-    gtk_tree_view_append_column (GTK_TREE_VIEW(self->treeview), column);
+    //gtk_tree_view_append_column (GTK_TREE_VIEW(self->treeview), column);
     //gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 5);
     
     //set sortable
-    gtk_tree_view_column_set_sort_column_id(column,SORTID_ARTIST);
+   // gtk_tree_view_column_set_sort_column_id(column,SORTID_ARTIST);
     
     
     
@@ -874,14 +869,37 @@ static void add_columns(MusicQueue *self)
 											"text",
 											COLUMN_TITLE,
 											NULL);
+
+	// gtk_tree_view_column_set_sort_column_id(column,SORTID_TITLE);
+
+	
+ 	renderer = gtk_cell_renderer_text_new ();
+    g_object_set(G_OBJECT(renderer),"ellipsize",PANGO_ELLIPSIZE_END,NULL);
+    
+    g_object_set(G_OBJECT(renderer),"font",font,NULL);
+    
+
+
+	
+    column = gtk_tree_view_column_new_with_attributes ("Songs",
+											renderer,
+											"text",
+											COLUMN_SONG,
+											NULL);
+
+	
+
+	gtk_tree_view_append_column (GTK_TREE_VIEW(self->treeview), column);
+
+	
     //gtk_tree_view_column_set_resizable(GTK_TREE_VIEW_COLUMN (column),TRUE);
     
     //gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 20);
     
     //sort
-    gtk_tree_view_column_set_sort_column_id(column,SORTID_TITLE);
+  
     
-    gtk_tree_view_append_column (GTK_TREE_VIEW(self->treeview), column);
+    //gtk_tree_view_append_column (GTK_TREE_VIEW(self->treeview), column);
 
 	
     renderer = gtk_cell_renderer_text_new ();

@@ -301,25 +301,34 @@ static void mwindow_new_file(GsPlayer *player,
 	MusicMainWindow *self = (MusicMainWindow *)user_data;
 	gchar title[200];
 	const gchar toke[] ="/";
+	const gchar toke2[] =".";
 	gchar buffer[50];
 	gchar *out;
 	gint i;
 	gchar **tokens;
+	gchar **tokens2;
 	gchar output[1024];
 	gchar output2[1024];
-
+	gchar *escaped;
+	gchar *escaped_artist;
+	gchar *escaped_title;
 
 
 	if(p_track->artist){
 		sprintf(title,"%s - %s",p_track->artist, p_track->title);
 		gtk_window_set_title(GTK_WINDOW(self),title);
-		g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s - %s</span>",p_track->artist,p_track->title);
+		escaped_artist = g_markup_escape_text(p_track->artist,-1);
+		escaped_title  = g_markup_escape_text(p_track->title,-1);
+		g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s - %s</span>",escaped_artist,escaped_title);
 		gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
+		g_free(escaped_title);
+		g_free(escaped_artist);
 		if(p_track->album)
 		{
 			g_sprintf(output,"<span style=\"italic\" size=\"small\">from:%s</span>",p_track->album);
 			gtk_label_set_markup(GTK_LABEL(self->albumlabel),output);
 			gtk_widget_show(self->albumlabel);
+			
 		}else{
 			gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
 		}
@@ -335,12 +344,17 @@ static void mwindow_new_file(GsPlayer *player,
 		{
 			for(i=1; tokens[i] != NULL; i++);
 
-			gtk_window_set_title(GTK_WINDOW(self),tokens[i-1]);
-
-			g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s</span>",tokens[i-1]);
+			tokens2=g_strsplit(tokens[i-1],toke2,2);
+					
+			gtk_window_set_title(GTK_WINDOW(self),*tokens2);
+			escaped = g_markup_escape_text(*tokens2,-1);
+			
+			g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s</span>",escaped);
 			gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
+			g_strfreev(tokens2);  
 			g_strfreev(tokens);  
 			g_free(out);
+			g_free(escaped);
 
 			gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
 		}
