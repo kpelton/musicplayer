@@ -530,7 +530,7 @@ s,@install_sh@,|#_!!_#|/home/kyle/c/music.git/musicplayer/install-sh,g
 s,@STRIP@,|#_!!_#|,g
 s,@INSTALL_STRIP_PROGRAM@,|#_!!_#|${SHELL} $(install_sh) -c -s,g
 s,@mkdir_p@,|#_!!_#|mkdir -p --,g
-s,@AWK@,|#_!!_#|mawk,g
+s,@AWK@,|#_!!_#|gawk,g
 s,@SET_MAKE@,|#_!!_#|,g
 s,@am__leading_dot@,|#_!!_#|.,g
 s,@AMTAR@,|#_!!_#|${SHELL} /home/kyle/c/music.git/musicplayer/missing --run tar,g

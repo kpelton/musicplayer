@@ -45,10 +45,8 @@ configure:1782: result: /usr/bin/install -c
 configure:1793: checking whether build environment is sane
 configure:1836: result: yes
 configure:1901: checking for gawk
-configure:1931: result: no
-configure:1901: checking for mawk
-configure:1917: found /usr/bin/mawk
-configure:1928: result: mawk
+configure:1917: found /usr/bin/gawk
+configure:1928: result: gawk
 configure:1939: checking whether make sets $(MAKE)
 configure:1960: result: yes
 configure:2158: checking for style of include used by make
@@ -251,7 +249,7 @@ ac_cv_objext=o
 ac_cv_path_EGREP='/bin/grep -E'
 ac_cv_path_GREP=/bin/grep
 ac_cv_path_install='/usr/bin/install -c'
-ac_cv_prog_AWK=mawk
+ac_cv_prog_AWK=gawk
 ac_cv_prog_CPP='gcc -E'
 ac_cv_prog_ac_ct_CC=gcc
 ac_cv_prog_cc_c89=
@@ -274,7 +272,7 @@ AMTAR='${SHELL} /home/kyle/c/music.git/musicplayer/missing --run tar'
 AUTOCONF='${SHELL} /home/kyle/c/music.git/musicplayer/missing --run autoconf'
 AUTOHEADER='${SHELL} /home/kyle/c/music.git/musicplayer/missing --run autoheader'
 AUTOMAKE='${SHELL} /home/kyle/c/music.git/musicplayer/missing --run automake-1.9'
-AWK='mawk'
+AWK='gawk'
 CC='gcc'
 CCDEPMODE='depmode=gcc3'
 CFLAGS='-g -O2'

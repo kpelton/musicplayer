@@ -71,7 +71,7 @@ AMTAR = ${SHELL} /home/kyle/c/music.git/musicplayer/missing --run tar
 AUTOCONF = ${SHELL} /home/kyle/c/music.git/musicplayer/missing --run autoconf
 AUTOHEADER = ${SHELL} /home/kyle/c/music.git/musicplayer/missing --run autoheader
 AUTOMAKE = ${SHELL} /home/kyle/c/music.git/musicplayer/missing --run automake-1.9
-AWK = mawk
+AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
