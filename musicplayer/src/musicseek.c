@@ -12,10 +12,37 @@ static gboolean ValueChanged (GtkRange     *range,
 		       gdouble       value,
 			      gpointer      user_data);
 
+
+
+static void
+music_seek_finalize (GObject *gobject)
+{
+  MusicSeek *self = MUSIC_SEEK(gobject);
+
+ 
+  /* Chain up to the parent class */
+  G_OBJECT_CLASS (music_seek_parent_class)->finalize (gobject);
+}
+
+static void
+music_seek_dispose (GObject *gobject)
+{
+    MusicSeek *self = MUSIC_SEEK(gobject);
+    G_OBJECT_CLASS (music_seek_parent_class)->dispose (gobject);
+
+}
+
 static void
 music_seek_class_init (MusicSeekClass *klass)
 {
+    GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+
+    gobject_class->dispose = music_seek_dispose;
+    gobject_class->finalize = music_seek_finalize;
+ 
 }
+
+
 
 static void
 music_seek_init (MusicSeek *self)

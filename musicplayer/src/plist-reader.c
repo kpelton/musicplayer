@@ -37,13 +37,15 @@ plist_reader_set_property (GObject *object, guint property_id,
 static void
 plist_reader_dispose (GObject *object)
 {
-  G_OBJECT_CLASS (plist_reader_parent_class)->dispose (object);
+  
 
   PlistReader *self = (PlistReader *) object;
   
 
   
     xmlCleanupParser();
+
+    G_OBJECT_CLASS (plist_reader_parent_class)->dispose (object);
 
 }
 gboolean plist_xspf_read(gchar *location,GList **list,PlistReader *self)

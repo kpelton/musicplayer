@@ -1,6 +1,6 @@
 #include "player.h"
 #include <string.h>
- G_DEFINE_TYPE (GsPlayer, gs_player, G_TYPE_OBJECT)
+ 
 
 
 static void gs_SecondsToReal(float fseconds, char *str);
@@ -11,13 +11,15 @@ static signals[5];
 static void gst_new_tags                (const GstTagList *list,
 				    const gchar *tag,
 				    gpointer user_data);
-static void gtk_widget_dispose (GObject *object);
-static void gtk_widget_finalize (GObject *object);
+static void gs_player_dispose (GObject *object);
+static void gs_player_finalize (GObject *object);
 
 static gboolean gs_checkEnd(gpointer data);
 static void ts_event_loop(GsPlayer* self, GstBus *bus);
 gboolean gs_get_tags(GsPlayer *);
 static metadata * copyTrack(metadata *track);
+
+
 typedef enum {
      TAGS,
      ERROR,
@@ -25,19 +27,27 @@ typedef enum {
      NEWFILE
 }SIGNALS;
 
+G_DEFINE_TYPE (GsPlayer, gs_player, G_TYPE_OBJECT)
 static void
-gtk_widget_dispose (GObject *object)
+gs_player_dispose (GObject *object)
 {
-	G_OBJECT_CLASS (gs_player_parent_class)->dispose (object);
-  
+    GsPlayer *player =GS_PLAYER(object);
+	if(player->play)
+    {
+        gst_element_set_state (player->play, GST_STATE_NULL);
+     g_object_unref(player->play);
+	g_object_unref(player->gconf);
+    player->play=NULL;
+    
+    G_OBJECT_CLASS (gs_player_parent_class)->dispose (object);
+    }
 }
 static void
-gtk_widget_finalize (GObject *object)
+gs_player_finalize (GObject *object)
 {
      GsPlayer *player =GS_PLAYER(object);
 
-    g_object_unref(player->play);
-	g_object_unref(player->gconf);
+   
 	G_OBJECT_CLASS (gs_player_parent_class)->finalize (object);
 }
 
@@ -80,8 +90,8 @@ gs_player_class_init (GsPlayerClass *klass)
 				     G_TYPE_POINTER);
 
 
-     object_class->dispose = gtk_widget_dispose;
-     object_class->finalize = gtk_widget_finalize;
+     object_class->dispose = gs_player_dispose;
+     object_class->finalize = gs_player_finalize;
 
 
  } 

@@ -49,24 +49,29 @@ music_main_window_set_property (GObject *object, guint property_id,
 static void
 music_main_window_dispose (GObject *object)
 {
-	
-	 	
+    MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);	
+	if(self->player)
+    {
+        
+       g_object_unref(G_OBJECT(self->client));
+	   //g_object_unref(G_OBJECT(self->player));
+	    self->player = NULL;
+    }
   G_OBJECT_CLASS (music_main_window_parent_class)->dispose (object);
  
- gtk_exit(0);
+gtk_exit(0);
 }
 
 static void
 music_main_window_finalize (GObject *object)
 {
 		MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);	
-	  //unref tout
-	  g_object_unref(G_OBJECT(self->player));
-	  g_object_unref(G_OBJECT(self->queue));
+	
 
-	 g_object_unref(G_OBJECT(self->client));	
-
+	 	
+    
 	 G_OBJECT_CLASS (music_main_window_parent_class)->finalize (object);
+   
 }
 
 static void
@@ -216,7 +221,7 @@ static void init_widgets(MusicMainWindow *self)
     g_signal_connect (self->playbutton, "released",
 				  G_CALLBACK (on_play_released),
 				  (gpointer)self);
-	  
+
 	  self->signum = g_signal_connect (self, "size-allocate",
 				  															  G_CALLBACK(on_size_allocate),
 				  															 (gpointer)self);

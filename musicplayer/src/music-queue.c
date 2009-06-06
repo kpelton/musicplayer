@@ -177,27 +177,21 @@ music_queue_set_property (GObject *object, guint property_id,
 static void
 music_queue_dispose (GObject *object)
 {
+    if(object){
      MusicQueue *self = MUSIC_QUEUE(object) ;
-     
-  G_OBJECT_CLASS (music_queue_parent_class)->dispose (object);
-}
-
-static void
-music_queue_finalize (GObject *object)
-{
-     MusicQueue *self = MUSIC_QUEUE(object);
-     GList *list;
+    GList *list;
      gboolean repeat;	
 	 gchar *font;
 
-
+if (self->client)
+    {
 
 	if((list = get_list(self)) != NULL)
 	{
 		plist_reader_write_list("/home/kyle/test.xspf",list,self->read);
 		g_list_free(list);
 	}
-	G_OBJECT_CLASS (music_queue_parent_class)->finalize (object);
+	
 
 	g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
 	g_object_get(G_OBJECT(self),"musicqueue-repeat",&repeat,NULL);
@@ -213,12 +207,23 @@ music_queue_finalize (GObject *object)
 	                                 repeat,
 	                                 NULL);
 
-
-	g_object_unref(self->client);	
+  
+	g_object_unref(self->client);
+    self->client = NULL;
 	g_free(font);
-	g_object_unref(self->store);
-	g_object_unref(self->read);
+	//g_object_unref(self->store);
+	//g_object_unref(self->read);
 
+     
+  G_OBJECT_CLASS (music_queue_parent_class)->dispose (object);
+    }
+    }
+}
+static void
+music_queue_finalize (GObject *object)
+{
+     MusicQueue *self = MUSIC_QUEUE(object);
+     G_OBJECT_CLASS (music_queue_parent_class)->finalize (object);
 }
   
 static void
