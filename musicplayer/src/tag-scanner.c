@@ -143,7 +143,7 @@ metadata * ts_get_metadata(gchar * uri,TagScanner * self){
      gst_bus_add_watch (self->bus, my_bus_callback, self);
      gst_element_set_state (self->pipeline, GST_STATE_PLAYING);
      
-     usleep(20000);
+    
      ts_event_loop(self,self->bus,track);
          
      gst_element_set_state (self->pipeline, GST_STATE_NULL);
