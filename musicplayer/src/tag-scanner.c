@@ -339,7 +339,6 @@ cb_newpad (GstElement *decodebin,
      }
 
   
-     /* link'n'play */
      gst_pad_link (pad, audiopad);
 }
 

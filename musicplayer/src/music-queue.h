@@ -41,6 +41,7 @@ typedef struct {
 	GtkWidget *menu;
 	GtkWidget *delete;
 	GtkListStore *store;
+    GtkTreeModel *musicstore;
 	GsPlayer *player;
 	GtkTreeIter  curr;
 	GtkTreeSelection *currselection;

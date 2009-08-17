@@ -47,11 +47,7 @@ music_seek_class_init (MusicSeekClass *klass)
 static void
 music_seek_init (MusicSeek *self)
 {
-    
-     gtk_scale_set_value_pos(GTK_SCALE(self),GTK_POS_TOP);
-     
-     
-
+    gtk_scale_set_value_pos(GTK_SCALE(self),GTK_POS_TOP);
      
 }
 

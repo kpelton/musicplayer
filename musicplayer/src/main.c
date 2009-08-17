@@ -11,11 +11,6 @@ main (int argc, char *argv[])
 {
   GtkWidget *mainwindow;
   MusicMainWindow *m;
-  MusicQueue *m2;
-  GtkWidget* vbox;
-  GtkBox *box;
-  
-
 
   gst_init (&argc, &argv);
    g_type_init();

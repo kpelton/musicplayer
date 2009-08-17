@@ -1,10 +1,11 @@
 /* Music-queue.c */
-
+#include "music-store.h"
 #include "music-queue.h"
 
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
 #include <gdk/gdkkeysyms.h>
+
 #include <glib.h>
 G_DEFINE_TYPE (MusicQueue, music_queue, GTK_TYPE_VBOX)
 
@@ -178,45 +179,45 @@ static void
 music_queue_dispose (GObject *object)
 {
     if(object){
-     MusicQueue *self = MUSIC_QUEUE(object) ;
-    GList *list;
-     gboolean repeat;	
-	 gchar *font;
+        MusicQueue *self = MUSIC_QUEUE(object) ;
+        GList *list;
+        gboolean repeat;	
+        gchar *font;
 
-if (self->client)
-    {
+        if (self->client)
+        {
 
-	if((list = get_list(self)) != NULL)
-	{
-		plist_reader_write_list("/home/kyle/test.xspf",list,self->read);
-		g_list_free(list);
-	}
-	
+            if((list = get_list(self)) != NULL)
+            {
+                plist_reader_write_list("/home/kyle/test.xspf",list,self->read);
+                g_list_free(list);
+            }
 
-	g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
-	g_object_get(G_OBJECT(self),"musicqueue-repeat",&repeat,NULL);
 
-	//save all the props we want to gconf
-	gconf_client_set_string              (self->client,
-	                                      "/apps/musicplayer/font",
-	                                      font,
-	                                      NULL);
+            g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
+            g_object_get(G_OBJECT(self),"musicqueue-repeat",&repeat,NULL);
 
-	gconf_client_set_bool           (self->client,
-	                                 "/apps/musicplayer/repeat",
-	                                 repeat,
-	                                 NULL);
+            //save all the props we want to gconf
+            gconf_client_set_string              (self->client,
+                                                  "/apps/musicplayer/font",
+                                                  font,
+                                                  NULL);
 
-  
-	g_object_unref(self->client);
-    self->client = NULL;
-	g_free(font);
-	//g_object_unref(self->store);
-	//g_object_unref(self->read);
+            gconf_client_set_bool           (self->client,
+                                             "/apps/musicplayer/repeat",
+                                             repeat,
+                                             NULL);
 
-     
-  G_OBJECT_CLASS (music_queue_parent_class)->dispose (object);
-    }
+
+            g_object_unref(self->client);
+            self->client = NULL;
+            g_free(font);
+            //g_object_unref(self->store);
+            //g_object_unref(self->read);
+
+
+            G_OBJECT_CLASS (music_queue_parent_class)->dispose (object);
+        }
     }
 }
 static void
@@ -386,12 +387,12 @@ static void init_widgets(MusicQueue *self)
 
      self->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,-1);
 
-    
+    self->musicstore = music_store_new_with_model(GTK_TREE_MODEL(self->store),NULL);
 
-     
+       
 
      //add model to widget
-     self->treeview = gtk_tree_view_new_with_model(GTK_TREE_MODEL(self->store));
+     self->treeview = gtk_tree_view_new_with_model(GTK_TREE_MODEL(self->musicstore));
      
      add_columns(self);
 
@@ -473,20 +474,6 @@ static void init_widgets(MusicQueue *self)
       gtk_tree_selection_set_mode(self->currselection,GTK_SELECTION_MULTIPLE);
 
 
-//sorting
-	sortable = GTK_TREE_SORTABLE(self->store);
-
-//artist
-	gtk_tree_sortable_set_sort_func(sortable,SORTID_ARTIST, sort_iter_compare_func,
-                                    GINT_TO_POINTER(SORTID_ARTIST),NULL);
-
-	gtk_tree_sortable_set_default_sort_func(sortable,sort_iter_compare_func,NULL,NULL);
-//title
-
-	gtk_tree_sortable_set_sort_func(sortable,SORTID_TITLE, sort_iter_compare_func_title,
-				GINT_TO_POINTER(SORTID_TITLE),NULL);
-
-	gtk_tree_sortable_set_default_sort_func(sortable,sort_iter_compare_func_title,NULL,NULL);
 
 
 	self->menu = getcontextmenu(self);
@@ -1125,6 +1112,7 @@ static void remove_files(GtkMenuItem *item, gpointer
     GList * rowref_list = g_list_alloc();
     gint i;
     GtkTreeIter iter;
+    GtkTreeIter childiter;
     GtkTreePath *path;
     GtkTreeModel *model;
     gchar *id;
@@ -1166,7 +1154,9 @@ static void remove_files(GtkMenuItem *item, gpointer
 			 self->currid = atoi(id);
 		  }
 	   }
-	   gtk_list_store_remove(GTK_LIST_STORE(self->store),&iter);
+
+        gtk_tree_model_filter_convert_iter_to_child_iter(GTK_TREE_MODEL_FILTER(model),&childiter,&iter);
+	   gtk_list_store_remove(GTK_LIST_STORE(self->store),&childiter);
 	   
     }
     //free everything
