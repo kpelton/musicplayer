@@ -1155,7 +1155,7 @@ static void remove_files(GtkMenuItem *item, gpointer
 		  }
 	   }
 
-        gtk_tree_model_filter_convert_iter_to_child_iter(GTK_TREE_MODEL_FILTER(model),&childiter,&iter);
+       gtk_tree_model_filter_convert_iter_to_child_iter(GTK_TREE_MODEL_FILTER(model),&childiter,&iter);
 	   gtk_list_store_remove(GTK_LIST_STORE(self->store),&childiter);
 	   
     }
