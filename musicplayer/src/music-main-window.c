@@ -223,7 +223,7 @@ static void init_widgets(MusicMainWindow *self)
 				  (gpointer)self);
 
 	  self->signum = g_signal_connect (self, "size-allocate",
-				  															  G_CALLBACK(on_size_allocate),
+				  											 G_CALLBACK(on_size_allocate),
 				  															 (gpointer)self);
 			 
     

@@ -7,7 +7,7 @@
 
 #include "jump-window.h"
 
-enum
+typedef enum
 {
   COLUMN_ARTIST,
   COLUMN_TITLE,
@@ -16,11 +16,23 @@ enum
   COLUMN_ID,
   N_COLUMNS,
   
-};
+}COLUMNS;
+
+
+typedef enum {
+	JUMP
+}SIGNALS;
+
+static signals[5];
+
+//prototypes
 static void init_widgets(JumpWindow *self, GtkTreeModel *model);
 static void add_columns(JumpWindow *self);
-
-
+static void jump_button_pressed(gpointer user_data);
+static void row_activated(GtkTreeView *treeview,
+                      GtkTreePath        *path,
+                      GtkTreeViewColumn  *col,
+                      gpointer data);
 G_DEFINE_TYPE (JumpWindow, jump_window, GTK_TYPE_WINDOW);
 
 static void
@@ -46,6 +58,18 @@ jump_window_class_init (JumpWindowClass *klass)
 	GtkWindowClass* parent_class = GTK_WINDOW_CLASS (klass);
 
 	object_class->finalize = jump_window_finalize;
+
+	signals[JUMP]= g_signal_new ("jump",
+				     G_TYPE_FROM_CLASS (klass),
+				     G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+				     0 /* closure */,
+				     NULL /* accumulator */,
+				     NULL /* accumulator data */,
+				     g_cclosure_marshal_VOID__POINTER,                            
+				     G_TYPE_NONE /* return_tpe */,
+				     1,
+				     G_TYPE_POINTER);
+
 }
 GtkWidget*
 jump_window_new_with_model (GtkTreeModel *model)
@@ -86,22 +110,46 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 	gtk_box_pack_start (GTK_BOX (self->mainvbox),self->entry, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (self->mainvbox),self->scrolledwindow, TRUE, TRUE, 0);
 	gtk_box_pack_start (GTK_BOX (self->mainvbox),self->jumpbutton, FALSE, FALSE, 0);
+
+	//properties
+	  gtk_window_set_default_size         (GTK_WINDOW(self),
+					  250,
+					  350);
 	
 	gtk_widget_show_all(GTK_WIDGET(self->mainvbox));
 	gtk_widget_show_all(GTK_WIDGET(self->scrolledwindow));
 
-	
+	//signals
+
+	g_signal_connect ((gpointer) self->jumpbutton, "released",
+	                  G_CALLBACK (jump_button_pressed),
+	                  (self));
+
+	g_signal_connect (G_OBJECT (self->treeview), "row-activated",
+	                  G_CALLBACK (row_activated),
+	                  self);
 	
 }
+
+static void jump_button_pressed(gpointer data)
+{
+	JumpWindow *self = JUMP_WINDOW(data);
+}
+static void row_activated(GtkTreeView *treeview,
+                      GtkTreePath        *path,
+                      GtkTreeViewColumn  *col,
+                      gpointer data)
+{
+	JumpWindow *self = JUMP_WINDOW(data);
+	
+}
+
+
 static void add_columns(JumpWindow *self)
 {
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
-    gchar *font = NULL;
-    g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
-    
 
-    
     renderer = gtk_cell_renderer_text_new ();
     
     column = gtk_tree_view_column_new_with_attributes ("Artist",
@@ -111,15 +159,7 @@ static void add_columns(JumpWindow *self)
 											NULL);
     
     gtk_tree_view_column_set_resizable(GTK_TREE_VIEW_COLUMN (column),TRUE);
-    
-    //gtk_tree_view_append_column (GTK_TREE_VIEW(self->treeview), column);
-    //gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 5);
-    
-    //set sortable
-   // gtk_tree_view_column_set_sort_column_id(column,SORTID_ARTIST);
-    
-    
-    
+       
     renderer = gtk_cell_renderer_text_new ();
     g_object_set(G_OBJECT(renderer),"ellipsize",PANGO_ELLIPSIZE_END,NULL);
     
@@ -131,17 +171,10 @@ static void add_columns(JumpWindow *self)
 											COLUMN_TITLE,
 											NULL);
 
-	// gtk_tree_view_column_set_sort_column_id(column,SORTID_TITLE);
-
 	
  	renderer = gtk_cell_renderer_text_new ();
     g_object_set(G_OBJECT(renderer),"ellipsize",PANGO_ELLIPSIZE_END,NULL);
-    
-    g_object_set(G_OBJECT(renderer),"font",font,NULL);
-    
 
-
-	
     column = gtk_tree_view_column_new_with_attributes ("Songs",
 											renderer,
 											"text",
@@ -152,17 +185,6 @@ static void add_columns(JumpWindow *self)
 
 	gtk_tree_view_append_column (GTK_TREE_VIEW(self->treeview), column);
 
-	
-    //gtk_tree_view_column_set_resizable(GTK_TREE_VIEW_COLUMN (column),TRUE);
-    
-    //gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 20);
-    
-    //sort
-  
-    
-    //gtk_tree_view_append_column (GTK_TREE_VIEW(self->treeview), column);
-
-	
     renderer = gtk_cell_renderer_text_new ();
     
     
