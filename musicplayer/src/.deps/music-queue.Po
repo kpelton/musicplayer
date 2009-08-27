@@ -486,7 +486,7 @@ music-queue.o: music-queue.c music-store.h \
   /usr/include/gstreamer-0.10/gst/gstxml.h \
   /usr/include/gstreamer-0.10/gst/gstcompat.h tag-scanner.h \
   /usr/include/semaphore.h /usr/include/bits/semaphore.h plist-reader.h \
-  /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs.h \
+  jump-window.h /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs.h \
   /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-acl.h \
   /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-result.h \
   /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs-ace.h \
@@ -1654,6 +1654,8 @@ tag-scanner.h:
 /usr/include/bits/semaphore.h:
 
 plist-reader.h:
+
+jump-window.h:
 
 /usr/include/gnome-vfs-2.0/libgnomevfs/gnome-vfs.h:
 

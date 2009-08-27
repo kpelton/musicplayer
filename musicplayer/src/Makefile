@@ -46,7 +46,7 @@ am_musicplayer_OBJECTS = music-main-window.$(OBJEXT) \
 	musicseek.$(OBJEXT) player.$(OBJEXT) main.$(OBJEXT) \
 	music-queue.$(OBJEXT) music-volume.$(OBJEXT) \
 	plist-reader.$(OBJEXT) tag-scanner.$(OBJEXT) \
-	music-store.$(OBJEXT)
+	music-store.$(OBJEXT) jump-window.$(OBJEXT)
 musicplayer_OBJECTS = $(am_musicplayer_OBJECTS)
 musicplayer_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.
@@ -148,7 +148,7 @@ top_builddir = ..
 top_srcdir = ..
 AM_CFLAGS = `pkg-config --cflags --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0` -g		
 AM_LDFLAGS = `pkg-config --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0` -g
-musicplayer_SOURCES = music-main-window.c musicseek.c player.c main.c music-queue.c music-volume.c  plist-reader.c tag-scanner.c music-queue.h  music-volume.h  plist-reader.h music-main-window.h music-seek.h player.h tag-scanner.h  music-store.c music-store.h 
+musicplayer_SOURCES = music-main-window.c musicseek.c player.c main.c music-queue.c music-volume.c  plist-reader.c tag-scanner.c music-queue.h  music-volume.h  plist-reader.h music-main-window.h music-seek.h player.h tag-scanner.h  music-store.c music-store.h jump-window.h jump-window.c
 musicplayer_LDADD = $(INTI_LIBS)
 all: all-am
 
@@ -216,6 +216,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+include ./$(DEPDIR)/jump-window.Po
 include ./$(DEPDIR)/main.Po
 include ./$(DEPDIR)/music-main-window.Po
 include ./$(DEPDIR)/music-queue.Po

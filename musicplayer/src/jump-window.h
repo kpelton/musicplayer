@@ -9,6 +9,7 @@
 #define _JUMP_WINDOW_H_
 
 #include <glib-object.h>
+#include <gtk/gtk.h>
 
 G_BEGIN_DECLS
 
@@ -30,10 +31,19 @@ struct _JumpWindowClass
 struct _JumpWindow
 {
 	GtkWindow parent_instance;
+	GtkWidget *mainvbox;
+    GtkWidget *mainhbox;
+	GtkWidget *entry;    
+	GtkWidget *treeview;
+	GtkWidget *openbutton;
+	GtkWidget *scrolledwindow;
+	GtkWidget *jumpbutton;
 };
 
 GType jump_window_get_type (void) G_GNUC_CONST;
 
+GtkWidget*
+jump_window_new_with_model (GtkTreeModel *model);
 G_END_DECLS
 
 #endif /* _JUMP_WINDOW_H_ */

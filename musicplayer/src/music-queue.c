@@ -1,11 +1,10 @@
 /* Music-queue.c */
 #include "music-store.h"
 #include "music-queue.h"
-
+#include "jump-window.h"
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
 #include <gdk/gdkkeysyms.h>
-
 #include <glib.h>
 G_DEFINE_TYPE (MusicQueue, music_queue, GTK_TYPE_VBOX)
 
@@ -391,8 +390,9 @@ static void init_widgets(MusicQueue *self)
 
        
 
-     //add model to widget
-     self->treeview = gtk_tree_view_new_with_model(GTK_TREE_MODEL(self->musicstore));
+     //add model to widget we want the jump window to have the filter store and the queue
+     // to have the regular list store
+     self->treeview = gtk_tree_view_new_with_model(GTK_TREE_MODEL(self->store));
      
      add_columns(self);
 
@@ -1060,9 +1060,17 @@ static gboolean remove_files_via_press(GtkWidget *widget,
 							    GdkEventKey *event,
 							    gpointer user_data)
 {
-    
+    GtkWidget *jumpwindow;
+    MusicQueue *self = (MusicQueue *) user_data;
     if(event->keyval == GDK_Delete && has_selected(user_data) == TRUE)
 	   remove_files(NULL,user_data);
+
+  if(event->keyval == GDK_j)
+    {
+       jumpwindow = jump_window_new_with_model(self->musicstore);
+
+        gtk_widget_show(jumpwindow);
+    }
     
     return FALSE;
 }  
