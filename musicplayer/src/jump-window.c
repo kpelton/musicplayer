@@ -28,7 +28,7 @@ static signals[5];
 //prototypes
 static void init_widgets(JumpWindow *self, GtkTreeModel *model);
 static void add_columns(JumpWindow *self);
-static void jump_button_pressed(gpointer user_data);
+static void jump_button_pressed(GtkButton *button, gpointer user_data);
 static void row_activated(GtkTreeView *treeview,
                       GtkTreePath        *path,
                       GtkTreeViewColumn  *col,
@@ -115,6 +115,10 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 	  gtk_window_set_default_size         (GTK_WINDOW(self),
 					  250,
 					  350);
+
+
+	gtk_entry_set_icon_from_stock (GTK_ENTRY(self->entry),GTK_ENTRY_ICON_PRIMARY, "gtk-find");
+	gtk_entry_set_icon_from_stock (GTK_ENTRY(self->entry),GTK_ENTRY_ICON_SECONDARY, "gtk-clear");
 	
 	gtk_widget_show_all(GTK_WIDGET(self->mainvbox));
 	gtk_widget_show_all(GTK_WIDGET(self->scrolledwindow));
@@ -131,7 +135,7 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 	
 }
 
-static void jump_button_pressed(gpointer data)
+static void jump_button_pressed(GtkButton *button,  gpointer data)
 {
 	JumpWindow *self = JUMP_WINDOW(data);
 }
@@ -141,6 +145,16 @@ static void row_activated(GtkTreeView *treeview,
                       gpointer data)
 {
 	JumpWindow *self = JUMP_WINDOW(data);
+	GtkTreePath *child;
+	GtkTreeModel *model;
+	model = gtk_tree_view_get_model(treeview);
+	
+	child = gtk_tree_model_filter_convert_path_to_child_path
+                                                        (GTK_TREE_MODEL_FILTER(model),
+                                                         path);
+
+	g_signal_emit (self, signals[JUMP],0,child);
+
 	
 }
 

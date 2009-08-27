@@ -111,6 +111,9 @@ static void set_repeat   (GtkCheckMenuItem *widget,
 
 static GList * get_list(gpointer user_data);
 
+static void gotJump(JumpWindow *jwindow,
+			    GtkTreePath* path,gpointer user_data);
+
 const static  GtkTargetEntry targetentries[] =
 {
      { "STRING",        0, TARGET_STRING },
@@ -1069,11 +1072,28 @@ static gboolean remove_files_via_press(GtkWidget *widget,
     {
        jumpwindow = jump_window_new_with_model(self->musicstore);
 
+    g_signal_connect(jumpwindow, "jump",
+	                 G_CALLBACK(gotJump),
+	                 self);
+
+        
         gtk_widget_show(jumpwindow);
     }
     
     return FALSE;
 }  
+
+static void gotJump(JumpWindow *jwindow,
+			    GtkTreePath* path,gpointer user_data)
+{
+    MusicQueue *self = (MusicQueue *) user_data;
+    gtk_tree_selection_unselect_all(self->currselection);
+    gtk_tree_selection_select_path(self->currselection,path); 
+
+    
+    playfile(GTK_TREE_VIEW(self->treeview),path,NULL,user_data);
+}
+    
 
 static void set_font   (gpointer    callback_data,
 				    guint       callback_action,
