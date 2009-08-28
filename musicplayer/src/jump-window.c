@@ -6,6 +6,8 @@
  */
 
 #include "jump-window.h"
+#include <glib.h>
+#include <string.h>
 
 typedef enum
 {
@@ -33,6 +35,12 @@ static void row_activated(GtkTreeView *treeview,
                       GtkTreePath        *path,
                       GtkTreeViewColumn  *col,
                       gpointer data);
+static void               text_written                   (GtkEntry *entry,
+                                                        gpointer  user_data);
+
+gboolean	check_visible								(GtkTreeModel *model,
+                                                         GtkTreeIter *iter,
+                                                         gpointer data);
 G_DEFINE_TYPE (JumpWindow, jump_window, GTK_TYPE_WINDOW);
 
 static void
@@ -47,6 +55,7 @@ static void
 jump_window_finalize (GObject *object)
 {
 	/* TODO: Add deinitalization code here */
+
 
 	G_OBJECT_CLASS (jump_window_parent_class)->finalize (object);
 }
@@ -92,7 +101,8 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 	self->mainvbox = gtk_vbox_new (FALSE, 0);
 
 	self->entry = 	gtk_entry_new();
-
+	self->filter =  GTK_TREE_MODEL_FILTER(model);
+	
 	self->scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
 	self->jumpbutton = gtk_button_new_with_label("Jump");
 	
@@ -116,22 +126,30 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 					  250,
 					  350);
 
-
+	
+	
 	gtk_entry_set_icon_from_stock (GTK_ENTRY(self->entry),GTK_ENTRY_ICON_PRIMARY, "gtk-find");
 	gtk_entry_set_icon_from_stock (GTK_ENTRY(self->entry),GTK_ENTRY_ICON_SECONDARY, "gtk-clear");
+
+	gtk_tree_model_filter_set_visible_func (GTK_TREE_MODEL_FILTER(model),check_visible,self,NULL);
 	
 	gtk_widget_show_all(GTK_WIDGET(self->mainvbox));
 	gtk_widget_show_all(GTK_WIDGET(self->scrolledwindow));
 
 	//signals
 
-	g_signal_connect ((gpointer) self->jumpbutton, "released",
+	g_signal_connect (G_OBJECT(self->jumpbutton), "released",
 	                  G_CALLBACK (jump_button_pressed),
 	                  (self));
 
 	g_signal_connect (G_OBJECT (self->treeview), "row-activated",
 	                  G_CALLBACK (row_activated),
 	                  self);
+	
+	g_signal_connect (G_OBJECT (self->entry), "changed",
+	                  G_CALLBACK (text_written),
+	                  self);
+	gtk_tree_model_filter_refilter (self->filter);
 	
 }
 
@@ -157,7 +175,50 @@ static void row_activated(GtkTreeView *treeview,
 
 	
 }
+static void               text_written                   (GtkEntry *entry,
+                                                          gpointer  data)
+{
+	JumpWindow *self = JUMP_WINDOW(data);
+	gtk_tree_model_filter_refilter (self->filter);
+	
+}
 
+gboolean	check_visible								(GtkTreeModel *model,
+                                                         GtkTreeIter *iter,
+                                                         gpointer data)
+{
+	
+	gchar *song=NULL;
+	JumpWindow *self = JUMP_WINDOW(data);
+	gchar *songlow=NULL;
+	gchar *textlow=NULL;
+	const gchar *text;
+	
+	text = gtk_entry_get_text(GTK_ENTRY(self->entry));
+
+	if(text){
+	gtk_tree_model_get (model, iter, COLUMN_SONG, &song, -1);
+	songlow =	g_utf8_strdown (song, g_utf8_strlen(song,500));
+
+	if(g_strrstr(songlow,text))
+	{
+		g_free(song);
+		g_free(songlow);
+		g_free(textlow);
+		return TRUE;
+	}
+		else
+	{
+		g_free(song);
+		g_free(songlow);
+		g_free(textlow);
+		return FALSE;
+	}
+	
+	g_free(song);
+	}
+	return TRUE;
+}
 
 static void add_columns(JumpWindow *self)
 {

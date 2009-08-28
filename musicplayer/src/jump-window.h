@@ -38,6 +38,8 @@ struct _JumpWindow
 	GtkWidget *openbutton;
 	GtkWidget *scrolledwindow;
 	GtkWidget *jumpbutton;
+	GtkTreeModelFilter *filter;
+	
 };
 
 GType jump_window_get_type (void) G_GNUC_CONST;

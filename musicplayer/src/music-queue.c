@@ -389,7 +389,7 @@ static void init_widgets(MusicQueue *self)
 
      self->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,-1);
 
-    self->musicstore = music_store_new_with_model(GTK_TREE_MODEL(self->store),NULL);
+    
 
        
 
@@ -1070,14 +1070,14 @@ static gboolean remove_files_via_press(GtkWidget *widget,
 
   if(event->keyval == GDK_j)
     {
+       self->musicstore = music_store_new_with_model(GTK_TREE_MODEL(self->store),NULL);
        jumpwindow = jump_window_new_with_model(self->musicstore);
 
     g_signal_connect(jumpwindow, "jump",
 	                 G_CALLBACK(gotJump),
 	                 self);
-
-        
-        gtk_widget_show(jumpwindow);
+           
+    gtk_widget_show(jumpwindow);
     }
     
     return FALSE;
@@ -1183,8 +1183,8 @@ static void remove_files(GtkMenuItem *item, gpointer
 		  }
 	   }
 
-       gtk_tree_model_filter_convert_iter_to_child_iter(GTK_TREE_MODEL_FILTER(model),&childiter,&iter);
-	   gtk_list_store_remove(GTK_LIST_STORE(self->store),&childiter);
+      
+	   gtk_list_store_remove(GTK_LIST_STORE(self->store),&iter);
 	   
     }
     //free everything
