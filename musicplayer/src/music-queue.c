@@ -407,6 +407,8 @@ static void init_widgets(MusicQueue *self)
      //gtk_box_pack_start (GTK_BOX (self),self->treeview, TRUE, TRUE, 0);
      //gtk_tree_view_set_fixed_height_mode (GTK_TREE_VIEW (self->treeview), TRUE);
 
+    g_object_set (G_OBJECT (self->treeview),"headers-visible"  ,FALSE,
+	          	"headers-clickable",FALSE,NULL);
      
      self->openbutton = gtk_button_new_from_stock(GTK_STOCK_ADD);
      gtk_box_pack_start (GTK_BOX (self),self->openbutton, FALSE, TRUE, 0);
@@ -781,7 +783,7 @@ music_queue_new_with_player(GsPlayer *player)
 				  G_CALLBACK(nextFile),
 				  (gpointer)self);
     
-    g_object_set(G_OBJECT (self), "expand",TRUE ,NULL);
+    
     
     
     return GTK_WIDGET(self);
@@ -1097,8 +1099,8 @@ static void gotJump(JumpWindow *jwindow,
     
 
 static void set_font   (gpointer    callback_data,
-				    guint       callback_action,
-				    GtkWidget  *widget)
+				         guint       callback_action,
+				         GtkWidget  *widget)
 {
     MusicQueue *self = (MusicQueue *) callback_data;
     
@@ -1124,13 +1126,7 @@ static void set_repeat   (GtkCheckMenuItem *widget,
 			g_object_set(G_OBJECT(self),"musicqueue-repeat",FALSE,NULL);
 			gtk_check_menu_item_set_active (widget,FALSE);
 		}
-	
-	
-
-
-
 }
-
 
 
 static void remove_files(GtkMenuItem *item, gpointer    

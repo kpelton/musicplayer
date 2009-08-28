@@ -41,7 +41,21 @@ static void               text_written                   (GtkEntry *entry,
 gboolean	check_visible								(GtkTreeModel *model,
                                                          GtkTreeIter *iter,
                                                          gpointer data);
+
+
+static void			clear_entry				(GtkEntry            *entry,
+                                     GtkEntryIconPosition icon_pos,
+                                     GdkEvent            *event,
+                                     gpointer             data);  
+
+
+
+
+
+
+
 G_DEFINE_TYPE (JumpWindow, jump_window, GTK_TYPE_WINDOW);
+
 
 static void
 jump_window_init (JumpWindow *object)
@@ -133,7 +147,7 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 	          	"headers-clickable",FALSE,NULL);
 	
 	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (self->treeview),TRUE);
-	gtk_entry_set_icon_from_stock (GTK_ENTRY(self->entry),GTK_ENTRY_ICON_PRIMARY, "gtk-find");
+	
 	gtk_entry_set_icon_from_stock (GTK_ENTRY(self->entry),GTK_ENTRY_ICON_SECONDARY, "gtk-clear");
 
 	gtk_tree_model_filter_set_visible_func (GTK_TREE_MODEL_FILTER(model),check_visible,self,NULL);
@@ -154,9 +168,27 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 	g_signal_connect (G_OBJECT (self->entry), "changed",
 	                  G_CALLBACK (text_written),
 	                  self);
+
+	g_signal_connect (G_OBJECT (self->entry), "icon-release",
+	                  G_CALLBACK (clear_entry),
+	                  self);
+
 	gtk_tree_model_filter_refilter (self->filter);
 	
 }
+
+
+static void			clear_entry				(GtkEntry            *entry,
+                                     GtkEntryIconPosition icon_pos,
+                                     GdkEvent            *event,
+                                     gpointer             data)   
+{
+	JumpWindow *self = JUMP_WINDOW(data);
+
+	gtk_entry_set_text(GTK_ENTRY(self->entry),"");
+	
+}
+
 
 static void jump_button_pressed(GtkButton *button,  gpointer data)
 {
