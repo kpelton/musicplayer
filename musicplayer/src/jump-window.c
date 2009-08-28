@@ -54,7 +54,9 @@ jump_window_init (JumpWindow *object)
 static void
 jump_window_finalize (GObject *object)
 {
-	/* TODO: Add deinitalization code here */
+	JumpWindow *self = JUMP_WINDOW(object);
+
+	g_object_unref(self->filter);
 
 
 	G_OBJECT_CLASS (jump_window_parent_class)->finalize (object);
@@ -173,6 +175,7 @@ static void row_activated(GtkTreeView *treeview,
 
 	g_signal_emit (self, signals[JUMP],0,child);
 
+	gtk_widget_destroy(GTK_WIDGET(self));
 	
 }
 static void               text_written                   (GtkEntry *entry,
@@ -197,9 +200,12 @@ gboolean	check_visible								(GtkTreeModel *model,
 	text = gtk_entry_get_text(GTK_ENTRY(self->entry));
 
 	if(text){
-	gtk_tree_model_get (model, iter, COLUMN_SONG, &song, -1);
-	songlow =	g_utf8_strdown (song, g_utf8_strlen(song,500));
 
+	gtk_tree_model_get (model, iter, COLUMN_SONG, &song, -1);
+		if(song && text){
+		songlow =	g_utf8_strdown (song, g_utf8_strlen(song,500));
+
+	
 	if(g_strrstr(songlow,text))
 	{
 		g_free(song);
@@ -216,6 +222,7 @@ gboolean	check_visible								(GtkTreeModel *model,
 	}
 	
 	g_free(song);
+		}
 	}
 	return TRUE;
 }
