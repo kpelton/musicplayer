@@ -1090,7 +1090,7 @@ static void gotJump(JumpWindow *jwindow,
     gtk_tree_selection_unselect_all(self->currselection);
     gtk_tree_selection_select_path(self->currselection,path); 
 
-    
+     gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->treeview),path,NULL,TRUE,0.5,0.5);   
     playfile(GTK_TREE_VIEW(self->treeview),path,NULL,user_data);
 }
     
