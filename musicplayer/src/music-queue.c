@@ -1078,6 +1078,7 @@ static gboolean remove_files_via_press(GtkWidget *widget,
 	                 self);
            
     gtk_widget_show(jumpwindow);
+       return TRUE;
     }
     
     return FALSE;

@@ -129,8 +129,10 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 					  350);
 
 	
-	g_object_set (G_OBJECT (self->treeview),"headers-visible"  ,FALSE,NULL);
-
+	g_object_set (G_OBJECT (self->treeview),"headers-visible"  ,FALSE,
+	          	"headers-clickable",FALSE,NULL);
+	
+	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (self->treeview),TRUE);
 	gtk_entry_set_icon_from_stock (GTK_ENTRY(self->entry),GTK_ENTRY_ICON_PRIMARY, "gtk-find");
 	gtk_entry_set_icon_from_stock (GTK_ENTRY(self->entry),GTK_ENTRY_ICON_SECONDARY, "gtk-clear");
 
