@@ -209,8 +209,8 @@ static void jump_button_pressed(GtkButton *button,  gpointer data)
 		g_signal_emit (self, signals[JUMP],0,child);
 		
 	}
-	g_object_unref(selection);
 
+	gtk_widget_destroy(GTK_WIDGET(self));
 	
 }
 static void row_activated(GtkTreeView *treeview,

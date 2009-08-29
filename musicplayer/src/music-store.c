@@ -128,7 +128,7 @@ music_store_drag_data_received (GtkTreeDragDest   *drag_dest_parent,
         {
             gtk_list_store_move_before (GTK_LIST_STORE(drag_dest),&src_iter,&dest_iter);
         }
-            gtk_tree_model_row_changed (drag_dest_parent, dest, &dest_iter);
+//            gtk_tree_model_row_changed (drag_dest_parent, dest, &dest_iter);
             gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(drag_dest_parent));  
         }
     
