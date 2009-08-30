@@ -64,7 +64,6 @@ gboolean plist_xspf_read(gchar *location,GList **list,PlistReader *self)
 	 if (nptr->type == XML_ELEMENT_NODE &&
             !xmlStrcmp(nptr->name, (xmlChar *)"playlist"))
 	 {
-
 	      for (nptr2 = nptr->children; nptr2 != NULL; nptr2 = nptr2->next)
 	      {
 		   if (nptr2->type == XML_ELEMENT_NODE &&
@@ -72,7 +71,7 @@ gboolean plist_xspf_read(gchar *location,GList **list,PlistReader *self)
 			process_xspf_tracks(nptr2,list);
 			
 		   }
-	      }
+	    }
 	 }
     }
 

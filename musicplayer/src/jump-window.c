@@ -8,6 +8,9 @@
 #include "jump-window.h"
 #include <glib.h>
 #include <string.h>
+#include <gdk/gdkkeysyms.h>
+#include <gdk/gdk.h>
+
 
 typedef enum
 {
@@ -49,7 +52,9 @@ static void			clear_entry				(GtkEntry            *entry,
                                      gpointer             data);  
 
 
-
+static gboolean key_press_event_cb(GtkWidget *widget,
+							    GdkEventKey *event,
+							    gpointer user_data);
 
 
 
@@ -160,6 +165,10 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 	g_signal_connect (G_OBJECT(self->jumpbutton), "released",
 	                  G_CALLBACK (jump_button_pressed),
 	                  (self));
+	
+	g_signal_connect (G_OBJECT (self), "key_press_event",
+	                  G_CALLBACK (key_press_event_cb),
+	                  self);
 
 	g_signal_connect (G_OBJECT (self->treeview), "row-activated",
 	                  G_CALLBACK (row_activated),
@@ -177,6 +186,20 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 	
 }
 
+static gboolean key_press_event_cb(GtkWidget *widget,
+							    GdkEventKey *event,
+							    gpointer data)
+{
+	JumpWindow *self = JUMP_WINDOW(data);
+	if(event->keyval == GDK_Escape)
+	{
+		gtk_widget_destroy(GTK_WIDGET(self));
+		return TRUE;
+	}
+
+	return FALSE;
+	
+}
 
 static void			clear_entry				(GtkEntry            *entry,
                                      GtkEntryIconPosition icon_pos,

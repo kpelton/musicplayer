@@ -311,7 +311,7 @@ static void foreach_xspf(gpointer data,gpointer user_data)
 		 //take out the '/' in the uri
 		 for(i=1; tokens[i] != NULL; i++);
 
-		 if(track->title != NULL && track->artist !=NULL)
+		 if(track->title!= NULL && track->artist !=NULL)
 		 {	
 			 gtk_list_store_set(self->store,&iter,COLUMN_TITLE,track->title,-1);
 			 gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,track->artist,-1);
@@ -348,7 +348,7 @@ music_queue_init (MusicQueue *self)
 	gboolean repeat=FALSE;
 		gchar *font;
  //need to pull in gconf stuff here
-     g_object_set(G_OBJECT (self), "musicqueue-font","verdanna bold 7",NULL);
+        g_object_set(G_OBJECT (self), "musicqueue-font","verdanna bold 7",NULL);
 	 g_object_set(G_OBJECT (self), "musicqueue-lastdir",g_get_home_dir(),NULL);
 
 	 self->client = gconf_client_get_default();
