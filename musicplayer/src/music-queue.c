@@ -8,34 +8,48 @@
 #include <glib.h>
 G_DEFINE_TYPE (MusicQueue, music_queue, GTK_TYPE_VBOX)
 
+struct
+{
+    gchar *title;
+    gint id;    
+}typedef sortnode;
+
+struct
+{
+    GHashTable *htable;
+    gint *order;
+    gint curr;
+}typedef traversestr;
+
+
 enum
 {
-  COLUMN_ARTIST,
-  COLUMN_TITLE,
-  COLUMN_SONG,
-  COLUMN_URI,
-  COLUMN_ID,
-  N_COLUMNS,
-  
+    COLUMN_ARTIST,
+    COLUMN_TITLE,
+    COLUMN_SONG,
+    COLUMN_URI,
+    COLUMN_ID,
+    N_COLUMNS,
+
 };
 enum
 {
-     TARGET_STRING,
-     TARGET_URL
+    TARGET_STRING,
+    TARGET_URL
 };
 
 enum
 {
-     SORTID_ARTIST,
-     SORTID_TITLE
+    SORTID_ARTIST,
+    SORTID_TITLE
 };
 enum
 {
-  PROP_0,
+    PROP_0,
 
-  PROP_MUSICQUEUE_FONT,
-  PROP_MUSICQUEUE_LASTDIR,
-  PROP_MUSICQUEUE_REPEAT
+    PROP_MUSICQUEUE_FONT,
+    PROP_MUSICQUEUE_LASTDIR,
+    PROP_MUSICQUEUE_REPEAT
 };
 
 
@@ -114,6 +128,14 @@ static GList * get_list(gpointer user_data);
 static void gotJump(JumpWindow *jwindow,
 			    GtkTreePath* path,gpointer user_data);
 
+static gint title_compare(sortnode *node1, sortnode *node2,gpointer userdata);
+
+static sort_by_artist(gpointer    callback_data,
+                        gpointer user_data);
+
+gboolean            traverse_tree                       (
+                                                         gpointer data,
+                                                         gpointer userdata);
 const static  GtkTargetEntry targetentries[] =
 {
      { "STRING",        0, TARGET_STRING },
@@ -348,7 +370,8 @@ music_queue_init (MusicQueue *self)
 	gboolean repeat=FALSE;
 		gchar *font;
  //need to pull in gconf stuff here
-        g_object_set(G_OBJECT (self), "musicqueue-font","verdanna bold 7",NULL);
+    
+     //g_object_set(G_OBJECT (self), "musicqueue-font","verdanna bold 7",NULL);
 	 g_object_set(G_OBJECT (self), "musicqueue-lastdir",g_get_home_dir(),NULL);
 
 	 self->client = gconf_client_get_default();
@@ -608,7 +631,6 @@ static void playfile (GtkTreeView *treeview,
      GtkTreeModel *model;
      gchar *id;
      model = gtk_tree_view_get_model(treeview);
-
     
      if (gtk_tree_model_get_iter (model, &iter,path))
         {
@@ -620,7 +642,8 @@ static void playfile (GtkTreeView *treeview,
 		gs_playFile(self->player,uri);
                 
                 g_free (uri);
-		g_free(id);
+		        g_free(id);
+                  
         }
 }
 void music_queue_play_selected (MusicQueue *self)
@@ -915,6 +938,7 @@ static void add_columns(MusicQueue *self)
 											"text",
 											COLUMN_ID,
 											NULL);
+    
 
 }
 static void  rowchanged  (GtkTreeModel *tree_model,
@@ -1024,7 +1048,7 @@ static GtkWidget * getcontextmenu(gpointer user_data)
 {
     
     GtkItemFactory *item_factory;
-    GtkWidget  *menu,*font,*repeat;
+    GtkWidget  *menu,*font,*repeat,*sort;
 	gboolean test;
 	
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1034,7 +1058,8 @@ static GtkWidget * getcontextmenu(gpointer user_data)
 		
     self->delete = gtk_image_menu_item_new_from_stock(GTK_STOCK_DELETE,NULL);
 	font   = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_FONT,NULL);
-	repeat =  gtk_check_menu_item_new_with_label("Repeat");
+    sort   = gtk_check_menu_item_new_with_label("Sort By Artist");
+	repeat =  gtk_menu_item_new_with_label("Repeat");
 
 
 	g_object_get(G_OBJECT(self),"musicqueue-repeat",&test,NULL);
@@ -1051,10 +1076,15 @@ static GtkWidget * getcontextmenu(gpointer user_data)
 	g_signal_connect (G_OBJECT (repeat), "activate",
 	                  G_CALLBACK (set_repeat),
 	                  user_data);
+    g_signal_connect (G_OBJECT (sort), "activate",
+	                  G_CALLBACK (sort_by_artist),
+	                  user_data);
+    
 
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),self->delete);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),font);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),repeat);
+    gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort);
 
 	
 	   
@@ -1212,7 +1242,125 @@ gboolean has_selected(gpointer user_data)
     return FALSE;
 }
 
+static sort_by_artist(gpointer    callback_data,
+                        gpointer user_data)
+{
+    MusicQueue *self = (MusicQueue *) user_data;
+    
+    GtkTreeIter iter;
+    GTree*  tree = NULL;
+    GHashTable *htable;
+    GList *list;
+    gchar *title;
+    gchar *cid;
+    gint *id;
+    gint *curri;
+    sortnode *node;
+    gint *old;
+    gint currid;
+    gint i=0;
+    traversestr str;
+    
+     
+     if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->store),&iter))
+    {
+	   tree= g_tree_new((GCompareFunc)title_compare);  
+       list = g_list_alloc();   
+        htable = g_hash_table_new(g_int_hash,g_int_equal);
+        
+        do
+	   {
+            //need a struture that holds artist name and ID of the element
+            node = g_malloc(sizeof(sortnode));
+		    gtk_tree_model_get (GTK_TREE_MODEL(self->store), 
+						  &iter,COLUMN_ARTIST, &(node->title), -1); 
+            gtk_tree_model_get (GTK_TREE_MODEL(self->store), 
+						  &iter,COLUMN_ID, &cid, -1); 
 
+            id = g_malloc(sizeof(gint));
+            curri = g_malloc(sizeof(gint));
+            *id = atoi(cid);
+            
+            node->id = *id;
+          
+		   *curri=i;
+           list = g_list_insert_sorted_with_data(list,node,
+                                                 (GCompareDataFunc)title_compare,
+                                                 self); 
+           g_hash_table_insert(htable,id,curri);
+              ++i;
+           
+       }while(gtk_tree_model_iter_next(
+								GTK_TREE_MODEL(self->store),
+								&iter));
+     
+        
+                //need to write compare function that compares the two artist strings
+        str.htable=htable;
+        str.order = g_malloc(sizeof(gint)*i+1);        
+        str.curr=0; //reset our counter for our new order
+
+          g_list_foreach(list,traverse_tree,&str); 
+            //insert code to compare our new location of id to old location of id
+            // so we can sort the list
+      
+
+        gtk_list_store_reorder(GTK_LIST_STORE(self->store),str.order);
+        //finally call the rearange function on the List store with our new order 
+    }        //free list of nodes
+}
+gboolean            traverse_tree                       (
+                                                         gpointer data,
+                                                         gpointer userdata)
+{
+    if(data)
+    {
+        
+    traversestr *str =(traversestr *) userdata;
+    int currid=0;
+    gint *old;
+    sortnode * node = (sortnode *)data;
+    currid= node->id;
+   
+
+     if(node->title)
+    printf("%s - %i\n",node->title,node->id);
+   
+    
+    old= (gint *)g_hash_table_lookup(str->htable,&currid); 
+     str->order[str->curr]=*old;
+   
+     str->curr++;
+    }
+    return FALSE;
+}
+static gint title_compare(sortnode *node1, sortnode *node2,gpointer userdata)
+{
+    int ret=0;
+ 
+   gchar*title1=NULL; 
+        if(node1)
+        title1= node1->title; 
+   gchar *title2 = NULL;
+        if(node2)
+        title2 = node2->title;
+    
+    	//title is empty
+	if(title1 == NULL || title2 == NULL)
+	{
+	     if (title1 == NULL && title1 == NULL)
+		  return 0;
+	     
+	     ret = (title1== NULL) ? -1 : 1;
+
+	}else
+    {
+     ret =g_utf8_collate(title1,title2);
+    }
+    return ret;
+}
+
+                                  
 static GList* get_list(gpointer user_data)
 {
     MusicQueue *self = (MusicQueue *) user_data;
