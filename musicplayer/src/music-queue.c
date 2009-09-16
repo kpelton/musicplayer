@@ -54,6 +54,7 @@ enum
 
 
 //priv fuctions
+static void destroy_hash_element(gpointer data);
 static void add (GtkWidget *widget,gpointer user_data);
 static void add_columns (MusicQueue *self);
 static void init_widgets (MusicQueue *self);
@@ -103,18 +104,8 @@ static gboolean remove_files_via_press(GtkWidget *widget,
 			 GdkEventKey *key,
 				   gpointer user_data);
 
-static gint sort_iter_compare_func(GtkTreeModel *model,
-				   GtkTreeIter  *a,
-				   GtkTreeIter  *b,
-				   gpointer      userdata);
-
-static gint sort_iter_compare_func_title(GtkTreeModel *model,
-					 GtkTreeIter  *a,
-					 GtkTreeIter  *b,
-					 gpointer      userdata);
-
-
 static void add_file(gpointer data,gpointer user_data);
+
 gboolean has_selected(gpointer user_data);
 
 static void set_font   (gpointer    callback_data,
@@ -128,7 +119,7 @@ static GList * get_list(gpointer user_data);
 static void gotJump(JumpWindow *jwindow,
 			    GtkTreePath* path,gpointer user_data);
 
-static gint title_compare(sortnode *node1, sortnode *node2,gpointer userdata);
+static gint compare_sort_nodes(sortnode *node1, sortnode *node2,gpointer userdata);
 
 static sort_by_artist(gpointer    callback_data,
                         gpointer user_data);
@@ -511,77 +502,7 @@ static void init_widgets(MusicQueue *self)
 
 
 
-static gint sort_iter_compare_func(GtkTreeModel *model,
-				   GtkTreeIter  *a,
-				   GtkTreeIter  *b,
-				   gpointer      userdata)
 
-{
-     
-
-     gchar *artist_a, *artist_b;
-     gint ret;
-
-        gtk_tree_model_get(model, a, COLUMN_ARTIST, &artist_a, -1);
-        gtk_tree_model_get(model, b, COLUMN_ARTIST, &artist_b, -1);
-
-
-	//artist is empty
-	if(artist_a == NULL || artist_b == NULL)
-	{
-	     if (artist_a == NULL && artist_b == NULL)
-		  return 0;
-	     
-	     ret = (artist_a == NULL) ? -1 : 1;
-
-	}
-	else
-        {
-	     ret = g_utf8_collate(artist_a,artist_b);
-        }
-
-	g_free(artist_a);
-        g_free(artist_b);
-	return ret;
-	
-}
-
-
-
-static gint sort_iter_compare_func_title(GtkTreeModel *model,
-				   GtkTreeIter  *a,
-				   GtkTreeIter  *b,
-				   gpointer      userdata)
-
-{
-     
-
-     gchar *title_a, *title_b;
-     gint ret;
-
-        gtk_tree_model_get(model, a, COLUMN_TITLE, &title_a, -1);
-        gtk_tree_model_get(model, b, COLUMN_TITLE, &title_b, -1);
-
-
-	//title is empty
-	if(title_a == NULL || title_b == NULL)
-	{
-	     if (title_a == NULL && title_b == NULL)
-		  return 0;
-	     
-	     ret = (title_a == NULL) ? -1 : 1;
-
-	}
-	else
-        {
-	     ret = g_utf8_collate(title_a,title_b);
-        }
-
-	g_free(title_a);
-        g_free(title_b);
-	return ret;
-	
-}
 
 
 
@@ -1058,8 +979,8 @@ static GtkWidget * getcontextmenu(gpointer user_data)
 		
     self->delete = gtk_image_menu_item_new_from_stock(GTK_STOCK_DELETE,NULL);
 	font   = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_FONT,NULL);
-    sort   = gtk_check_menu_item_new_with_label("Sort By Artist");
-	repeat =  gtk_menu_item_new_with_label("Repeat");
+    sort   = gtk_menu_item_new_with_label("Sort By Artist");
+	repeat =  gtk_check_menu_item_new_with_label("Repeat");
 
 
 	g_object_get(G_OBJECT(self),"musicqueue-repeat",&test,NULL);
@@ -1248,7 +1169,7 @@ static sort_by_artist(gpointer    callback_data,
     MusicQueue *self = (MusicQueue *) user_data;
     
     GtkTreeIter iter;
-    GTree*  tree = NULL;
+    
     GHashTable *htable;
     GList *list;
     gchar *title;
@@ -1256,7 +1177,6 @@ static sort_by_artist(gpointer    callback_data,
     gint *id;
     gint *curri;
     sortnode *node;
-    gint *old;
     gint currid;
     gint i=0;
     traversestr str;
@@ -1264,9 +1184,10 @@ static sort_by_artist(gpointer    callback_data,
      
      if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->store),&iter))
     {
-	   tree= g_tree_new((GCompareFunc)title_compare);  
        list = g_list_alloc();   
-        htable = g_hash_table_new(g_int_hash,g_int_equal);
+        htable = g_hash_table_new_full(g_int_hash,g_int_equal,
+                                       destroy_hash_element,
+                                       destroy_hash_element);
         
         do
 	   {
@@ -1284,9 +1205,9 @@ static sort_by_artist(gpointer    callback_data,
             node->id = *id;
           
 		   *curri=i;
-           list = g_list_insert_sorted_with_data(list,node,
-                                                 (GCompareDataFunc)title_compare,
-                                                 self); 
+           list = g_list_insert_sorted_with_data(list,(gpointer)node,
+                                                 (GCompareDataFunc)compare_sort_nodes,
+                                                 self);  
            g_hash_table_insert(htable,id,curri);
               ++i;
            
@@ -1300,14 +1221,26 @@ static sort_by_artist(gpointer    callback_data,
         str.order = g_malloc(sizeof(gint)*i+1);        
         str.curr=0; //reset our counter for our new order
 
-          g_list_foreach(list,traverse_tree,&str); 
-            //insert code to compare our new location of id to old location of id
-            // so we can sort the list
-      
+          g_list_foreach(list,(GFunc)traverse_tree,&str); 
+        
 
         gtk_list_store_reorder(GTK_LIST_STORE(self->store),str.order);
+
+        
         //finally call the rearange function on the List store with our new order 
-    }        //free list of nodes
+    }    
+    //free list of nodes
+    //free our order
+    g_free(str.order);
+
+    //destroy data structures
+    g_list_free(list);
+    g_hash_table_destroy(htable);
+    
+}
+static void destroy_hash_element(gpointer data)
+{
+    g_free((gint *)data);
 }
 gboolean            traverse_tree                       (
                                                          gpointer data,
@@ -1315,47 +1248,46 @@ gboolean            traverse_tree                       (
 {
     if(data)
     {
-        
-    traversestr *str =(traversestr *) userdata;
-    int currid=0;
-    gint *old;
-    sortnode * node = (sortnode *)data;
-    currid= node->id;
-   
 
-     if(node->title)
-    printf("%s - %i\n",node->title,node->id);
-   
-    
-    old= (gint *)g_hash_table_lookup(str->htable,&currid); 
-     str->order[str->curr]=*old;
-   
-     str->curr++;
+        traversestr *str =(traversestr *) userdata;
+        int currid=0;
+        gint *old;
+        sortnode * node = (sortnode *)data;
+        currid= node->id;
+
+        old= (gint *)g_hash_table_lookup(str->htable,&currid); 
+        str->order[str->curr]=*old;
+
+        str->curr++;
+        if(node->title)
+            g_free(node->title);
+      
+        g_free(node);
     }
     return FALSE;
 }
-static gint title_compare(sortnode *node1, sortnode *node2,gpointer userdata)
+static gint compare_sort_nodes(sortnode *node1, sortnode *node2,gpointer userdata)
 {
     int ret=0;
- 
-   gchar*title1=NULL; 
-        if(node1)
-        title1= node1->title; 
-   gchar *title2 = NULL;
-        if(node2)
-        title2 = node2->title;
-    
-    	//title is empty
-	if(title1 == NULL || title2 == NULL)
-	{
-	     if (title1 == NULL && title1 == NULL)
-		  return 0;
-	     
-	     ret = (title1== NULL) ? -1 : 1;
 
-	}else
+    gchar*title1=NULL; 
+    if(node1)
+        title1= node1->title; 
+    gchar *title2 = NULL;
+    if(node2)
+        title2 = node2->title;
+
+    //title is empty
+    if(title1 == NULL || title2 == NULL)
     {
-     ret =g_utf8_collate(title1,title2);
+        if (title1 == NULL && title1 == NULL)
+            return 0;
+
+        ret = (title1== NULL) ? -1 : 1;
+
+    }else
+    {
+        ret =g_utf8_collate(title1,title2);
     }
     return ret;
 }
