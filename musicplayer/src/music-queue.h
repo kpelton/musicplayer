@@ -56,6 +56,7 @@ typedef struct {
 	gchar *lastdir;
 	GConfClient* client;
 	gboolean repeat;
+    gboolean sorted;
 	
 } MusicQueue;
 

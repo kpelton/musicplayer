@@ -377,8 +377,9 @@ music_queue_init (MusicQueue *self)
      self->drag_started=FALSE;
      self->ts = NULL;
      self->read = plist_reader_new();
-
+     self->sorted = FALSE;
      music_queue_read_xspf("/home/kyle/test.xspf",self);
+     
      
   
 } 
@@ -535,7 +536,7 @@ onDragDataReceived(GtkWidget *wgt, GdkDragContext *context, int x, int y,
     else{
      self->changed = TRUE;
     }
-
+     self->sorted=FALSE;
     g_object_unref(self->ts);
 }
 
@@ -704,7 +705,7 @@ static void add_file(gpointer data,gpointer user_data)
 		g_free(out);
 		g_free(valid);
 	}
-
+    self->sorted = FALSE;
 }
 
 
@@ -957,6 +958,7 @@ static void dragend (GtkWidget *widget,
     
     MusicQueue *self = (MusicQueue *) user_data;
     self->drag_started = FALSE;
+    
     //gtk_drag_dest_unset (self->treeview);
     //gtk_tree_view_set_reorderable(GTK_TREE_VIEW(self->treeview),FALSE);
     
@@ -1140,6 +1142,7 @@ static void remove_files(GtkMenuItem *item, gpointer
     g_list_free(rowref_list);
     g_list_free(rows);
     g_free(id);
+    self->sorted=FALSE;
 } 
 
 
@@ -1182,7 +1185,7 @@ static sort_by_artist(gpointer    callback_data,
     traversestr str;
     
      
-     if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->store),&iter))
+     if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->store),&iter) && !self->sorted)
     {
        list = g_list_alloc();   
         htable = g_hash_table_new_full(g_int_hash,g_int_equal,
@@ -1228,7 +1231,7 @@ static sort_by_artist(gpointer    callback_data,
 
         
         //finally call the rearange function on the List store with our new order 
-    }    
+     
     //free list of nodes
     //free our order
     g_free(str.order);
@@ -1236,7 +1239,9 @@ static sort_by_artist(gpointer    callback_data,
     //destroy data structures
     g_list_free(list);
     g_hash_table_destroy(htable);
-    
+
+    self->sorted =TRUE;
+    }
 }
 static void destroy_hash_element(gpointer data)
 {
