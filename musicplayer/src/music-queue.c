@@ -6,6 +6,7 @@
 #include <libgnomevfs/gnome-vfs-utils.h>
 #include <gdk/gdkkeysyms.h>
 #include <glib.h>
+#include <gio/gio.h>
 G_DEFINE_TYPE (MusicQueue, music_queue, GTK_TYPE_VBOX)
 
 struct
@@ -14,6 +15,12 @@ struct
     gint id;    
 }typedef sortnode;
 
+struct
+{
+     gchar *datestr; 
+     guint  date;
+    gint id;    
+}typedef sortnodedate;
 struct
 {
     GHashTable *htable;
@@ -29,6 +36,7 @@ enum
     COLUMN_SONG,
     COLUMN_URI,
     COLUMN_ID,
+    COLUMN_MOD,
     N_COLUMNS,
 
 };
@@ -123,7 +131,14 @@ static gint compare_sort_nodes(sortnode *node1, sortnode *node2,gpointer userdat
 
 static sort_by_artist(gpointer    callback_data,
                         gpointer user_data);
-
+static gint compare_sort_nodes_by_date(sortnodedate *node1, 
+                                       sortnodedate *node2,
+                                       gpointer userdata);
+static sort_by_date(gpointer    callback_data,
+                        gpointer user_data);
+gboolean            traverse_tree_by_date                       (
+                                                         gpointer data,
+                                                         gpointer userdata);
 gboolean            traverse_tree                       (
                                                          gpointer data,
                                                          gpointer userdata);
@@ -300,6 +315,9 @@ static void foreach_xspf(gpointer data,gpointer user_data)
 	gchar **tokens;
 	const gchar toke[] ="/";
 	gchar buffer[60000];
+    GFile *file;
+    GFileInfo *info;
+    guint64 mod;
 	int i;
 
 	if(data)
@@ -315,10 +333,27 @@ static void foreach_xspf(gpointer data,gpointer user_data)
 		gtk_list_store_set(self->store,&iter,COLUMN_URI,track->uri,-1);  
 
 		sprintf(buffer,"%i",self->i);
-		gtk_list_store_set(self->store,&iter,COLUMN_ID,buffer,-1);  
+		gtk_list_store_set(self->store,&iter,COLUMN_ID,buffer,-1);
 
+        file =g_file_new_for_uri(track->uri);
+         info= g_file_query_info(file,G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                            G_FILE_QUERY_INFO_NONE,
+                            NULL,
+                            NULL);    
+        
+        
+        mod = g_file_info_get_attribute_uint64(info,
+                                               G_FILE_ATTRIBUTE_TIME_MODIFIED); 
 
+      g_snprintf(buffer,20,"%lu",(unsigned long int)mod);
+     g_printf("%s\n",buffer);
+        
+	  gtk_list_store_set(self->store,&iter,COLUMN_MOD,buffer,-1);
+       
+        g_object_unref(file);
+        g_object_unref(info);
 		tokens=g_strsplit(out,toke,10);
+        
 		
 
 		 //take out the '/' in the uri
@@ -330,7 +365,7 @@ static void foreach_xspf(gpointer data,gpointer user_data)
 			 gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,track->artist,-1);
 			 sprintf(buffer,"%s - %s",track->artist,track->title);
 			 
-		gtk_list_store_set(self->store,&iter,COLUMN_SONG,buffer,-1);
+		     gtk_list_store_set(self->store,&iter,COLUMN_SONG,buffer,-1);
 			 
 		 }
 		 else
@@ -377,7 +412,7 @@ music_queue_init (MusicQueue *self)
      self->drag_started=FALSE;
      self->ts = NULL;
      self->read = plist_reader_new();
-     self->sorted = FALSE;
+     
      music_queue_read_xspf("/home/kyle/test.xspf",self);
      
      
@@ -402,7 +437,7 @@ static void init_widgets(MusicQueue *self)
      
      gtk_widget_show (self->scrolledwindow);
 
-     self->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,-1);
+     self->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,-1);
 
     
 
@@ -536,7 +571,7 @@ onDragDataReceived(GtkWidget *wgt, GdkDragContext *context, int x, int y,
     else{
      self->changed = TRUE;
     }
-     self->sorted=FALSE;
+    
     g_object_unref(self->ts);
 }
 
@@ -653,6 +688,9 @@ static void add_file(gpointer data,gpointer user_data)
 	const gchar toke2[] =".";
 	gchar buffer[60000];
 	gchar *valid;
+     GFile *file;
+    GFileInfo *info;
+    guint64 mod;
 	int i;
 	metadata *md = NULL;
 
@@ -665,12 +703,30 @@ static void add_file(gpointer data,gpointer user_data)
 
 
 
-	// gtk_list_store_set(self->store,&iter,COLUMN_TITLE,out,-1);    
-	gtk_list_store_set(self->store,&iter,COLUMN_URI,valid,-1);  
+    // gtk_list_store_set(self->store,&iter,COLUMN_TITLE,out,-1);    
+    gtk_list_store_set(self->store,&iter,COLUMN_URI,valid,-1);  
 
-	sprintf(buffer,"%i",self->i);
-	gtk_list_store_set(self->store,&iter,COLUMN_ID,buffer,-1);  
+    sprintf(buffer,"%i",self->i);
+    gtk_list_store_set(self->store,&iter,COLUMN_ID,buffer,-1);  
 
+    file =g_file_new_for_uri(valid);
+    info= g_file_query_info(file,G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                            G_FILE_QUERY_INFO_NONE,
+                            NULL,
+                            NULL);    
+
+
+    mod = g_file_info_get_attribute_uint64(info,
+                                           G_FILE_ATTRIBUTE_TIME_MODIFIED); 
+
+    g_snprintf(buffer,20,"%lu",(unsigned long int)mod);
+  
+        
+		gtk_list_store_set(self->store,&iter,COLUMN_MOD,buffer,-1);
+       
+        g_object_unref(file);
+        g_object_unref(info);
+    
 	//get meta data info
 	md=ts_get_metadata(valid,self->ts);
 	//printf("%s\n",(gchar *)data);
@@ -705,7 +761,7 @@ static void add_file(gpointer data,gpointer user_data)
 		g_free(out);
 		g_free(valid);
 	}
-    self->sorted = FALSE;
+    
 }
 
 
@@ -860,6 +916,13 @@ static void add_columns(MusicQueue *self)
 											"text",
 											COLUMN_ID,
 											NULL);
+     renderer = gtk_cell_renderer_text_new ();
+    
+    column = gtk_tree_view_column_new_with_attributes ("MODIFCATION",
+											renderer,
+											"text",
+											COLUMN_MOD,
+											NULL);
     
 
 }
@@ -971,7 +1034,7 @@ static GtkWidget * getcontextmenu(gpointer user_data)
 {
     
     GtkItemFactory *item_factory;
-    GtkWidget  *menu,*font,*repeat,*sort;
+    GtkWidget  *menu,*font,*repeat,*sort,*sort2;
 	gboolean test;
 	
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -982,6 +1045,7 @@ static GtkWidget * getcontextmenu(gpointer user_data)
     self->delete = gtk_image_menu_item_new_from_stock(GTK_STOCK_DELETE,NULL);
 	font   = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_FONT,NULL);
     sort   = gtk_menu_item_new_with_label("Sort By Artist");
+    sort2   = gtk_menu_item_new_with_label("Sort By Date");
 	repeat =  gtk_check_menu_item_new_with_label("Repeat");
 
 
@@ -1002,13 +1066,16 @@ static GtkWidget * getcontextmenu(gpointer user_data)
     g_signal_connect (G_OBJECT (sort), "activate",
 	                  G_CALLBACK (sort_by_artist),
 	                  user_data);
+      g_signal_connect (G_OBJECT (sort2), "activate",
+	                  G_CALLBACK (sort_by_date),
+	                  user_data);
     
 
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),self->delete);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),font);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),repeat);
     gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort);
-
+     gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort2);
 	
 	   
     return menu;
@@ -1142,7 +1209,7 @@ static void remove_files(GtkMenuItem *item, gpointer
     g_list_free(rowref_list);
     g_list_free(rows);
     g_free(id);
-    self->sorted=FALSE;
+   
 } 
 
 
@@ -1184,8 +1251,8 @@ static sort_by_artist(gpointer    callback_data,
     gint i=0;
     traversestr str;
     
-     
-     if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->store),&iter) && !self->sorted)
+        //need to compare titles if the artists are the same
+     if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->store),&iter))
     {
        list = g_list_alloc();   
         htable = g_hash_table_new_full(g_int_hash,g_int_equal,
@@ -1240,13 +1307,101 @@ static sort_by_artist(gpointer    callback_data,
     g_list_free(list);
     g_hash_table_destroy(htable);
 
-    self->sorted =TRUE;
+    
     }
 }
+
+static sort_by_date(gpointer    callback_data,
+                        gpointer user_data)
+{
+    MusicQueue *self = (MusicQueue *) user_data;
+    
+    GtkTreeIter iter;
+    
+    GHashTable *htable;
+    GList *list;
+    gchar *title;
+    gchar *cid;
+    gint *id;
+    gint *curri;
+    sortnodedate *node;
+    gint currid;
+    gint i=0;
+    traversestr str;
+    
+     
+     if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->store),&iter) )
+    {
+       list = g_list_alloc();   
+        htable = g_hash_table_new_full(g_int_hash,g_int_equal,
+                                       destroy_hash_element,
+                                       destroy_hash_element);
+        
+        do
+	   {
+            //need a struture that holds artist name and ID of the element
+            node = g_malloc(sizeof(sortnodedate));
+		    gtk_tree_model_get (GTK_TREE_MODEL(self->store), 
+						  &iter,COLUMN_MOD, &(node->datestr), -1); 
+            gtk_tree_model_get (GTK_TREE_MODEL(self->store), 
+						  &iter,COLUMN_ID, &cid, -1); 
+
+           
+           
+            node->date = strtoul(node->datestr,NULL, 10);
+
+                       
+             id = g_malloc(sizeof(gint));
+            curri = g_malloc(sizeof(gint));
+            *id = atoi(cid);
+            
+            node->id = *id;
+          
+		   *curri=i;
+           list = g_list_insert_sorted_with_data(list,(gpointer)node,
+                                                 (GCompareDataFunc)compare_sort_nodes_by_date,
+                                                 self);  
+           g_hash_table_insert(htable,id,curri);
+              ++i;
+           
+       }while(gtk_tree_model_iter_next(
+								GTK_TREE_MODEL(self->store),
+								&iter));
+     
+        
+                //need to write compare function that compares the two artist strings
+        str.htable=htable;
+        str.order = g_malloc(sizeof(gint)*i+1);        
+        str.curr=0; //reset our counter for our new order
+
+          g_list_foreach(list,(GFunc)traverse_tree_by_date,&str); 
+        
+
+        gtk_list_store_reorder(GTK_LIST_STORE(self->store),str.order);
+
+        
+        //finally call the rearange function on the List store with our new order 
+     
+    //free list of nodes
+    //free our order
+    g_free(str.order);
+
+    //destroy data structures
+    g_list_free(list);
+    g_hash_table_destroy(htable);
+
+    
+    }
+}
+
 static void destroy_hash_element(gpointer data)
 {
     g_free((gint *)data);
 }
+
+
+
+
 gboolean            traverse_tree                       (
                                                          gpointer data,
                                                          gpointer userdata)
@@ -1260,10 +1415,14 @@ gboolean            traverse_tree                       (
         sortnode * node = (sortnode *)data;
         currid= node->id;
 
+        
         old= (gint *)g_hash_table_lookup(str->htable,&currid); 
+
+       
         str->order[str->curr]=*old;
 
         str->curr++;
+        
         if(node->title)
             g_free(node->title);
       
@@ -1271,7 +1430,36 @@ gboolean            traverse_tree                       (
     }
     return FALSE;
 }
-static gint compare_sort_nodes(sortnode *node1, sortnode *node2,gpointer userdata)
+gboolean            traverse_tree_by_date                       (
+                                                         gpointer data,
+                                                         gpointer userdata)
+{
+    if(data)
+    {
+
+        traversestr *str =(traversestr *) userdata;
+        int currid=0;
+        gint *old;
+        sortnodedate * node = (sortnodedate *)data;
+        currid= node->id;
+
+         
+        old= (gint *)g_hash_table_lookup(str->htable,&currid); 
+        
+        str->order[str->curr]=*old;
+
+        str->curr++;
+     if(node->datestr)
+            g_free(node->datestr);
+      
+        
+        g_free(node);
+    }
+    return FALSE;
+}
+static gint compare_sort_nodes(sortnode *node1, 
+                               sortnode *node2,
+                               gpointer userdata)
 {
     int ret=0;
 
@@ -1293,6 +1481,34 @@ static gint compare_sort_nodes(sortnode *node1, sortnode *node2,gpointer userdat
     }else
     {
         ret =g_utf8_collate(title1,title2);
+    }
+    return ret;
+}
+
+static gint compare_sort_nodes_by_date(sortnodedate *node1, 
+                                       sortnodedate *node2,
+                                       gpointer userdata)
+{
+    int ret=0;
+
+    guint date1 =0; 
+    if(node1)
+        date1= node1->date; 
+    guint date2= 0;
+    if(node2)
+        date2 = node2->date;
+
+    //title is empty
+    if(date1 == 0 || date2 == 0)
+    {
+        if (date1 == 0 && date2 == 0)
+            return 0;
+
+        ret = (date1== 0) ? -1 : 1;
+
+    }else
+    {
+         ret = (date1 > date2) ? 1 : -1;
     }
     return ret;
 }
@@ -1329,8 +1545,9 @@ static GList* get_list(gpointer user_data)
 		  list =  g_list_append(list,(gpointer)track); 
 	   }while(gtk_tree_model_iter_next(
 								GTK_TREE_MODEL(self->store),
-								&iter));
+					 			&iter));
     }
+    
     
     return list;
     

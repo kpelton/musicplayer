@@ -1,5 +1,7 @@
 #include "music-volume.h"
 #include "player.h"
+
+
 G_DEFINE_TYPE (MusicVolume, music_volume, GTK_TYPE_VOLUME_BUTTON)
 //hack
 static void              value_changed                     (GtkScaleButton *button,
