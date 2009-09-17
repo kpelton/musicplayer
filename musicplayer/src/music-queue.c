@@ -1647,7 +1647,8 @@ static gint compare_sort_nodes(sortnode *node1,
 
     }else
     {
-        ret =g_utf8_collate(title1,title2);
+        //ret =g_utf8_collate(title1,title2);
+          ret =strcmp(title1,title2);
     }
     return ret;
 }
