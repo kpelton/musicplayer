@@ -323,17 +323,17 @@ static void mwindow_new_file(GsPlayer *player,
 
 
 	if(p_track->artist){
-		sprintf(title,"%s - %s",p_track->artist, p_track->title);
+		g_snprintf(title,1023,"%s - %s",p_track->artist, p_track->title);
 		gtk_window_set_title(GTK_WINDOW(self),title);
 		escaped_artist = g_markup_escape_text(p_track->artist,-1);
 		escaped_title  = g_markup_escape_text(p_track->title,-1);
-		g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s - %s</span>",escaped_artist,escaped_title);
+		g_snprintf(output,1023,"<span foreground=\"blue\" size=\"large\">%s - %s</span>",escaped_artist,escaped_title);
 		gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
 		g_free(escaped_title);
 		g_free(escaped_artist);
 		if(p_track->album)
 		{
-			g_sprintf(output,"<span style=\"italic\" size=\"small\">from:%s</span>",p_track->album);
+			g_snprintf(output,1023,"<span style=\"italic\" size=\"small\">from:%s</span>",p_track->album);
 			gtk_label_set_markup(GTK_LABEL(self->albumlabel),output);
 			gtk_widget_show(self->albumlabel);
 			
@@ -357,7 +357,7 @@ static void mwindow_new_file(GsPlayer *player,
 			gtk_window_set_title(GTK_WINDOW(self),*tokens2);
 			escaped = g_markup_escape_text(*tokens2,-1);
 			
-			g_sprintf(output,"<span foreground=\"blue\" size=\"large\">%s</span>",escaped);
+			g_snprintf(output,1023,"<span foreground=\"blue\" size=\"large\">%s</span>",escaped);
 			gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
 			g_strfreev(tokens2);  
 			g_strfreev(tokens);  

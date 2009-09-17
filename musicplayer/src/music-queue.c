@@ -7,6 +7,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <glib.h>
 #include <gio/gio.h>
+#include <string.h>
 G_DEFINE_TYPE (MusicQueue, music_queue, GTK_TYPE_VBOX)
 
 struct
@@ -62,6 +63,7 @@ enum
 
 
 //priv fuctions
+static void traverse_folders(gpointer data,gpointer user_data);
 static void destroy_hash_element(gpointer data);
 static void add (GtkWidget *widget,gpointer user_data);
 static void add_columns (MusicQueue *self);
@@ -142,6 +144,8 @@ gboolean            traverse_tree_by_date                       (
 gboolean            traverse_tree                       (
                                                          gpointer data,
                                                          gpointer userdata);
+
+static gboolean check_type_supported(const gchar *type);
 const static  GtkTargetEntry targetentries[] =
 {
      { "STRING",        0, TARGET_STRING },
@@ -614,60 +618,74 @@ void music_queue_play_selected (MusicQueue *self)
 static void add(GtkWidget *widget,gpointer user_data)
 {
 
-	MusicQueue *self = (MusicQueue *) user_data;
+    MusicQueue *self = (MusicQueue *) user_data;
 
-	GtkWidget *dialog;
-	gboolean b = TRUE;
-	GSList *list;
-	GtkFileFilter *filter;
-	gchar *lastdir = NULL;	
+    GtkWidget *dialog;
+    gboolean b = TRUE;
+    GSList *list;
+    GtkFileFilter *filter;
+    gchar *lastdir = NULL;	
+    gint response;
 
-	filter = gtk_file_filter_new ();
+    filter = gtk_file_filter_new ();
 
-	gtk_file_filter_set_name(filter,"Music Files");  
-	gtk_file_filter_add_pattern(filter,"*.mp3");
-	gtk_file_filter_add_pattern(filter,"*.flac");
-	gtk_file_filter_add_pattern(filter,"*.ogg");
-	gtk_file_filter_add_pattern(filter,"*.wma");
+    gtk_file_filter_set_name(filter,"Music Files");  
+    gtk_file_filter_add_pattern(filter,"*.mp3");
+    gtk_file_filter_add_pattern(filter,"*.flac");
+    gtk_file_filter_add_pattern(filter,"*.ogg");
+    gtk_file_filter_add_pattern(filter,"*.wma");
 
 
-	g_object_get(G_OBJECT(self),"musicqueue-lastdir",&lastdir,NULL);	
+    g_object_get(G_OBJECT(self),"musicqueue-lastdir",&lastdir,NULL);	
 
-	dialog = gtk_file_chooser_dialog_new ("Open File",
-	                                      NULL,
-	                                      GTK_FILE_CHOOSER_ACTION_OPEN,
-	                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-	                                      GTK_STOCK_OPEN,5,	   
-	                                      GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
-	                                      NULL);
+    dialog = gtk_file_chooser_dialog_new ("Open File",
+                                          NULL,
+                                          GTK_FILE_CHOOSER_ACTION_OPEN,
+                                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                          GTK_STOCK_OPEN,1,	   
+                                          GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
+                                          NULL);
 
-     //gtk_dialog_add_button (GTK_DIALOG(dialog),"gtk-open",5);
+    //gtk_dialog_add_button (GTK_DIALOG(dialog),"gtk-open",5);
 
-     
-     g_object_set(G_OBJECT(dialog),"select-multiple",TRUE,NULL);
 
-     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog),filter);
-     self->ts = tag_scanner_new();
-     gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (dialog),lastdir);
-     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
-     {
-	 
-	  list =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
-	//set our last dir to one they chose
-		 g_object_set(G_OBJECT(self),"musicqueue-lastdir",
-		              gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog))
-		              ,NULL);	
-		 		
-		
-	  gtk_widget_destroy (dialog);
-	  g_slist_foreach (list,add_file,self);
-	  g_slist_free (list);
-     }
-     else{
-     gtk_widget_destroy (dialog);
-     }     
-	 g_free(lastdir);
-     g_object_unref(self->ts);
+    g_object_set(G_OBJECT(dialog),"select-multiple",TRUE,NULL);
+
+    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog),filter);
+    self->ts = tag_scanner_new();
+    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (dialog),lastdir);
+
+    response = gtk_dialog_run (GTK_DIALOG (dialog)); 
+    if ( response  == GTK_RESPONSE_ACCEPT )
+    {
+
+        list =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
+        //set our last dir to one they chose
+        gtk_widget_destroy (dialog);
+        g_object_set(G_OBJECT(self),"musicqueue-lastdir",
+                     gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog))
+                     ,NULL);	
+
+
+        
+        g_slist_foreach (list,add_file,self);
+        g_slist_free (list);
+    }
+    else if(response == 1) //folder(s) selected
+    {
+         
+        list = gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
+        gtk_widget_destroy (dialog);
+        //need to check if the selection is a folder
+        g_slist_foreach (list,traverse_folders,self);
+        
+        g_slist_free (list);
+    }
+    else{
+        gtk_widget_destroy (dialog);
+    }     
+    g_free(lastdir);
+    g_object_unref(self->ts);
  }
 void add_file_ext(gpointer data,gpointer user_data)
 {
@@ -676,6 +694,98 @@ void add_file_ext(gpointer data,gpointer user_data)
 	 add_file(data,user_data);   
 	 g_object_unref(self->ts) ;
 }
+static void traverse_folders(gpointer data,gpointer user_data)
+{
+    GFileEnumerator *enumer; 
+    GFileInfo *info;
+    GFile *file;
+    const gchar *target_uri;
+    const gchar *uri = (gchar *) data;
+    const gchar *name;
+    const gchar *filetype;
+    gchar *buffer;
+    gchar *escaped;
+    GError *err=NULL;
+
+    file = g_file_new_for_uri((gchar *)data);
+    
+    enumer = g_file_enumerate_children (file,
+                                         G_FILE_ATTRIBUTE_STANDARD_NAME ","
+                                         G_FILE_ATTRIBUTE_STANDARD_TYPE ","
+                                         G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE ","
+                                         G_FILE_ATTRIBUTE_STANDARD_TARGET_URI ,
+                                         0,NULL,
+                                         &err);
+    
+   if (err != NULL)
+  {
+    /* Report error to user, and free error */
+    fprintf (stderr, "Unable to read file: %s\n", err->message);
+    g_error_free (err);
+  }
+
+    
+    info = g_file_enumerator_next_file(enumer,NULL,&err);
+
+       if (err != NULL)
+  {
+    /* Report error to user, and free error */
+    fprintf (stderr, "Unable to read file: %s\n", err->message);
+    g_error_free (err);
+  }
+    
+    while(info != NULL)
+    {
+      target_uri = g_file_info_get_attribute_byte_string (info, G_FILE_ATTRIBUTE_STANDARD_NAME);
+       
+              if (target_uri != NULL)
+                {
+                  escaped = g_uri_escape_string(target_uri,NULL,TRUE);
+                  buffer = g_malloc(sizeof(gchar) *strlen(escaped)+strlen(uri)+10);
+                  g_snprintf(buffer,strlen(escaped)+strlen(uri)+10,"%s/%s",uri,escaped);
+
+                  if(g_file_info_get_file_type(info) ==  G_FILE_TYPE_DIRECTORY)
+                    {
+                         //call recursively
+                        traverse_folders(buffer,user_data);
+                    }
+                    else
+                    {
+                        filetype = g_file_info_get_attribute_string (info, 
+                                              G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
+                        if(check_type_supported(filetype))
+                        {
+                            add_file(buffer,user_data);
+                        }
+                    }
+                  
+                  g_free(escaped);
+                  g_free(buffer);
+                 
+                }
+
+            
+     g_object_unref(info);
+    info = g_file_enumerator_next_file(enumer,NULL,NULL);
+    }
+    g_object_unref(file);
+    g_object_unref(enumer);
+                                            
+}
+static gboolean check_type_supported(const gchar *type)
+{
+    if(strcmp(type,"audio/mpeg") == 0)
+        return TRUE;
+    if(strcmp(type,"audio/ogg")  == 0)
+        return TRUE;
+    if(strcmp(type,"audio/flac") == 0)
+        return TRUE;
+    if(strcmp(type,"audio/wma")  == 0)
+         return TRUE;
+
+    return FALSE;
+}
+
 //uri and musicqueuestatic void add_file(gpointer data,gpointer user_data);
 static void add_file(gpointer data,gpointer user_data)
 {
@@ -971,7 +1081,8 @@ static gboolean grabfocuscb (GtkWidget *widget,
 		else
 			gtk_widget_set_sensitive(self->delete,FALSE);
 			
-		gtk_menu_popup(GTK_MENU(self->menu),NULL,NULL,NULL,NULL,event->button,event->time);
+		gtk_menu_popup(GTK_MENU(self->menu),NULL,NULL,
+                       NULL,NULL,event->button,event->time);
 		return FALSE;
 	}
     
@@ -1034,7 +1145,7 @@ static GtkWidget * getcontextmenu(gpointer user_data)
 {
     
     GtkItemFactory *item_factory;
-    GtkWidget  *menu,*font,*repeat,*sort,*sort2;
+    GtkWidget  *menu,*font,*repeat,*sort,*sort2,*seperator;
 	gboolean test;
 	
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1044,9 +1155,11 @@ static GtkWidget * getcontextmenu(gpointer user_data)
 		
     self->delete = gtk_image_menu_item_new_from_stock(GTK_STOCK_DELETE,NULL);
 	font   = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_FONT,NULL);
+    repeat =  gtk_check_menu_item_new_with_label("Repeat");
+    seperator = gtk_separator_menu_item_new ();
     sort   = gtk_menu_item_new_with_label("Sort By Artist");
     sort2   = gtk_menu_item_new_with_label("Sort By Date");
-	repeat =  gtk_check_menu_item_new_with_label("Repeat");
+	
 
 
 	g_object_get(G_OBJECT(self),"musicqueue-repeat",&test,NULL);
@@ -1064,18 +1177,19 @@ static GtkWidget * getcontextmenu(gpointer user_data)
 	                  G_CALLBACK (set_repeat),
 	                  user_data);
     g_signal_connect (G_OBJECT (sort), "activate",
-	                  G_CALLBACK (sort_by_artist),
-	                  user_data);
-      g_signal_connect (G_OBJECT (sort2), "activate",
-	                  G_CALLBACK (sort_by_date),
-	                  user_data);
-    
+                      G_CALLBACK (sort_by_artist),
+                      user_data);
+    g_signal_connect (G_OBJECT (sort2), "activate",
+                      G_CALLBACK (sort_by_date),
+                      user_data);
 
+    
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),self->delete);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),font);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),repeat);
+    gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator);
     gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort);
-     gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort2);
+    gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort2);
 	
 	   
     return menu;
@@ -1113,7 +1227,7 @@ static void gotJump(JumpWindow *jwindow,
     gtk_tree_selection_unselect_all(self->currselection);
     gtk_tree_selection_select_path(self->currselection,path); 
 
-     gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->treeview),path,NULL,TRUE,0.5,0.5);   
+    gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->treeview),path,NULL,TRUE,0.5,0.5);   
     playfile(GTK_TREE_VIEW(self->treeview),path,NULL,user_data);
 }
     
@@ -1351,7 +1465,7 @@ static sort_by_date(gpointer    callback_data,
             node->date = strtoul(node->datestr,NULL, 10);
 
                        
-             id = g_malloc(sizeof(gint));
+            id = g_malloc(sizeof(gint));
             curri = g_malloc(sizeof(gint));
             *id = atoi(cid);
             
@@ -1389,6 +1503,7 @@ static sort_by_date(gpointer    callback_data,
     //destroy data structures
     g_list_free(list);
     g_hash_table_destroy(htable);
+    
 
     
     }
