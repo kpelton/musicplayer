@@ -63,6 +63,11 @@ enum
 
 
 //priv fuctions
+static gboolean check_for_folders(GSList *list);
+static void file_chooser_cb(GtkWidget *data, 
+                            gint response,
+                            gpointer user_data);
+
 static void traverse_folders(gpointer data,gpointer user_data);
 static void destroy_hash_element(gpointer data);
 static void add (GtkWidget *widget,gpointer user_data);
@@ -336,7 +341,7 @@ static void foreach_xspf(gpointer data,gpointer user_data)
 
 		gtk_list_store_set(self->store,&iter,COLUMN_URI,track->uri,-1);  
 
-		sprintf(buffer,"%i",self->i);
+		g_snprintf(buffer,10,"%i",self->i);
 		gtk_list_store_set(self->store,&iter,COLUMN_ID,buffer,-1);
 
         file =g_file_new_for_uri(track->uri);
@@ -350,7 +355,7 @@ static void foreach_xspf(gpointer data,gpointer user_data)
                                                G_FILE_ATTRIBUTE_TIME_MODIFIED); 
 
       g_snprintf(buffer,20,"%lu",(unsigned long int)mod);
-     g_printf("%s\n",buffer);
+
         
 	  gtk_list_store_set(self->store,&iter,COLUMN_MOD,buffer,-1);
        
@@ -367,7 +372,8 @@ static void foreach_xspf(gpointer data,gpointer user_data)
 		 {	
 			 gtk_list_store_set(self->store,&iter,COLUMN_TITLE,track->title,-1);
 			 gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,track->artist,-1);
-			 sprintf(buffer,"%s - %s",track->artist,track->title);
+			 g_snprintf(buffer,strlen(track->artist)+strlen(track->title) +4
+                       ,"%s - %s",track->artist,track->title);
 			 
 		     gtk_list_store_set(self->store,&iter,COLUMN_SONG,buffer,-1);
 			 
@@ -621,8 +627,6 @@ static void add(GtkWidget *widget,gpointer user_data)
     MusicQueue *self = (MusicQueue *) user_data;
 
     GtkWidget *dialog;
-    gboolean b = TRUE;
-    GSList *list;
     GtkFileFilter *filter;
     gchar *lastdir = NULL;	
     gint response;
@@ -646,53 +650,99 @@ static void add(GtkWidget *widget,gpointer user_data)
                                           GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
                                           NULL);
 
-    //gtk_dialog_add_button (GTK_DIALOG(dialog),"gtk-open",5);
 
 
     g_object_set(G_OBJECT(dialog),"select-multiple",TRUE,NULL);
 
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog),filter);
+    gtk_file_chooser_set_local_only (GTK_FILE_CHOOSER(dialog),FALSE);
     self->ts = tag_scanner_new();
     gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (dialog),lastdir);
 
-    response = gtk_dialog_run (GTK_DIALOG (dialog)); 
+    g_signal_connect_swapped (dialog,
+                             "response", 
+                             (GCallback)file_chooser_cb,
+                             self);
+
+    gtk_widget_show_all (dialog);
+    g_free(lastdir);
+
+
+}
+static void file_chooser_cb(GtkWidget *data, 
+                            gint response,
+                            gpointer user_data)
+{
+    MusicQueue *self = (MusicQueue *) data;
+    gboolean b = TRUE;
+    GSList *list;
+    GtkFileFilter *filter;
+    GtkWidget *dialog = GTK_WIDGET(user_data);
+    
+    gchar *lastdir = NULL;	
+       
     if ( response  == GTK_RESPONSE_ACCEPT )
     {
 
         list =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
         //set our last dir to one they chose
-        gtk_widget_destroy (dialog);
+        
         g_object_set(G_OBJECT(self),"musicqueue-lastdir",
                      gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog))
                      ,NULL);	
 
 
-        
+        gtk_widget_destroy (dialog);
         g_slist_foreach (list,add_file,self);
         g_slist_free (list);
+        g_object_unref(self->ts);
     }
-    else if(response == 1) //folder(s) selected
+   else if(response == 1) //folder(s) selected
     {
-         
+
         list = gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
-        gtk_widget_destroy (dialog);
-        //need to check if the selection is a folder
-        g_slist_foreach (list,traverse_folders,self);
-        
+        if(check_for_folders(list))
+        {
+            gtk_widget_destroy (dialog);
+            //need to check if the selection is a folder
+            g_slist_foreach (list,traverse_folders,self);
+            g_object_unref(self->ts);
+        }
         g_slist_free (list);
     }
-    else{
-        gtk_widget_destroy (dialog);
-    }     
-    g_free(lastdir);
-    g_object_unref(self->ts);
- }
+
+
+}
 void add_file_ext(gpointer data,gpointer user_data)
 {
 	 MusicQueue *self = (MusicQueue *) user_data;
 	 self->ts = tag_scanner_new();
 	 add_file(data,user_data);   
 	 g_object_unref(self->ts) ;
+}
+static gboolean check_for_folders(GSList *list)
+{
+    GSList *beg = list;
+    GFile *file;
+    gchar *uri;
+    GFileInfo *info;
+    gboolean ret = TRUE;
+    
+    for(list; list!=NULL; list=list->next)
+    {
+        if(list->data){
+        file = g_file_new_for_uri((gchar *)list->data);
+        info = g_file_query_info(file,G_FILE_ATTRIBUTE_STANDARD_TYPE,0,NULL,NULL);
+
+            if(g_file_info_get_file_type(info) != G_FILE_TYPE_DIRECTORY)
+            {
+                ret = FALSE;
+            }
+            g_object_unref(file);
+            g_object_unref(info);
+        }
+    }
+    return ret;
 }
 static void traverse_folders(gpointer data,gpointer user_data)
 {
@@ -770,6 +820,7 @@ static void traverse_folders(gpointer data,gpointer user_data)
     }
     g_object_unref(file);
     g_object_unref(enumer);
+    
                                             
 }
 static gboolean check_type_supported(const gchar *type)
@@ -816,7 +867,7 @@ static void add_file(gpointer data,gpointer user_data)
     // gtk_list_store_set(self->store,&iter,COLUMN_TITLE,out,-1);    
     gtk_list_store_set(self->store,&iter,COLUMN_URI,valid,-1);  
 
-    sprintf(buffer,"%i",self->i);
+    g_snprintf(buffer,10,"%i",self->i);
     gtk_list_store_set(self->store,&iter,COLUMN_ID,buffer,-1);  
 
     file =g_file_new_for_uri(valid);
@@ -845,7 +896,8 @@ static void add_file(gpointer data,gpointer user_data)
 		gtk_list_store_set(self->store,&iter,COLUMN_TITLE,md->title,-1);
 		gtk_list_store_set(self->store,&iter,COLUMN_ARTIST,md->artist,-1);
 		
-	   	sprintf(buffer,"%s - %s",md->artist,md->title);
+	   	g_snprintf(buffer,strlen(md->artist)+strlen(md->title)+4,
+                      "%s - %s",md->artist,md->title);
 			gtk_list_store_set(self->store,&iter,COLUMN_SONG,buffer,-1);
 		
 		ts_metadata_free(md);
@@ -891,8 +943,8 @@ music_queue_new_with_player(GsPlayer *player)
     self->player =player;
     
     g_signal_connect (player, "eof",
-				  G_CALLBACK(nextFile),
-				  (gpointer)self);
+                      G_CALLBACK(nextFile),
+                      (gpointer)self);
     
     
     
@@ -1023,18 +1075,18 @@ static void add_columns(MusicQueue *self)
     
     column = gtk_tree_view_column_new_with_attributes ("ID",
 											renderer,
-											"text",
-											COLUMN_ID,
-											NULL);
-     renderer = gtk_cell_renderer_text_new ();
-    
-    column = gtk_tree_view_column_new_with_attributes ("MODIFCATION",
-											renderer,
-											"text",
-											COLUMN_MOD,
-											NULL);
-    
+                                                       "text",
+                                                       COLUMN_ID,
+                                                       NULL);
+    renderer = gtk_cell_renderer_text_new ();
 
+    column = gtk_tree_view_column_new_with_attributes ("MODIFCATION",
+                                                       renderer,
+                                                       "text",
+                                                       COLUMN_MOD,
+                                                       NULL);
+
+    
 }
 static void  rowchanged  (GtkTreeModel *tree_model,
 					 GtkTreePath  *path,

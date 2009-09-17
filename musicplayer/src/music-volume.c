@@ -52,7 +52,7 @@ music_volume_new(void)
 {
      GtkWidget *ret;
      MusicVolume *me;
- 	return g_object_new (MUSIC_TYPE_VOLUME, NULL);
+ 	 return g_object_new (MUSIC_TYPE_VOLUME, NULL);
     
        
 }
