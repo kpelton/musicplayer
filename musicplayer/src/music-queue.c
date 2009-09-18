@@ -1445,32 +1445,39 @@ remove_files_via_press(GtkWidget *widget,
                        GdkEventKey *event,
                        gpointer user_data)
 {
-    GtkWidget *jumpwindow;
+    
     MusicQueue *self = (MusicQueue *) user_data;
     if(event->keyval == GDK_Delete && has_selected(user_data) == TRUE)
 	   remove_files(NULL,user_data);
 
   if(event->keyval == GDK_j)
     {
-       self->priv->musicstore = music_store_new_with_model(GTK_TREE_MODEL(self->priv->store),NULL);
-       jumpwindow = jump_window_new_with_model(self->priv->musicstore);
-
-    g_signal_connect(jumpwindow, "jump",
-	                 G_CALLBACK(gotJump),
-	                 self);
-           
-    gtk_widget_show(jumpwindow);
+       make_jump_window(self);
        return TRUE;
     }
     
     return FALSE;
 }  
 
+void
+make_jump_window(MusicQueue *self)
+{
+    GtkWidget *jumpwindow;
+    self->priv->musicstore = music_store_new_with_model(GTK_TREE_MODEL(self->priv->store),NULL);
+    jumpwindow = jump_window_new_with_model(self->priv->musicstore);
+
+    g_signal_connect(jumpwindow, "jump",
+	                 G_CALLBACK(gotJump),
+	                 self);
+           
+    gtk_widget_show(jumpwindow);
+}
 static void 
 gotJump(JumpWindow *jwindow,
         GtkTreePath* path,
         gpointer user_data)
 {
+    
     MusicQueue *self = (MusicQueue *) user_data;
     gtk_tree_selection_unselect_all(self->priv->currselection);
     gtk_tree_selection_select_path(self->priv->currselection,path); 

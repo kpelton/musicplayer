@@ -1,9 +1,11 @@
 /* music-main-window.c */
 
 #include "music-main-window.h"
+#include "music-queue.h"
 #include "tag-scanner.h"
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
+#include <gdk/gdkkeysyms.h>
 #include <gconf/gconf-client.h>
 
 
@@ -26,6 +28,10 @@ on_pause_released                (GtkButton       *button,
 static void
 on_play_released                       (GtkButton       *button,
                                         gpointer         user_data);
+static gboolean 
+key_press_cb(GtkWidget *widget,
+             GdkEventKey *event,
+             gpointer user_data);
 
 static void music_main_window_get_property (GObject *object, guint property_id,
 				GValue *value, GParamSpec *pspec)
@@ -222,6 +228,10 @@ static void init_widgets(MusicMainWindow *self)
 				  G_CALLBACK (on_play_released),
 				  (gpointer)self);
     
+    g_signal_connect (G_OBJECT (self), "key_press_event",
+	                  G_CALLBACK (key_press_cb),
+	                  self);
+    
 
      
 	  self->signum = g_signal_connect (self, "size-allocate",
@@ -230,6 +240,23 @@ static void init_widgets(MusicMainWindow *self)
     
 			 
     
+}
+
+static gboolean 
+key_press_cb(GtkWidget *widget,
+             GdkEventKey *event,
+             gpointer user_data)
+{
+    MusicMainWindow *self = (MusicMainWindow *)user_data;
+   
+  if(event->keyval == GDK_j)
+    {
+       make_jump_window(MUSIC_QUEUE(self->queue));
+       return TRUE;
+    }
+    
+    return FALSE;
+
 }
 
 static void

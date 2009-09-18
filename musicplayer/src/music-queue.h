@@ -55,6 +55,9 @@ music_queue_new_with_player(GsPlayer *player);
 void 
 add_file_ext(gpointer data,gpointer user_data);
 
+void
+make_jump_window(MusicQueue *self);
+
 void 
 music_queue_play_selected (MusicQueue *self);
 
