@@ -158,7 +158,7 @@ static void
 foreach_xspf(gpointer data,gpointer user_data)
 {
     metadata *track = (metadata *) data;
-    XspfReader *self = XSPF_READER(data);
+    XspfReader *self = XSPF_READER(user_data);
     xmlNodePtr tracknode ,node;
     xmlNodePtr location, title,artist;
 
@@ -200,18 +200,12 @@ foreach_xspf(gpointer data,gpointer user_data)
 static void
 xspf_reader_playlist_interface_init(PlaylistReaderInterface *iface)
 {
-  iface->do_action = do_action;
+
   iface->playlist_reader_read_list=xspf_reader_read_list;
   iface->playlist_reader_write_list=xspf_reader_write_list;  
     
 }
 
-static void 
-do_action(PlaylistReader *plist)
-{
-  XspfReader *self = XSPF_READER(plist);  
-  g_print ("xspf implementation of playlist interface Action: .\n");
-}
 
 static void
 xspf_reader_finalize (GObject *object)

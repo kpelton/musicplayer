@@ -31,13 +31,7 @@ playlist_reader_get_type (void)
   return iface_type;
 }
 
-void
-playlist_reader_do_action (PlaylistReader *self)
-{
-  g_return_if_fail (PLAYLIST_IS_READER(self));
 
-  PLAYLIST_READER_GET_INTERFACE (self)->do_action (self);
-}
 gboolean 
 playlist_reader_write_list (PlaylistReader *self,gchar *location,GList * list)
 {

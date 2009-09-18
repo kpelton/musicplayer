@@ -13,10 +13,8 @@ main (int argc, char *argv[])
 {
   GtkWidget *mainwindow;
   MusicMainWindow *m;
-  PlaylistReader *read;
-     g_type_init();   
-  read =PLAYLIST_READER(xspf_reader_new());
-        playlist_reader_do_action(read);
+  
+  g_type_init();   
 
   gst_init (&argc, &argv);
   

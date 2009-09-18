@@ -73,6 +73,7 @@ static void destroy_hash_element(gpointer data);
 static void add (GtkWidget *widget,gpointer user_data);
 static void add_columns (MusicQueue *self);
 static void init_widgets (MusicQueue *self);
+static void music_queue_read_start_playlist(gchar *location,MusicQueue *self);
 //static void playfile (GtkTreeSelection *selection, gpointer data);
 static void nextFile (GsPlayer *player,gpointer user_data);
 static void
@@ -228,7 +229,7 @@ music_queue_dispose (GObject *object)
 
             if((list = get_list(self)) != NULL)
             {
-                plist_reader_write_list("/home/kyle/test.xspf",list,self->read);
+                playlist_reader_write_list(self->read,"/home/kyle/test.xspf",list);
                 g_list_free(list);
             }
 
@@ -390,7 +391,7 @@ static void foreach_playlist_file(gpointer data,gpointer user_data)
 	 }
 }
 
-static void music_queue_read_xspf(gchar *location,MusicQueue *self)
+static void music_queue_read_start_playlist(gchar *location,MusicQueue *self)
 {
      GList *list = g_list_alloc();
     
@@ -399,7 +400,7 @@ static void music_queue_read_xspf(gchar *location,MusicQueue *self)
      g_list_foreach(list,foreach_playlist_file,self);
 
      g_list_free(list);
-     g_object_unref(self->read);
+     
 }
 
 static void
@@ -425,7 +426,7 @@ music_queue_init (MusicQueue *self)
      self->ts = NULL;
      self->read = PLAYLIST_READER(xspf_reader_new());
      
-     music_queue_read_xspf("/home/kyle/test.xspf",self);
+     music_queue_read_start_playlist("/home/kyle/test.xspf",self);
      
      
   
