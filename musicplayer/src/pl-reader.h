@@ -26,7 +26,7 @@ struct _PlaylistReaderInterface {
     
   GTypeInterface parent_iface;
 
-        void (*do_action) (PlaylistReader *self);
+    const gchar* (*playlist_reader_mime_supported) (PlaylistReader *self);
     gboolean (*playlist_reader_write_list) (PlaylistReader *self,gchar *location,GList * list);
     gboolean (*playlist_reader_read_list ) (PlaylistReader *self,gchar *location,GList **list);
 

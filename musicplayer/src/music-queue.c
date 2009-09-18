@@ -67,6 +67,14 @@ static gboolean check_for_folders(GSList *list);
 static void file_chooser_cb(GtkWidget *data, 
                             gint response,
                             gpointer user_data);
+static
+void
+choose_file_action(gchar * uri,
+                   const gchar *type, 
+                   gpointer user_data);
+static void 
+scan_file_action(gpointer data,
+                 gpointer user_data);
 
 static void traverse_folders(gpointer data,gpointer user_data);
 static void destroy_hash_element(gpointer data);
@@ -636,11 +644,12 @@ static void add(GtkWidget *widget,gpointer user_data)
 
     filter = gtk_file_filter_new ();
 
-    gtk_file_filter_set_name(filter,"Music Files");  
+    gtk_file_filter_set_name(filter,"Supported Types");  
     gtk_file_filter_add_pattern(filter,"*.mp3");
     gtk_file_filter_add_pattern(filter,"*.flac");
     gtk_file_filter_add_pattern(filter,"*.ogg");
     gtk_file_filter_add_pattern(filter,"*.wma");
+    gtk_file_filter_add_pattern(filter,"*.xspf");
 
 
     g_object_get(G_OBJECT(self),"musicqueue-lastdir",&lastdir,NULL);	
@@ -682,21 +691,26 @@ static void file_chooser_cb(GtkWidget *data,
     GtkFileFilter *filter;
     GtkWidget *dialog = GTK_WIDGET(user_data);
     
-    gchar *lastdir = NULL;	
-       
-    if ( response  == GTK_RESPONSE_ACCEPT )
+    gchar *lastdir = NULL;
+    if(response == GTK_RESPONSE_CANCEL)
+    {
+        g_object_unref(self->ts);
+        gtk_widget_destroy (dialog);
+    }
+
+    else if (response  == GTK_RESPONSE_ACCEPT)
     {
 
         list =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
         //set our last dir to one they chose
-        
+
         g_object_set(G_OBJECT(self),"musicqueue-lastdir",
                      gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog))
                      ,NULL);	
 
 
         gtk_widget_destroy (dialog);
-        g_slist_foreach (list,add_file,self);
+        g_slist_foreach (list,scan_file_action,self);
         g_slist_free (list);
         g_object_unref(self->ts);
     }
@@ -826,6 +840,8 @@ static void traverse_folders(gpointer data,gpointer user_data)
     
                                             
 }
+
+
 static gboolean check_type_supported(const gchar *type)
 {
     if(strcmp(type,"audio/mpeg") == 0)
@@ -841,7 +857,80 @@ static gboolean check_type_supported(const gchar *type)
 }
 
 //uri and musicqueuestatic void add_file(gpointer data,gpointer user_data);
-static void add_file(gpointer data,gpointer user_data)
+
+static void 
+scan_file_action(gpointer data,
+                 gpointer user_data)
+{
+    MusicQueue *self = (MusicQueue *) user_data;
+    GFile * file = g_file_new_for_uri((gchar *)data);
+    GError *err;
+    GFileInfo *info;
+    gchar* uri = (gchar *)data; 
+    
+    const gchar *type;
+    
+    
+    info =g_file_query_info (file,
+                                         G_FILE_ATTRIBUTE_STANDARD_NAME ","
+                                         G_FILE_ATTRIBUTE_STANDARD_TYPE ","
+                                         G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE ,
+                                         0,NULL,
+                                         &err);
+    if(info)
+    {
+       type= g_file_info_get_attribute_string (info, 
+                                            G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
+        choose_file_action(uri,type,user_data);
+        
+    }
+    
+    
+}
+
+static void 
+choose_file_action(gchar * uri,
+                   const gchar *type, 
+                   gpointer user_data)
+{
+    PlaylistReader *read;
+    GList *list;
+    MusicQueue *self = (MusicQueue *) user_data;
+    
+
+    if(strcmp(type,"audio/mpeg") == 0)
+    {
+        add_file(uri,user_data);
+    }
+    else if(strcmp(type,"audio/ogg")  == 0)
+    {
+        add_file(uri,user_data);
+    }
+    else if(strcmp(type,"audio/flac") == 0)
+    {
+        add_file(uri,user_data);
+    }
+    else if(strcmp(type,"audio/wma")  == 0)
+    {
+        add_file(uri,user_data);
+    }
+    else if(strcmp(type,"application/xspf+xml")  == 0)
+    {
+        GList *list = g_list_alloc();
+        read = PLAYLIST_READER(xspf_reader_new());
+        playlist_reader_read_list(read,uri,&list);
+        g_list_foreach(list,foreach_playlist_file,self);
+        g_object_unref(read);
+        g_list_free(list);
+    }
+    else
+    {
+        fprintf(stderr,"MIME type not supported\n");
+    }
+    
+}
+static void 
+add_file(gpointer data,gpointer user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GtkTreeIter   iter;

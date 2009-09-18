@@ -47,7 +47,7 @@ am_musicplayer_OBJECTS = music-main-window.$(OBJEXT) \
 	music-queue.$(OBJEXT) music-volume.$(OBJEXT) \
 	tag-scanner.$(OBJEXT) music-store.$(OBJEXT) \
 	jump-window.$(OBJEXT) pl-reader.$(OBJEXT) \
-	xspf-reader.$(OBJEXT)
+	xspf-reader.$(OBJEXT) m3u-reader.$(OBJEXT)
 musicplayer_OBJECTS = $(am_musicplayer_OBJECTS)
 musicplayer_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -149,9 +149,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = `pkg-config --cflags --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0 gio-2.0` -O3		
 AM_LDFLAGS = `pkg-config --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0 gio-2.0` -O3
-musicplayer_SOURCES = music-main-window.c musicseek.c player.c main.c music-queue.c music-volume.c  tag-scanner.c music-queue.h  music-volume.h  music-main-window.h music-seek.h player.h tag-scanner.h  music-store.c music-store.h jump-window.h jump-window.c \
-	pl-reader.h  pl-reader.c  xspf-reader.h  xspf-reader.c 
-
+musicplayer_SOURCES = music-main-window.c musicseek.c player.c main.c music-queue.c music-volume.c  tag-scanner.c music-queue.h  music-volume.h  music-main-window.h music-seek.h player.h tag-scanner.h  music-store.c music-store.h jump-window.h jump-window.c pl-reader.h  pl-reader.c  xspf-reader.h  xspf-reader.c m3u-reader.h  m3u-reader.c
 musicplayer_LDADD = $(INTI_LIBS)
 all: all-am
 
@@ -220,6 +218,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jump-window.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m3u-reader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/music-main-window.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/music-queue.Po@am__quote@

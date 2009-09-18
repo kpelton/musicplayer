@@ -17,13 +17,15 @@ static void
 plist_xspf_add_file(xmlNode *nptr ,metadata *track);
 static void 
 foreach_xspf(gpointer data,gpointer user_data);
+static const char *
+xspf_mime_type(PlaylistReader *plist);
 
 G_DEFINE_TYPE_WITH_CODE (XspfReader, xspf_reader, G_TYPE_OBJECT,
                            G_IMPLEMENT_INTERFACE (PLAYLIST_TYPE_READER,xspf_reader_playlist_interface_init));
 
 #define XSPF_XMLNS "http://xspf.org/ns/0/"
 #define CREATOR "musicplayer"
-
+#define MIME_TYPE "application/xspf+xml"
 
 struct _XspfReaderPrivate{
     
@@ -202,10 +204,17 @@ xspf_reader_playlist_interface_init(PlaylistReaderInterface *iface)
 {
 
   iface->playlist_reader_read_list=xspf_reader_read_list;
-  iface->playlist_reader_write_list=xspf_reader_write_list;  
-    
+  iface->playlist_reader_write_list=xspf_reader_write_list;
+  iface->playlist_reader_mime_supported=xspf_mime_type;
+
 }
 
+static const char *
+xspf_mime_type(PlaylistReader *plist)
+{
+    return MIME_TYPE;
+    
+}
 
 static void
 xspf_reader_finalize (GObject *object)

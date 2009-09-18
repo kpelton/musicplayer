@@ -31,7 +31,15 @@ playlist_reader_get_type (void)
   return iface_type;
 }
 
-
+const gchar* 
+playlist_reader_mime_supported (PlaylistReader *self)
+{
+     g_return_if_fail (PLAYLIST_IS_READER(self));
+    
+     return PLAYLIST_READER_GET_INTERFACE (self)->playlist_reader_mime_supported(self);
+    
+      
+}
 gboolean 
 playlist_reader_write_list (PlaylistReader *self,gchar *location,GList * list)
 {
