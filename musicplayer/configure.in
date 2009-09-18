@@ -1,7 +1,7 @@
 AC_INIT(src/main.c)
 
 PACKAGE=musicplayer
-VERSION=0.1.0
+VERSION=0.1.5
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
