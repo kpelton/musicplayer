@@ -1772,7 +1772,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 PACKAGE=musicplayer
-VERSION=0.1.0
+VERSION=0.1.5
 
 am__api_version='1.10'
 

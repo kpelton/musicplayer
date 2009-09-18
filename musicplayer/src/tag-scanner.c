@@ -94,7 +94,7 @@ static void ts_event_loop(TagScanner * self, GstBus *bus, metadata *data)
 {
      GstMessage *message;
      gboolean val = FALSE;
-     message = gst_bus_timed_pop(bus,GST_SECOND/3);
+     message = gst_bus_timed_pop(bus,GST_SECOND/10);
      
      while( val != TRUE && message != NULL)
      {
@@ -107,7 +107,7 @@ static void ts_event_loop(TagScanner * self, GstBus *bus, metadata *data)
 
 	  }
 	  
-	  message = gst_bus_timed_pop(bus,GST_SECOND/3);
+	  message = gst_bus_timed_pop(bus,GST_SECOND/10);
      }
 
      
@@ -140,13 +140,13 @@ metadata * ts_get_metadata(gchar * uri,TagScanner * self){
      
      gst_element_set_state (self->pipeline, GST_STATE_READY);
      g_object_set (G_OBJECT (self->filesrc), "location", uri, NULL);
-     gst_bus_add_watch (self->bus, my_bus_callback, self);
+     //gst_bus_add_watch (self->bus, my_bus_callback, self);
      gst_element_set_state (self->pipeline, GST_STATE_PLAYING);
      
     
      ts_event_loop(self,self->bus,track);
          
-     gst_element_set_state (self->pipeline, GST_STATE_NULL);
+     //gst_element_set_state (self->pipeline, GST_STATE_NULL);
      track = self->track;
 
      //if(track->artist == NULL || track->title == NULL)
@@ -368,7 +368,7 @@ tag_scanner_init (TagScanner *self)
      gst_element_link (self->filesrc,self->dec);
 
      self->already_found = FALSE;
-     gst_bus_set_flushing(self->bus,TRUE);
+     //gst_bus_set_flushing(self->bus,TRUE);
      //gst_bus_add_watch (self->bus, my_bus_callback, self);
 }
 
