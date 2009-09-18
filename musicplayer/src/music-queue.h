@@ -31,33 +31,11 @@ G_BEGIN_DECLS
 
 #define MUSIC_QUEUE_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS ((obj), MUSIC_TYPE_QUEUE, MusicQueueClass))
-
+typedef struct _MusicQueuePrivate MusicQueuePrivate;
 typedef struct {
 	GtkVBoxClass parent;
-	GtkWidget* vbox;
-	GtkWidget* hbox;
-	GtkWidget* treeview;
-	GtkWidget* openbutton;
-	GtkWidget* scrolledwindow;
-	GtkWidget *menu;
-	GtkWidget *delete;
-	GtkListStore *store;
-    GtkTreeModel *musicstore;
-	GsPlayer *player;
-	GtkTreeIter  curr;
-	GtkTreeSelection *currselection;
-	GtkTreePath *path;
-	gboolean changed;
-	guint i;
-	gint currid;
-	gboolean drag_started;
-	TagScanner *ts;
-	PlaylistReader *read;
-	gchar *font;
-	gchar *lastdir;
-	GConfClient* client;
-	gboolean repeat;
-    gboolean sorted;
+
+    MusicQueuePrivate *priv;
 	
 } MusicQueue;
 
@@ -67,10 +45,20 @@ typedef struct {
 
 GType music_queue_get_type (void);
 
-GtkWidget* music_queue_new (void);
-GtkWidget* music_queue_new_with_player(GsPlayer *player);
-void add_file_ext(gpointer data,gpointer user_data);
-void music_queue_play_selected (MusicQueue *self);
+//public methods
+GtkWidget* 
+music_queue_new (void);
+
+GtkWidget* 
+music_queue_new_with_player(GsPlayer *player);
+
+void 
+add_file_ext(gpointer data,gpointer user_data);
+
+void 
+music_queue_play_selected (MusicQueue *self);
+
+//end public methods
 G_END_DECLS
 
 #endif /* _MUSIC_QUEUE */
