@@ -49,7 +49,8 @@ am_musicplayer_OBJECTS = music-main-window.$(OBJEXT) \
 	jump-window.$(OBJEXT) pl-reader.$(OBJEXT) \
 	xspf-reader.$(OBJEXT) m3u-reader.$(OBJEXT)
 musicplayer_OBJECTS = $(am_musicplayer_OBJECTS)
-musicplayer_DEPENDENCIES =
+am__DEPENDENCIES_1 =
+musicplayer_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -81,7 +82,15 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+GLIB_CFLAGS = @GLIB_CFLAGS@
+GLIB_LDFLAGS = @GLIB_LDFLAGS@
+GLIB_LIBS = @GLIB_LIBS@
 GREP = @GREP@
+GST_CFLAGS = @GST_CFLAGS@
+GST_LDFLAGS = @GST_LDFLAGS@
+GST_LIBS = @GST_LIBS@
+GTK_CFLAGS = @GTK_CFLAGS@
+GTK_LIBS = @GTK_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -101,6 +110,7 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -147,10 +157,9 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CFLAGS = `pkg-config --cflags --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0 gio-2.0` -O3		
-AM_LDFLAGS = `pkg-config --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0 gio-2.0` -O3
+INCLUDES = $(GST_CFLAGS) $(GLIB_CFLAGS) $(WARN_CFLAGS)	 
+musicplayer_LDADD = $(GLIB_LIBS) $(INTI_LIBS) $(GST_LIBS)
 musicplayer_SOURCES = music-main-window.c musicseek.c player.c main.c music-queue.c music-volume.c  tag-scanner.c music-queue.h  music-volume.h  music-main-window.h music-seek.h player.h tag-scanner.h  music-store.c music-store.h jump-window.h jump-window.c pl-reader.h  pl-reader.c  xspf-reader.h  xspf-reader.c m3u-reader.h  m3u-reader.c
-musicplayer_LDADD = $(INTI_LIBS)
 all: all-am
 
 .SUFFIXES:

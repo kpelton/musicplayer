@@ -5844,6 +5844,13 @@ fi
 
 fi
 
+GLIB_REQS=2.13.4
+GTK_REQS=2.16.0
+
+
+gst010_toolsdir=`$PKG_CONFIG --variable=toolsdir gstreamer-0.10`
+gst010_inspect="$gst010_toolsdir/gst-inspect-0.10"
+
 
 
 ac_config_files="$ac_config_files Makefile src/Makefile"
