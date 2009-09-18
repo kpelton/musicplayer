@@ -4,6 +4,7 @@
 #define _XSPF_READER
 
 #include <glib-object.h>
+#include "pl-reader.h"
 
 G_BEGIN_DECLS
 
@@ -24,8 +25,10 @@ G_BEGIN_DECLS
 #define XSPF_READER_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS ((obj), XSPF_TYPE_READER, XspfReaderClass))
 
+typedef struct _XspfReaderPrivate XspfReaderPrivate;
 typedef struct {
   GObject parent;
+  XspfReaderPrivate * priv;
 } XspfReader;
 
 typedef struct {

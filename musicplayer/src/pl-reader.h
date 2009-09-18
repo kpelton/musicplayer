@@ -15,21 +15,28 @@ G_BEGIN_DECLS
 #define PLAYLIST_IS_READER(obj) \
   (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PLAYLIST_TYPE_READER))
 
-#define PLAYLIST_READER_GET_INST(inst) \
-  (G_TYPE_INSTANCE_GET_INTERFACE((inst), PLAYLIST_TYPE_READER, PlaylistReaderInterface))
+#define PLAYLIST_READER_GET_INTERFACE(inst) \
+(G_TYPE_INSTANCE_GET_INTERFACE ((inst), PLAYLIST_TYPE_READER, PlaylistReaderInterface))
 
-typedef struct _PlayListReader PlaylistReader;
 
-typedef struct {
-  GTypeInterface parent_class;
+typedef struct _PlaylistReader PlaylistReader;
+typedef struct _PlaylistReaderInterface PlaylistReaderInterface;
+
+struct _PlaylistReaderInterface {
     
-    void (*do_action) (PlayListReader *self);
+  GTypeInterface parent_iface;
 
-} PlaylistReaderInterface;
+        void (*do_action) (PlaylistReader *self);
+    gboolean (*playlist_reader_write_list) (PlaylistReader *self,gchar *location,GList * list);
+    gboolean (*playlist_reader_read_list ) (PlaylistReader *self,gchar *location,GList **list);
+
+};
 
 GType playlist_reader_get_type (void);
 
-void playlist_reader_do_action(PlayListReader *self);
+void playlist_reader_do_action(PlaylistReader *self);
+gboolean playlist_reader_write_list (PlaylistReader *self,gchar *location,GList * list);
+gboolean playlist_reader_read_list (PlaylistReader *self,gchar *location,GList **list);
 
 G_END_DECLS
 

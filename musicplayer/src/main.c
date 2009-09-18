@@ -5,15 +5,21 @@
 #include "player.h"
 #include "music-queue.h"
 #include "music-main-window.h"
+#include "xspf-reader.h"
+#include "pl-reader.h"
 #include <gconf/gconf-client.h>
 
 main (int argc, char *argv[])
 {
   GtkWidget *mainwindow;
   MusicMainWindow *m;
+  PlaylistReader *read;
+     g_type_init();   
+  read =PLAYLIST_READER(xspf_reader_new());
+        playlist_reader_do_action(read);
 
   gst_init (&argc, &argv);
-   g_type_init();
+  
   gtk_init (&argc, &argv);
   gconf_init(argc, argv, NULL);
 

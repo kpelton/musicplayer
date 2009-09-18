@@ -314,7 +314,7 @@ music_queue_class_init (MusicQueueClass *klass)
 
 
 }
-static void foreach_xspf(gpointer data,gpointer user_data)
+static void foreach_playlist_file(gpointer data,gpointer user_data)
 {
 
 	metadata *track = (metadata *)data;
@@ -345,7 +345,7 @@ static void foreach_xspf(gpointer data,gpointer user_data)
 		gtk_list_store_set(self->store,&iter,COLUMN_ID,buffer,-1);
 
         file =g_file_new_for_uri(track->uri);
-         info= g_file_query_info(file,G_FILE_ATTRIBUTE_TIME_MODIFIED,
+        info= g_file_query_info(file,G_FILE_ATTRIBUTE_TIME_MODIFIED,
                             G_FILE_QUERY_INFO_NONE,
                             NULL,
                             NULL);    
@@ -393,19 +393,21 @@ static void foreach_xspf(gpointer data,gpointer user_data)
 static void music_queue_read_xspf(gchar *location,MusicQueue *self)
 {
      GList *list = g_list_alloc();
-     plist_xspf_read(location,&list,self->read);
+    
+     playlist_reader_read_list(self->read,location,&list);
 
-     g_list_foreach(list,foreach_xspf,self);
+     g_list_foreach(list,foreach_playlist_file,self);
 
      g_list_free(list);
+     g_object_unref(self->read);
 }
 
 static void
 music_queue_init (MusicQueue *self)
 {
 	gboolean repeat=FALSE;
-		gchar *font;
- //need to pull in gconf stuff here
+    gchar *font;
+    //need to pull in gconf stuff here
     
      //g_object_set(G_OBJECT (self), "musicqueue-font","verdanna bold 7",NULL);
 	 g_object_set(G_OBJECT (self), "musicqueue-lastdir",g_get_home_dir(),NULL);
@@ -421,7 +423,7 @@ music_queue_init (MusicQueue *self)
      self->i=0;
      self->drag_started=FALSE;
      self->ts = NULL;
-     self->read = plist_reader_new();
+     self->read = PLAYLIST_READER(xspf_reader_new());
      
      music_queue_read_xspf("/home/kyle/test.xspf",self);
      

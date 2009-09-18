@@ -45,8 +45,9 @@ PROGRAMS = $(bin_PROGRAMS)
 am_musicplayer_OBJECTS = music-main-window.$(OBJEXT) \
 	musicseek.$(OBJEXT) player.$(OBJEXT) main.$(OBJEXT) \
 	music-queue.$(OBJEXT) music-volume.$(OBJEXT) \
-	plist-reader.$(OBJEXT) tag-scanner.$(OBJEXT) \
-	music-store.$(OBJEXT) jump-window.$(OBJEXT)
+	tag-scanner.$(OBJEXT) music-store.$(OBJEXT) \
+	jump-window.$(OBJEXT) pl-reader.$(OBJEXT) \
+	xspf-reader.$(OBJEXT)
 musicplayer_OBJECTS = $(am_musicplayer_OBJECTS)
 musicplayer_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -146,9 +147,11 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CFLAGS = `pkg-config --cflags --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0 gio-2.0` -pg		
-AM_LDFLAGS = `pkg-config --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0 gio-2.0` -pg
-musicplayer_SOURCES = music-main-window.c musicseek.c player.c main.c music-queue.c music-volume.c  plist-reader.c tag-scanner.c music-queue.h  music-volume.h  plist-reader.h music-main-window.h music-seek.h player.h tag-scanner.h  music-store.c music-store.h jump-window.h jump-window.c
+AM_CFLAGS = `pkg-config --cflags --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0 gio-2.0` -O3		
+AM_LDFLAGS = `pkg-config --libs gtk+-2.0 gstreamer-0.10 libgnome-2.0 gio-2.0` -O3
+musicplayer_SOURCES = music-main-window.c musicseek.c player.c main.c music-queue.c music-volume.c  tag-scanner.c music-queue.h  music-volume.h  music-main-window.h music-seek.h player.h tag-scanner.h  music-store.c music-store.h jump-window.h jump-window.c \
+	pl-reader.h  pl-reader.c  xspf-reader.h  xspf-reader.c 
+
 musicplayer_LDADD = $(INTI_LIBS)
 all: all-am
 
@@ -223,9 +226,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/music-store.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/music-volume.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/musicseek.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pl-reader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/player.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plist-reader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tag-scanner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xspf-reader.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

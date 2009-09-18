@@ -8,7 +8,8 @@
 #include <gconf/gconf-client.h>
 #include "player.h"
 #include "tag-scanner.h"
-#include "plist-reader.h"
+#include "pl-reader.h"
+#include "xspf-reader.h"
 
 
 
@@ -51,7 +52,7 @@ typedef struct {
 	gint currid;
 	gboolean drag_started;
 	TagScanner *ts;
-	PlistReader *read;
+	PlaylistReader *read;
 	gchar *font;
 	gchar *lastdir;
 	GConfClient* client;

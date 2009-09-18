@@ -83,19 +83,19 @@ static void process_xspf_tracks(xmlNode *nptr ,GList **list)
      metadata *track = NULL;
 
 
-     for (nptr=nptr->children; nptr != NULL; nptr = nptr->next) {
-	  //each track
-	  if (nptr->type == XML_ELEMENT_NODE &&
-	      !xmlStrcmp(nptr->name, (xmlChar *)"track")) {
-	       track = ts_metadata_new();
-	       plist_xspf_add_file(nptr,track);
-	       if(track->uri)
-		    *list = g_list_append(*list,track);
-	       else
-		    ts_metadata_free(track);
-	  }
+    for (nptr=nptr->children; nptr != NULL; nptr = nptr->next) {
+        //each track
+        if (nptr->type == XML_ELEMENT_NODE &&
+            !xmlStrcmp(nptr->name, (xmlChar *)"track")) {
+                track = ts_metadata_new();
+                plist_xspf_add_file(nptr,track);
+                if(track->uri)
+                    *list = g_list_append(*list,track);
+                else
+                    ts_metadata_free(track);
+            }
 
-     }
+    }
 
 }
 static void plist_xspf_add_file(xmlNode *nptr ,metadata *track)
@@ -224,7 +224,8 @@ plist_reader_init (PlistReader *self)
      self->doc = NULL;
      self->rootnode = NULL;
      self->tracklist = NULL;
-     
+
+    
 }
 
 PlistReader*
