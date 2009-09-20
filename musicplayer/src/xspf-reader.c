@@ -37,8 +37,10 @@ struct _XspfReaderPrivate{
 
 
 
-gboolean
-xspf_reader_read_list(PlaylistReader *plist,gchar *location,GList **list)
+static gboolean
+xspf_reader_read_list(PlaylistReader *plist,
+                      gchar *location,
+                      GList **list)
 {
     XspfReader *self = XSPF_READER(plist);
      int ret;
@@ -72,7 +74,9 @@ xspf_reader_read_list(PlaylistReader *plist,gchar *location,GList **list)
     return TRUE;
 }
 
-static void process_xspf_tracks(xmlNode *nptr ,GList **list)
+static void 
+process_xspf_tracks(xmlNode *nptr,
+                    GList **list)
 {
     metadata *track = NULL;
 
@@ -96,7 +100,8 @@ static void process_xspf_tracks(xmlNode *nptr ,GList **list)
 }
 
 static void 
-plist_xspf_add_file(xmlNode *nptr ,metadata *track)
+plist_xspf_add_file(xmlNode *nptr ,
+                    metadata *track)
 {
     const gchar *name;
 
@@ -123,8 +128,10 @@ plist_xspf_add_file(xmlNode *nptr ,metadata *track)
 }
 
 
-gboolean
-xspf_reader_write_list(PlaylistReader *plist,gchar *location,GList *list)
+static gboolean
+xspf_reader_write_list(PlaylistReader *plist,
+                       gchar *location,
+                       GList *list)
 {
     XspfReader *self = XSPF_READER(plist);
 
@@ -157,7 +164,8 @@ xspf_reader_write_list(PlaylistReader *plist,gchar *location,GList *list)
     
 }
 static void 
-foreach_xspf(gpointer data,gpointer user_data)
+foreach_xspf(gpointer data,
+             gpointer user_data)
 {
     metadata *track = (metadata *) data;
     XspfReader *self = XSPF_READER(user_data);

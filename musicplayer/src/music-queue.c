@@ -738,7 +738,7 @@ add(GtkWidget *widget,
     gtk_file_filter_add_pattern(filter,"*.ogg");
     gtk_file_filter_add_pattern(filter,"*.wma");
     gtk_file_filter_add_pattern(filter,"*.xspf");
-
+    gtk_file_filter_add_pattern(filter,"*.m3u");
 
     g_object_get(G_OBJECT(self),"musicqueue-lastdir",&lastdir,NULL);	
 
@@ -992,7 +992,8 @@ choose_file_action(gchar * uri,
     GList *list;
     MusicQueue *self = (MusicQueue *) user_data;
     
-
+    printf("%s\n",type);
+    
     if(strcmp(type,"audio/mpeg") == 0)
     {
         add_file(uri,user_data);
@@ -1011,12 +1012,23 @@ choose_file_action(gchar * uri,
     }
     else if(strcmp(type,"application/xspf+xml")  == 0)
     {
-        GList *list = g_list_alloc();
+       list = g_list_alloc();
         read = PLAYLIST_READER(xspf_reader_new());
         playlist_reader_read_list(read,uri,&list);
         g_list_foreach(list,foreach_playlist_file,self);
         g_object_unref(read);
         g_list_free(list);
+    }
+    
+     else if(strcmp(type,"audio/x-mpegurl")  == 0)
+    {
+        list = g_list_alloc();
+        read = PLAYLIST_READER(m3u_reader_new());
+        playlist_reader_read_list(read,uri,&list);
+        g_list_foreach(list,foreach_playlist_file,self);
+        g_object_unref(read);
+        g_list_free(list);
+        //g_list_free(list);
     }
     else
     {
