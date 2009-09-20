@@ -667,8 +667,8 @@ onDragDataReceived(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 	 list = g_uri_list_extract_uris ((char *)seldata->data);
 	 for(i=0; list[i] != NULL; i++)
 	 {
-	      //for each selected item
-	      add_file(list[i],self);
+	      
+	    scan_file_action (list[i],self);
 	 }
 	 // gtk_drag_finish (context, TRUE, FALSE, time);
 
@@ -823,11 +823,19 @@ void
 add_file_ext(gpointer data,
              gpointer user_data)
 {
-	 MusicQueue *self = (MusicQueue *) user_data;
-	 self->priv->ts = tag_scanner_new();
-	 add_file(data,user_data);   
-	 g_object_unref(self->priv->ts) ;
-}
+    GFile *file;
+    gchar *uri;
+    MusicQueue *self = (MusicQueue *) user_data;
+    file = g_file_new_for_commandline_arg (data);
+    uri = g_file_get_uri(file);
+    self->priv->ts = tag_scanner_new(); 
+    if(uri){
+        scan_file_action (uri,self);
+        g_free(uri);
+    }
+    g_object_unref(self->priv->ts);
+    g_object_unref(file);
+ }
 static 
 gboolean check_for_folders(GSList *list)
 {
@@ -992,7 +1000,7 @@ choose_file_action(gchar * uri,
     GList *list;
     MusicQueue *self = (MusicQueue *) user_data;
     
-    printf("%s\n",type);
+
     
     if(strcmp(type,"audio/mpeg") == 0)
     {
@@ -1028,7 +1036,7 @@ choose_file_action(gchar * uri,
         g_list_foreach(list,foreach_playlist_file,self);
         g_object_unref(read);
         g_list_free(list);
-        //g_list_free(list);
+      
     }
     else
     {
@@ -1051,7 +1059,7 @@ add_file(gpointer data,gpointer user_data)
      GFile *file;
     GFileInfo *info;
     guint64 mod;
-	int i;
+    int i;
 	metadata *md = NULL;
 
 	self->priv->i++;

@@ -21,7 +21,7 @@ m3u_reader_mime_type();
 //private vars
 struct _M3uReaderPrivate
 {
-    TagScanner *ts;
+
 };
 //end privates vars
 
@@ -72,9 +72,9 @@ m3u_reader_read_list(PlaylistReader *plist,
             ts = tag_scanner_new ();
             for(i=0; lines[i] != NULL; i++)
             {
-                if( *lines[i] != '\0' && g_strrstr(lines[i],"#EXT") == NULL)
+                if( *lines[i] != '\0' && *lines[i] != '#')
                 {
-    if(lines[i][strlen(lines[i])-1] == '\r' || lines[i][strlen(lines[i])-1] == '\n')
+                    if(lines[i][strlen(lines[i])-1] == '\r' || lines[i][strlen(lines[i])-1] == '\n')
                         lines[i][strlen(lines[i])-1] = '\0';  
                     
                     //get rid of the \n at the start and  at the end
@@ -94,7 +94,6 @@ m3u_reader_read_list(PlaylistReader *plist,
                     if( g_file_test(gnome_vfs_get_local_path_from_uri (newuri),
                                     G_FILE_TEST_EXISTS))
                     {
-                        printf("%s\n",newuri);
                         md=ts_get_metadata (newuri,ts);
 
                         if(md) //has metadata
@@ -117,15 +116,10 @@ m3u_reader_read_list(PlaylistReader *plist,
             g_free(uri);
             g_strfreev(lines); 
             g_object_unref(ts);
+             return TRUE;
         }
     }
      
-  
-
-    
-            
-
-    
     return FALSE;
 }
 
@@ -153,7 +147,7 @@ static void
 m3u_reader_finalize (GObject *object)
 {
     M3uReader *self = M3U_READER(object);
-   //g_object_unref(self->priv->ts);
+
 
     
   G_OBJECT_CLASS (m3u_reader_parent_class)->finalize (object);
@@ -164,14 +158,14 @@ m3u_reader_class_init (M3uReaderClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-   g_type_class_add_private (klass, sizeof (M3uReaderPrivate));  
+   //g_type_class_add_private (klass, sizeof (M3uReaderPrivate));  
   object_class->finalize = m3u_reader_finalize;
 }
 
 static void
 m3u_reader_init (M3uReader *self)
 {
-    //self->priv->ts=tag_scanner_new();
+   
 }
 
 M3uReader*

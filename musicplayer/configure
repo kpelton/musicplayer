@@ -5871,7 +5871,7 @@ GLIB_REQS=2.13.4
 GTK_REQS=2.16.0
 GST_MAJORMINOR=0.10
 GST_REQS=0.10.24
-GSTPLUG_REQS=0.10.24
+GSTPLUG_REQS=0.10.00
 
 
 
@@ -6188,16 +6188,16 @@ if test -n "$PKG_CONFIG"; then
     else
         if test -n "$PKG_CONFIG" && \
     { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"
-  gstreamer-0.10
+  gstreamer-0.10 >= \$GSTPLUG_REQS
   \"") >&5
   ($PKG_CONFIG --exists --print-errors "
-  gstreamer-0.10
+  gstreamer-0.10 >= $GSTPLUG_REQS
   ") 2>&5
   ac_status=$?
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
   pkg_cv_GST_CFLAGS=`$PKG_CONFIG --cflags "
-  gstreamer-0.10
+  gstreamer-0.10 >= $GSTPLUG_REQS
   " 2>/dev/null`
 else
   pkg_failed=yes
@@ -6212,16 +6212,16 @@ if test -n "$PKG_CONFIG"; then
     else
         if test -n "$PKG_CONFIG" && \
     { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"
-  gstreamer-0.10
+  gstreamer-0.10 >= \$GSTPLUG_REQS
   \"") >&5
   ($PKG_CONFIG --exists --print-errors "
-  gstreamer-0.10
+  gstreamer-0.10 >= $GSTPLUG_REQS
   ") 2>&5
   ac_status=$?
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
   pkg_cv_GST_LIBS=`$PKG_CONFIG --libs "
-  gstreamer-0.10
+  gstreamer-0.10 >= $GSTPLUG_REQS
   " 2>/dev/null`
 else
   pkg_failed=yes
@@ -6242,18 +6242,18 @@ else
 fi
         if test $_pkg_short_errors_supported = yes; then
 	        GST_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "
-  gstreamer-0.10
+  gstreamer-0.10 >= $GSTPLUG_REQS
   "`
         else
 	        GST_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "
-  gstreamer-0.10
+  gstreamer-0.10 >= $GSTPLUG_REQS
   "`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$GST_PKG_ERRORS" >&5
 
 	{ { $as_echo "$as_me:$LINENO: error: Package requirements (
-  gstreamer-0.10
+  gstreamer-0.10 >= $GSTPLUG_REQS
   ) were not met:
 
 $GST_PKG_ERRORS
@@ -6266,7 +6266,7 @@ and GST_LIBS to avoid the need to call pkg-config.
 See the pkg-config man page for more details.
 " >&5
 $as_echo "$as_me: error: Package requirements (
-  gstreamer-0.10
+  gstreamer-0.10 >= $GSTPLUG_REQS
   ) were not met:
 
 $GST_PKG_ERRORS

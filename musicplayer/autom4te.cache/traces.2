@@ -865,19 +865,19 @@ m4trace:configure.in:21: -1- _PKG_SHORT_ERRORS_SUPPORTED
 m4trace:configure.in:30: -1- m4_pattern_allow([^GLIB_CFLAGS$])
 m4trace:configure.in:31: -1- m4_pattern_allow([^GLIB_LDFLAGS$])
 m4trace:configure.in:33: -1- PKG_CHECK_MODULES([GST], [
-  gstreamer-0.10
+  gstreamer-0.10 >= $GSTPLUG_REQS
   ])
 m4trace:configure.in:33: -1- m4_pattern_allow([^GST_CFLAGS$])
 m4trace:configure.in:33: -1- m4_pattern_allow([^GST_LIBS$])
 m4trace:configure.in:33: -1- PKG_CHECK_EXISTS([
-  gstreamer-0.10
+  gstreamer-0.10 >= $GSTPLUG_REQS
   ], [pkg_cv_[]GST_CFLAGS=`$PKG_CONFIG --[]cflags "
-  gstreamer-0.10
+  gstreamer-0.10 >= $GSTPLUG_REQS
   " 2>/dev/null`], [pkg_failed=yes])
 m4trace:configure.in:33: -1- PKG_CHECK_EXISTS([
-  gstreamer-0.10
+  gstreamer-0.10 >= $GSTPLUG_REQS
   ], [pkg_cv_[]GST_LIBS=`$PKG_CONFIG --[]libs "
-  gstreamer-0.10
+  gstreamer-0.10 >= $GSTPLUG_REQS
   " 2>/dev/null`], [pkg_failed=yes])
 m4trace:configure.in:33: -1- _PKG_SHORT_ERRORS_SUPPORTED
 m4trace:configure.in:39: -1- m4_pattern_allow([^GST_CFLAGS$])
