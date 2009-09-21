@@ -278,8 +278,8 @@ on_play_released                       (GtkButton       *button,
     MusicMainWindow *self = (MusicMainWindow *)user_data;
     if (isPaused (self->player))	
 	    	gs_pauseResume(self->player);
-	//else
-      //     	music_queue_play_selected (self->queue);
+	else
+           	music_queue_play_selected (self->queue);
         
 }	
 

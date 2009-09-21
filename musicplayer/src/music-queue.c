@@ -712,8 +712,21 @@ static void playfile (GtkTreeView *treeview,
 }
 void music_queue_play_selected (MusicQueue *self)
 {
- //	playfile(self->priv->treeview,self->path,
-//	          NULL,(gpointer)self);
+ GList *list;
+    GtkTreeModel *model= GTK_TREE_MODEL(self->priv->store); 
+    
+       list = gtk_tree_selection_get_selected_rows (self->priv->currselection,
+                                                    &model);
+    
+ 	
+    if(list){
+        //dont start 
+        playfile(GTK_TREE_VIEW(self->priv->treeview),list->data,
+	          NULL,(gpointer)self);
+    }
+    g_list_foreach (list, (GFunc) gtk_tree_path_free, NULL);
+    g_list_free (list);
+  
 }
 
 
