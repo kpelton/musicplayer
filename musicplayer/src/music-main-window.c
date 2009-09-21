@@ -68,8 +68,7 @@ music_main_window_finalize (GObject *object)
 		MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);	
 
         g_object_unref(G_OBJECT(self->client));
-	   
-	    
+
         g_object_unref(G_OBJECT(self->player));
         self->player = NULL;
 	 	//g_object_unref(G_OBJECT(self->queue));

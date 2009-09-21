@@ -34,7 +34,7 @@ gs_player_dispose (GObject *object)
     GsPlayer *player =GS_PLAYER(object);
 	if(player->play)
     {
-        gst_element_set_state (player->play, GST_STATE_NULL);
+      gst_element_set_state (player->play, GST_STATE_NULL);
      g_object_unref(player->play);
 	g_object_unref(player->gconf);
     player->play=NULL;

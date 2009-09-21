@@ -12,6 +12,7 @@ G_DEFINE_TYPE (MusicQueue, music_queue, GTK_TYPE_VBOX)
 
 struct
 {
+    gchar *artist;
     gchar *title;
     gint id;    
 }typedef sortnode;
@@ -720,7 +721,7 @@ void music_queue_play_selected (MusicQueue *self)
     
  	
     if(list){
-        //dont start 
+      
         playfile(GTK_TREE_VIEW(self->priv->treeview),list->data,
 	          NULL,(gpointer)self);
     }
@@ -1670,7 +1671,9 @@ sort_by_artist(gpointer    callback_data,
             //need a struture that holds artist name and ID of the element
             node = g_malloc(sizeof(sortnode));
 		    gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
-						  &iter,COLUMN_ARTIST, &(node->title), -1); 
+						  &iter,COLUMN_ARTIST, &(node->artist), -1);
+            gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
+						  &iter,COLUMN_TITLE, &(node->title), -1);
             gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
 						  &iter,COLUMN_ID, &cid, -1); 
 
@@ -1873,25 +1876,39 @@ compare_sort_nodes(sortnode *node1,
 {
     int ret=0;
 
+    gchar*artist1=NULL; 
+    gchar *artist2 = NULL;
     gchar*title1=NULL; 
-    if(node1)
-        title1= node1->title; 
     gchar *title2 = NULL;
+    
+    if(node1){
+        artist1= node1->artist;
+        title1=node1->title;   
+    }
+    
     if(node2)
-        title2 = node2->title;
-
-    //title is empty
-    if(title1 == NULL || title2 == NULL)
     {
-        if (title1 == NULL && title1 == NULL)
+        
+        artist2 = node2->artist;
+        title2 = node2->title;
+    }
+    //title is empty
+    if(artist1 == NULL || artist2 == NULL)
+    {
+        if (artist1 == NULL && artist1 == NULL)
             return 0;
 
-        ret = (title1== NULL) ? -1 : 1;
+        ret = (artist1== NULL) ? -1 : 1;
 
     }else
     {
-        //ret =g_utf8_collate(title1,title2);
-          ret =strcmp(title1,title2);
+        //ret =g_utf8_collate(artist1,artist2);
+          ret =strcmp(artist1,artist2);
+
+        if(ret == 0 && title1 && title2) //same artists so sort by title
+        {
+            ret =strcmp(title1,title2);
+        }
     }
     return ret;
 }
