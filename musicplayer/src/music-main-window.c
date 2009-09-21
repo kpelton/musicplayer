@@ -56,25 +56,24 @@ static void
 music_main_window_dispose (GObject *object)
 {
     MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);	
-	if(self->player)
-    {
-        
-       g_object_unref(G_OBJECT(self->client));
-	   //g_object_unref(G_OBJECT(self->player));
-	    self->player = NULL;
-    }
+    
   G_OBJECT_CLASS (music_main_window_parent_class)->dispose (object);
+    gtk_exit(0);
  
-gtk_exit(0);
 }
 
 static void
 music_main_window_finalize (GObject *object)
 {
 		MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);	
-	
 
-	 	
+        g_object_unref(G_OBJECT(self->client));
+	   
+	    
+        g_object_unref(G_OBJECT(self->player));
+        self->player = NULL;
+	 	//g_object_unref(G_OBJECT(self->queue));
+        
     
 	 G_OBJECT_CLASS (music_main_window_parent_class)->finalize (object);
    
@@ -279,8 +278,8 @@ on_play_released                       (GtkButton       *button,
     if (isPaused (self->player))	
 	    	gs_pauseResume(self->player);
 	else
-           	music_queue_play_selected (self->queue);
-        
+           	music_queue_play_selected (MUSIC_QUEUE(self->queue));
+            
 }	
 
 
