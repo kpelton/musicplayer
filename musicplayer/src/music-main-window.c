@@ -168,17 +168,18 @@ static void init_widgets(MusicMainWindow *self)
     self->playbutton  = gtk_button_new_from_stock ("gtk-media-play");
     self->volumebutton = music_volume_new_with_player(self->player);
     self->albumlabel = gtk_label_new ("");
-
+    
+    
     
     //packing of hbox expander in vbox
 
     gtk_box_pack_start (GTK_BOX (self->mainvbox), self->mainhbox, FALSE, FALSE,0);
-    gtk_box_pack_start (GTK_BOX (self->mainvbox), self->expander, TRUE, TRUE,1);
+    gtk_box_pack_start (GTK_BOX (self->mainvbox), self->expander, TRUE, TRUE,0);
 
     //pack into hbox
      gtk_box_pack_start (GTK_BOX (self->mainhbox), self->pausebutton, FALSE,FALSE,0);
      gtk_box_pack_start (GTK_BOX (self->mainhbox), self->playbutton, FALSE, FALSE,0);
-     gtk_box_pack_start (GTK_BOX (self->mainhbox), self->volumebutton, FALSE, FALSE,0);
+     gtk_box_pack_start (GTK_BOX (self->mainhbox), self->volumebutton,FALSE, FALSE,0);
      gtk_box_pack_start (GTK_BOX (self->mainhbox), self->albumlabel, TRUE, TRUE,10);
 
      //properties
@@ -194,6 +195,10 @@ static void init_widgets(MusicMainWindow *self)
 					  self->dhight);
      gtk_label_set_ellipsize(GTK_LABEL(self->songlabel),PANGO_ELLIPSIZE_END);
      gtk_label_set_ellipsize(GTK_LABEL(self->albumlabel),PANGO_ELLIPSIZE_END);
+
+     //buttons
+    gtk_button_set_relief(GTK_BUTTON(self->pausebutton),GTK_RELIEF_NONE);
+    gtk_button_set_relief(GTK_BUTTON(self->playbutton),GTK_RELIEF_NONE);
     
      //show all 
 
@@ -232,7 +237,7 @@ static void init_widgets(MusicMainWindow *self)
     
 
      
-	  self->signum = g_signal_connect (self, "size-allocate",
+	self->signum = g_signal_connect (self, "size-allocate",
 				  											 G_CALLBACK(on_size_allocate),
 				  															 (gpointer)self);
     

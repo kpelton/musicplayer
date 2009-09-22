@@ -16,6 +16,7 @@ main (int argc, char *argv[])
   
   g_type_init();   
 
+    
   gst_init (&argc, &argv);
   
   gtk_init (&argc, &argv);
