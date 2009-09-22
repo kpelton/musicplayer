@@ -13,10 +13,10 @@ main (int argc, char *argv[])
 {
   GtkWidget *mainwindow;
   MusicMainWindow *m;
-  
-  g_type_init();   
 
-    
+    g_type_init();   
+
+     
   gst_init (&argc, &argv);
   
   gtk_init (&argc, &argv);

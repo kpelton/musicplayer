@@ -198,8 +198,9 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 common_defines = -DPLUGIN_DIR=\""$(libdir)/musicplayer/plugins"\"
-musicplayer_CFLAGS = $(GST_CFLAGS) $(GLIB_CFLAGS)  $(common_defines)
-musicplayer_LDADD = $(GLIB_LIBS) $(INTI_LIBS) $(GST_LIBS)
+musicplayer_CPPFLAGS = $(common_defines) $(AM_CPPFLAGS)
+musicplayer_CFLAGS = $(GST_CFLAGS) $(GLIB_CFLAGS) $(GTK_CFLAGS) $(WARN_CFLAGS)
+musicplayer_LDADD = $(GLIB_LIBS) $(INTI_LIBS) $(GST_LIBS) 
 musicplayer_SOURCES = music-main-window.c musicseek.c player.c main.c music-queue.c music-volume.c  tag-scanner.c music-queue.h  music-volume.h  music-main-window.h music-seek.h player.h tag-scanner.h  music-store.c music-store.h jump-window.h jump-window.c pl-reader.h  pl-reader.c  xspf-reader.h  xspf-reader.c m3u-reader.h  m3u-reader.c \
 	plugin-engine.c
 
@@ -310,186 +311,186 @@ distclean-compile:
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
 musicplayer-music-main-window.o: music-main-window.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-main-window.o -MD -MP -MF $(DEPDIR)/musicplayer-music-main-window.Tpo -c -o musicplayer-music-main-window.o `test -f 'music-main-window.c' || echo '$(srcdir)/'`music-main-window.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-main-window.o -MD -MP -MF $(DEPDIR)/musicplayer-music-main-window.Tpo -c -o musicplayer-music-main-window.o `test -f 'music-main-window.c' || echo '$(srcdir)/'`music-main-window.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-music-main-window.Tpo $(DEPDIR)/musicplayer-music-main-window.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='music-main-window.c' object='musicplayer-music-main-window.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-main-window.o `test -f 'music-main-window.c' || echo '$(srcdir)/'`music-main-window.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-main-window.o `test -f 'music-main-window.c' || echo '$(srcdir)/'`music-main-window.c
 
 musicplayer-music-main-window.obj: music-main-window.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-main-window.obj -MD -MP -MF $(DEPDIR)/musicplayer-music-main-window.Tpo -c -o musicplayer-music-main-window.obj `if test -f 'music-main-window.c'; then $(CYGPATH_W) 'music-main-window.c'; else $(CYGPATH_W) '$(srcdir)/music-main-window.c'; fi`
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-main-window.obj -MD -MP -MF $(DEPDIR)/musicplayer-music-main-window.Tpo -c -o musicplayer-music-main-window.obj `if test -f 'music-main-window.c'; then $(CYGPATH_W) 'music-main-window.c'; else $(CYGPATH_W) '$(srcdir)/music-main-window.c'; fi`
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-music-main-window.Tpo $(DEPDIR)/musicplayer-music-main-window.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='music-main-window.c' object='musicplayer-music-main-window.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-main-window.obj `if test -f 'music-main-window.c'; then $(CYGPATH_W) 'music-main-window.c'; else $(CYGPATH_W) '$(srcdir)/music-main-window.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-main-window.obj `if test -f 'music-main-window.c'; then $(CYGPATH_W) 'music-main-window.c'; else $(CYGPATH_W) '$(srcdir)/music-main-window.c'; fi`
 
 musicplayer-musicseek.o: musicseek.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-musicseek.o -MD -MP -MF $(DEPDIR)/musicplayer-musicseek.Tpo -c -o musicplayer-musicseek.o `test -f 'musicseek.c' || echo '$(srcdir)/'`musicseek.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-musicseek.o -MD -MP -MF $(DEPDIR)/musicplayer-musicseek.Tpo -c -o musicplayer-musicseek.o `test -f 'musicseek.c' || echo '$(srcdir)/'`musicseek.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-musicseek.Tpo $(DEPDIR)/musicplayer-musicseek.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='musicseek.c' object='musicplayer-musicseek.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-musicseek.o `test -f 'musicseek.c' || echo '$(srcdir)/'`musicseek.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-musicseek.o `test -f 'musicseek.c' || echo '$(srcdir)/'`musicseek.c
 
 musicplayer-musicseek.obj: musicseek.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-musicseek.obj -MD -MP -MF $(DEPDIR)/musicplayer-musicseek.Tpo -c -o musicplayer-musicseek.obj `if test -f 'musicseek.c'; then $(CYGPATH_W) 'musicseek.c'; else $(CYGPATH_W) '$(srcdir)/musicseek.c'; fi`
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-musicseek.obj -MD -MP -MF $(DEPDIR)/musicplayer-musicseek.Tpo -c -o musicplayer-musicseek.obj `if test -f 'musicseek.c'; then $(CYGPATH_W) 'musicseek.c'; else $(CYGPATH_W) '$(srcdir)/musicseek.c'; fi`
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-musicseek.Tpo $(DEPDIR)/musicplayer-musicseek.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='musicseek.c' object='musicplayer-musicseek.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-musicseek.obj `if test -f 'musicseek.c'; then $(CYGPATH_W) 'musicseek.c'; else $(CYGPATH_W) '$(srcdir)/musicseek.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-musicseek.obj `if test -f 'musicseek.c'; then $(CYGPATH_W) 'musicseek.c'; else $(CYGPATH_W) '$(srcdir)/musicseek.c'; fi`
 
 musicplayer-player.o: player.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-player.o -MD -MP -MF $(DEPDIR)/musicplayer-player.Tpo -c -o musicplayer-player.o `test -f 'player.c' || echo '$(srcdir)/'`player.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-player.o -MD -MP -MF $(DEPDIR)/musicplayer-player.Tpo -c -o musicplayer-player.o `test -f 'player.c' || echo '$(srcdir)/'`player.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-player.Tpo $(DEPDIR)/musicplayer-player.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='player.c' object='musicplayer-player.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-player.o `test -f 'player.c' || echo '$(srcdir)/'`player.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-player.o `test -f 'player.c' || echo '$(srcdir)/'`player.c
 
 musicplayer-player.obj: player.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-player.obj -MD -MP -MF $(DEPDIR)/musicplayer-player.Tpo -c -o musicplayer-player.obj `if test -f 'player.c'; then $(CYGPATH_W) 'player.c'; else $(CYGPATH_W) '$(srcdir)/player.c'; fi`
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-player.obj -MD -MP -MF $(DEPDIR)/musicplayer-player.Tpo -c -o musicplayer-player.obj `if test -f 'player.c'; then $(CYGPATH_W) 'player.c'; else $(CYGPATH_W) '$(srcdir)/player.c'; fi`
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-player.Tpo $(DEPDIR)/musicplayer-player.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='player.c' object='musicplayer-player.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-player.obj `if test -f 'player.c'; then $(CYGPATH_W) 'player.c'; else $(CYGPATH_W) '$(srcdir)/player.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-player.obj `if test -f 'player.c'; then $(CYGPATH_W) 'player.c'; else $(CYGPATH_W) '$(srcdir)/player.c'; fi`
 
 musicplayer-main.o: main.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-main.o -MD -MP -MF $(DEPDIR)/musicplayer-main.Tpo -c -o musicplayer-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-main.o -MD -MP -MF $(DEPDIR)/musicplayer-main.Tpo -c -o musicplayer-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-main.Tpo $(DEPDIR)/musicplayer-main.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='musicplayer-main.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
 
 musicplayer-main.obj: main.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-main.obj -MD -MP -MF $(DEPDIR)/musicplayer-main.Tpo -c -o musicplayer-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-main.obj -MD -MP -MF $(DEPDIR)/musicplayer-main.Tpo -c -o musicplayer-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-main.Tpo $(DEPDIR)/musicplayer-main.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='musicplayer-main.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
 
 musicplayer-music-queue.o: music-queue.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-queue.o -MD -MP -MF $(DEPDIR)/musicplayer-music-queue.Tpo -c -o musicplayer-music-queue.o `test -f 'music-queue.c' || echo '$(srcdir)/'`music-queue.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-queue.o -MD -MP -MF $(DEPDIR)/musicplayer-music-queue.Tpo -c -o musicplayer-music-queue.o `test -f 'music-queue.c' || echo '$(srcdir)/'`music-queue.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-music-queue.Tpo $(DEPDIR)/musicplayer-music-queue.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='music-queue.c' object='musicplayer-music-queue.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-queue.o `test -f 'music-queue.c' || echo '$(srcdir)/'`music-queue.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-queue.o `test -f 'music-queue.c' || echo '$(srcdir)/'`music-queue.c
 
 musicplayer-music-queue.obj: music-queue.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-queue.obj -MD -MP -MF $(DEPDIR)/musicplayer-music-queue.Tpo -c -o musicplayer-music-queue.obj `if test -f 'music-queue.c'; then $(CYGPATH_W) 'music-queue.c'; else $(CYGPATH_W) '$(srcdir)/music-queue.c'; fi`
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-queue.obj -MD -MP -MF $(DEPDIR)/musicplayer-music-queue.Tpo -c -o musicplayer-music-queue.obj `if test -f 'music-queue.c'; then $(CYGPATH_W) 'music-queue.c'; else $(CYGPATH_W) '$(srcdir)/music-queue.c'; fi`
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-music-queue.Tpo $(DEPDIR)/musicplayer-music-queue.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='music-queue.c' object='musicplayer-music-queue.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-queue.obj `if test -f 'music-queue.c'; then $(CYGPATH_W) 'music-queue.c'; else $(CYGPATH_W) '$(srcdir)/music-queue.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-queue.obj `if test -f 'music-queue.c'; then $(CYGPATH_W) 'music-queue.c'; else $(CYGPATH_W) '$(srcdir)/music-queue.c'; fi`
 
 musicplayer-music-volume.o: music-volume.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-volume.o -MD -MP -MF $(DEPDIR)/musicplayer-music-volume.Tpo -c -o musicplayer-music-volume.o `test -f 'music-volume.c' || echo '$(srcdir)/'`music-volume.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-volume.o -MD -MP -MF $(DEPDIR)/musicplayer-music-volume.Tpo -c -o musicplayer-music-volume.o `test -f 'music-volume.c' || echo '$(srcdir)/'`music-volume.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-music-volume.Tpo $(DEPDIR)/musicplayer-music-volume.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='music-volume.c' object='musicplayer-music-volume.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-volume.o `test -f 'music-volume.c' || echo '$(srcdir)/'`music-volume.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-volume.o `test -f 'music-volume.c' || echo '$(srcdir)/'`music-volume.c
 
 musicplayer-music-volume.obj: music-volume.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-volume.obj -MD -MP -MF $(DEPDIR)/musicplayer-music-volume.Tpo -c -o musicplayer-music-volume.obj `if test -f 'music-volume.c'; then $(CYGPATH_W) 'music-volume.c'; else $(CYGPATH_W) '$(srcdir)/music-volume.c'; fi`
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-volume.obj -MD -MP -MF $(DEPDIR)/musicplayer-music-volume.Tpo -c -o musicplayer-music-volume.obj `if test -f 'music-volume.c'; then $(CYGPATH_W) 'music-volume.c'; else $(CYGPATH_W) '$(srcdir)/music-volume.c'; fi`
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-music-volume.Tpo $(DEPDIR)/musicplayer-music-volume.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='music-volume.c' object='musicplayer-music-volume.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-volume.obj `if test -f 'music-volume.c'; then $(CYGPATH_W) 'music-volume.c'; else $(CYGPATH_W) '$(srcdir)/music-volume.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-volume.obj `if test -f 'music-volume.c'; then $(CYGPATH_W) 'music-volume.c'; else $(CYGPATH_W) '$(srcdir)/music-volume.c'; fi`
 
 musicplayer-tag-scanner.o: tag-scanner.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-tag-scanner.o -MD -MP -MF $(DEPDIR)/musicplayer-tag-scanner.Tpo -c -o musicplayer-tag-scanner.o `test -f 'tag-scanner.c' || echo '$(srcdir)/'`tag-scanner.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-tag-scanner.o -MD -MP -MF $(DEPDIR)/musicplayer-tag-scanner.Tpo -c -o musicplayer-tag-scanner.o `test -f 'tag-scanner.c' || echo '$(srcdir)/'`tag-scanner.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-tag-scanner.Tpo $(DEPDIR)/musicplayer-tag-scanner.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tag-scanner.c' object='musicplayer-tag-scanner.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-tag-scanner.o `test -f 'tag-scanner.c' || echo '$(srcdir)/'`tag-scanner.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-tag-scanner.o `test -f 'tag-scanner.c' || echo '$(srcdir)/'`tag-scanner.c
 
 musicplayer-tag-scanner.obj: tag-scanner.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-tag-scanner.obj -MD -MP -MF $(DEPDIR)/musicplayer-tag-scanner.Tpo -c -o musicplayer-tag-scanner.obj `if test -f 'tag-scanner.c'; then $(CYGPATH_W) 'tag-scanner.c'; else $(CYGPATH_W) '$(srcdir)/tag-scanner.c'; fi`
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-tag-scanner.obj -MD -MP -MF $(DEPDIR)/musicplayer-tag-scanner.Tpo -c -o musicplayer-tag-scanner.obj `if test -f 'tag-scanner.c'; then $(CYGPATH_W) 'tag-scanner.c'; else $(CYGPATH_W) '$(srcdir)/tag-scanner.c'; fi`
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-tag-scanner.Tpo $(DEPDIR)/musicplayer-tag-scanner.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tag-scanner.c' object='musicplayer-tag-scanner.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-tag-scanner.obj `if test -f 'tag-scanner.c'; then $(CYGPATH_W) 'tag-scanner.c'; else $(CYGPATH_W) '$(srcdir)/tag-scanner.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-tag-scanner.obj `if test -f 'tag-scanner.c'; then $(CYGPATH_W) 'tag-scanner.c'; else $(CYGPATH_W) '$(srcdir)/tag-scanner.c'; fi`
 
 musicplayer-music-store.o: music-store.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-store.o -MD -MP -MF $(DEPDIR)/musicplayer-music-store.Tpo -c -o musicplayer-music-store.o `test -f 'music-store.c' || echo '$(srcdir)/'`music-store.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-store.o -MD -MP -MF $(DEPDIR)/musicplayer-music-store.Tpo -c -o musicplayer-music-store.o `test -f 'music-store.c' || echo '$(srcdir)/'`music-store.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-music-store.Tpo $(DEPDIR)/musicplayer-music-store.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='music-store.c' object='musicplayer-music-store.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-store.o `test -f 'music-store.c' || echo '$(srcdir)/'`music-store.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-store.o `test -f 'music-store.c' || echo '$(srcdir)/'`music-store.c
 
 musicplayer-music-store.obj: music-store.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-store.obj -MD -MP -MF $(DEPDIR)/musicplayer-music-store.Tpo -c -o musicplayer-music-store.obj `if test -f 'music-store.c'; then $(CYGPATH_W) 'music-store.c'; else $(CYGPATH_W) '$(srcdir)/music-store.c'; fi`
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-music-store.obj -MD -MP -MF $(DEPDIR)/musicplayer-music-store.Tpo -c -o musicplayer-music-store.obj `if test -f 'music-store.c'; then $(CYGPATH_W) 'music-store.c'; else $(CYGPATH_W) '$(srcdir)/music-store.c'; fi`
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-music-store.Tpo $(DEPDIR)/musicplayer-music-store.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='music-store.c' object='musicplayer-music-store.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-store.obj `if test -f 'music-store.c'; then $(CYGPATH_W) 'music-store.c'; else $(CYGPATH_W) '$(srcdir)/music-store.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-music-store.obj `if test -f 'music-store.c'; then $(CYGPATH_W) 'music-store.c'; else $(CYGPATH_W) '$(srcdir)/music-store.c'; fi`
 
 musicplayer-jump-window.o: jump-window.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-jump-window.o -MD -MP -MF $(DEPDIR)/musicplayer-jump-window.Tpo -c -o musicplayer-jump-window.o `test -f 'jump-window.c' || echo '$(srcdir)/'`jump-window.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-jump-window.o -MD -MP -MF $(DEPDIR)/musicplayer-jump-window.Tpo -c -o musicplayer-jump-window.o `test -f 'jump-window.c' || echo '$(srcdir)/'`jump-window.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-jump-window.Tpo $(DEPDIR)/musicplayer-jump-window.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jump-window.c' object='musicplayer-jump-window.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-jump-window.o `test -f 'jump-window.c' || echo '$(srcdir)/'`jump-window.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-jump-window.o `test -f 'jump-window.c' || echo '$(srcdir)/'`jump-window.c
 
 musicplayer-jump-window.obj: jump-window.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-jump-window.obj -MD -MP -MF $(DEPDIR)/musicplayer-jump-window.Tpo -c -o musicplayer-jump-window.obj `if test -f 'jump-window.c'; then $(CYGPATH_W) 'jump-window.c'; else $(CYGPATH_W) '$(srcdir)/jump-window.c'; fi`
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-jump-window.obj -MD -MP -MF $(DEPDIR)/musicplayer-jump-window.Tpo -c -o musicplayer-jump-window.obj `if test -f 'jump-window.c'; then $(CYGPATH_W) 'jump-window.c'; else $(CYGPATH_W) '$(srcdir)/jump-window.c'; fi`
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-jump-window.Tpo $(DEPDIR)/musicplayer-jump-window.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jump-window.c' object='musicplayer-jump-window.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-jump-window.obj `if test -f 'jump-window.c'; then $(CYGPATH_W) 'jump-window.c'; else $(CYGPATH_W) '$(srcdir)/jump-window.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-jump-window.obj `if test -f 'jump-window.c'; then $(CYGPATH_W) 'jump-window.c'; else $(CYGPATH_W) '$(srcdir)/jump-window.c'; fi`
 
 musicplayer-pl-reader.o: pl-reader.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-pl-reader.o -MD -MP -MF $(DEPDIR)/musicplayer-pl-reader.Tpo -c -o musicplayer-pl-reader.o `test -f 'pl-reader.c' || echo '$(srcdir)/'`pl-reader.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-pl-reader.o -MD -MP -MF $(DEPDIR)/musicplayer-pl-reader.Tpo -c -o musicplayer-pl-reader.o `test -f 'pl-reader.c' || echo '$(srcdir)/'`pl-reader.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-pl-reader.Tpo $(DEPDIR)/musicplayer-pl-reader.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pl-reader.c' object='musicplayer-pl-reader.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-pl-reader.o `test -f 'pl-reader.c' || echo '$(srcdir)/'`pl-reader.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-pl-reader.o `test -f 'pl-reader.c' || echo '$(srcdir)/'`pl-reader.c
 
 musicplayer-pl-reader.obj: pl-reader.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-pl-reader.obj -MD -MP -MF $(DEPDIR)/musicplayer-pl-reader.Tpo -c -o musicplayer-pl-reader.obj `if test -f 'pl-reader.c'; then $(CYGPATH_W) 'pl-reader.c'; else $(CYGPATH_W) '$(srcdir)/pl-reader.c'; fi`
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-pl-reader.obj -MD -MP -MF $(DEPDIR)/musicplayer-pl-reader.Tpo -c -o musicplayer-pl-reader.obj `if test -f 'pl-reader.c'; then $(CYGPATH_W) 'pl-reader.c'; else $(CYGPATH_W) '$(srcdir)/pl-reader.c'; fi`
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-pl-reader.Tpo $(DEPDIR)/musicplayer-pl-reader.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pl-reader.c' object='musicplayer-pl-reader.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-pl-reader.obj `if test -f 'pl-reader.c'; then $(CYGPATH_W) 'pl-reader.c'; else $(CYGPATH_W) '$(srcdir)/pl-reader.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-pl-reader.obj `if test -f 'pl-reader.c'; then $(CYGPATH_W) 'pl-reader.c'; else $(CYGPATH_W) '$(srcdir)/pl-reader.c'; fi`
 
 musicplayer-xspf-reader.o: xspf-reader.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-xspf-reader.o -MD -MP -MF $(DEPDIR)/musicplayer-xspf-reader.Tpo -c -o musicplayer-xspf-reader.o `test -f 'xspf-reader.c' || echo '$(srcdir)/'`xspf-reader.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-xspf-reader.o -MD -MP -MF $(DEPDIR)/musicplayer-xspf-reader.Tpo -c -o musicplayer-xspf-reader.o `test -f 'xspf-reader.c' || echo '$(srcdir)/'`xspf-reader.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-xspf-reader.Tpo $(DEPDIR)/musicplayer-xspf-reader.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='xspf-reader.c' object='musicplayer-xspf-reader.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-xspf-reader.o `test -f 'xspf-reader.c' || echo '$(srcdir)/'`xspf-reader.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-xspf-reader.o `test -f 'xspf-reader.c' || echo '$(srcdir)/'`xspf-reader.c
 
 musicplayer-xspf-reader.obj: xspf-reader.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-xspf-reader.obj -MD -MP -MF $(DEPDIR)/musicplayer-xspf-reader.Tpo -c -o musicplayer-xspf-reader.obj `if test -f 'xspf-reader.c'; then $(CYGPATH_W) 'xspf-reader.c'; else $(CYGPATH_W) '$(srcdir)/xspf-reader.c'; fi`
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-xspf-reader.obj -MD -MP -MF $(DEPDIR)/musicplayer-xspf-reader.Tpo -c -o musicplayer-xspf-reader.obj `if test -f 'xspf-reader.c'; then $(CYGPATH_W) 'xspf-reader.c'; else $(CYGPATH_W) '$(srcdir)/xspf-reader.c'; fi`
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-xspf-reader.Tpo $(DEPDIR)/musicplayer-xspf-reader.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='xspf-reader.c' object='musicplayer-xspf-reader.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-xspf-reader.obj `if test -f 'xspf-reader.c'; then $(CYGPATH_W) 'xspf-reader.c'; else $(CYGPATH_W) '$(srcdir)/xspf-reader.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-xspf-reader.obj `if test -f 'xspf-reader.c'; then $(CYGPATH_W) 'xspf-reader.c'; else $(CYGPATH_W) '$(srcdir)/xspf-reader.c'; fi`
 
 musicplayer-m3u-reader.o: m3u-reader.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-m3u-reader.o -MD -MP -MF $(DEPDIR)/musicplayer-m3u-reader.Tpo -c -o musicplayer-m3u-reader.o `test -f 'm3u-reader.c' || echo '$(srcdir)/'`m3u-reader.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-m3u-reader.o -MD -MP -MF $(DEPDIR)/musicplayer-m3u-reader.Tpo -c -o musicplayer-m3u-reader.o `test -f 'm3u-reader.c' || echo '$(srcdir)/'`m3u-reader.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-m3u-reader.Tpo $(DEPDIR)/musicplayer-m3u-reader.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='m3u-reader.c' object='musicplayer-m3u-reader.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-m3u-reader.o `test -f 'm3u-reader.c' || echo '$(srcdir)/'`m3u-reader.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-m3u-reader.o `test -f 'm3u-reader.c' || echo '$(srcdir)/'`m3u-reader.c
 
 musicplayer-m3u-reader.obj: m3u-reader.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-m3u-reader.obj -MD -MP -MF $(DEPDIR)/musicplayer-m3u-reader.Tpo -c -o musicplayer-m3u-reader.obj `if test -f 'm3u-reader.c'; then $(CYGPATH_W) 'm3u-reader.c'; else $(CYGPATH_W) '$(srcdir)/m3u-reader.c'; fi`
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-m3u-reader.obj -MD -MP -MF $(DEPDIR)/musicplayer-m3u-reader.Tpo -c -o musicplayer-m3u-reader.obj `if test -f 'm3u-reader.c'; then $(CYGPATH_W) 'm3u-reader.c'; else $(CYGPATH_W) '$(srcdir)/m3u-reader.c'; fi`
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-m3u-reader.Tpo $(DEPDIR)/musicplayer-m3u-reader.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='m3u-reader.c' object='musicplayer-m3u-reader.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-m3u-reader.obj `if test -f 'm3u-reader.c'; then $(CYGPATH_W) 'm3u-reader.c'; else $(CYGPATH_W) '$(srcdir)/m3u-reader.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-m3u-reader.obj `if test -f 'm3u-reader.c'; then $(CYGPATH_W) 'm3u-reader.c'; else $(CYGPATH_W) '$(srcdir)/m3u-reader.c'; fi`
 
 musicplayer-plugin-engine.o: plugin-engine.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-plugin-engine.o -MD -MP -MF $(DEPDIR)/musicplayer-plugin-engine.Tpo -c -o musicplayer-plugin-engine.o `test -f 'plugin-engine.c' || echo '$(srcdir)/'`plugin-engine.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-plugin-engine.o -MD -MP -MF $(DEPDIR)/musicplayer-plugin-engine.Tpo -c -o musicplayer-plugin-engine.o `test -f 'plugin-engine.c' || echo '$(srcdir)/'`plugin-engine.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-plugin-engine.Tpo $(DEPDIR)/musicplayer-plugin-engine.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='plugin-engine.c' object='musicplayer-plugin-engine.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-plugin-engine.o `test -f 'plugin-engine.c' || echo '$(srcdir)/'`plugin-engine.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-plugin-engine.o `test -f 'plugin-engine.c' || echo '$(srcdir)/'`plugin-engine.c
 
 musicplayer-plugin-engine.obj: plugin-engine.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-plugin-engine.obj -MD -MP -MF $(DEPDIR)/musicplayer-plugin-engine.Tpo -c -o musicplayer-plugin-engine.obj `if test -f 'plugin-engine.c'; then $(CYGPATH_W) 'plugin-engine.c'; else $(CYGPATH_W) '$(srcdir)/plugin-engine.c'; fi`
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-plugin-engine.obj -MD -MP -MF $(DEPDIR)/musicplayer-plugin-engine.Tpo -c -o musicplayer-plugin-engine.obj `if test -f 'plugin-engine.c'; then $(CYGPATH_W) 'plugin-engine.c'; else $(CYGPATH_W) '$(srcdir)/plugin-engine.c'; fi`
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-plugin-engine.Tpo $(DEPDIR)/musicplayer-plugin-engine.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='plugin-engine.c' object='musicplayer-plugin-engine.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-plugin-engine.obj `if test -f 'plugin-engine.c'; then $(CYGPATH_W) 'plugin-engine.c'; else $(CYGPATH_W) '$(srcdir)/plugin-engine.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-plugin-engine.obj `if test -f 'plugin-engine.c'; then $(CYGPATH_W) 'plugin-engine.c'; else $(CYGPATH_W) '$(srcdir)/plugin-engine.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

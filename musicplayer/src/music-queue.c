@@ -965,7 +965,7 @@ check_type_supported(const gchar *type)
         return TRUE;
     if(strcmp(type,"audio/ogg")  == 0)
         return TRUE;
-    if(strcmp(type,"audio/flac") == 0)
+    if(strcmp(type,"audio/x-flac") == 0)
         return TRUE;
     if(strcmp(type,"audio/wma")  == 0)
          return TRUE;
@@ -1024,7 +1024,7 @@ choose_file_action(gchar * uri,
     {
         add_file(uri,user_data);
     }
-    else if(strcmp(type,"audio/flac") == 0)
+    else if(strcmp(type,"audio/x-flac") == 0)
     {
         add_file(uri,user_data);
     }
