@@ -1,0 +1,2 @@
+/* enable search for UI files and plugins in local directory */
+#undef RUN_IN_SOURCE_TREE
