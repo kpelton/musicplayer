@@ -1,0 +1,24 @@
+/* real-test.c */
+
+#include "real-test.h"
+
+G_DEFINE_TYPE (RealTest, real_test, G_TYPE_OBJECT)
+
+
+static void
+real_test_class_init (RealTestClass *klass)
+{
+}
+
+static void
+real_test_init (RealTest *self)
+{
+  printf("it's working\n\n");
+}
+
+RealTest*
+real_test_new (void)
+{
+  return g_object_new (REAL_TYPE_TEST, NULL);
+}
+

@@ -90,6 +90,8 @@ AC_OUTPUT([
 Makefile
 src/Makefile
 src/plugins/Makefile
+src/plugins/real/Makefile
+src/plugins/plugins/Makefile
 ])
 
 

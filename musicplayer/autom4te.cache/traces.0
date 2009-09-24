@@ -611,6 +611,8 @@ m4trace:configure.in:89: -1- AC_CONFIG_FILES([
 Makefile
 src/Makefile
 src/plugins/Makefile
+src/plugins/real/Makefile
+src/plugins/plugins/Makefile
 ])
 m4trace:configure.in:89: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])

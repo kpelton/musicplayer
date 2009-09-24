@@ -1,0 +1,1 @@
+modules_flags = -avoid-version -module

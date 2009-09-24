@@ -6,12 +6,15 @@
 
 #endif
 #include "plugin-engine.h"
+
+typedef  void  (*plugininfo)(char *);
+
 struct _MusicPluginInfo
 {
 	gchar        *file;
 
 	gchar        *location;
-	GTypeModule  *module;
+	GModule  *module;
 
 	gchar        *name;
 	gchar        *desc;
@@ -34,7 +37,6 @@ static GHashTable *music_plugins = NULL;
 static MusicMainWindow * mainwindow;
 
 
-
 static 
 gboolean music_plugins_load_all ();
 static GList * 
@@ -42,7 +44,7 @@ music_plugins_get_dirs ();
 static void  
 music_plugins_find_plugins (gchar * start,
                             GList **list);
-static void 
+static gboolean
 load_file(gchar *location);
 
 gboolean 
@@ -75,17 +77,44 @@ gboolean music_plugins_load_all ()
 
   for(list1 = list->next; list1!=NULL; list1 = list1->next)
     {   printf("file to load: %s\n",(gchar *)list1->data);
-        g_free(list->data);
+
+        load_file(list1->data);
+        g_free(list1->data);
     }
     
     g_list_free(list);
     
 }
 
-static void 
+static gboolean
 load_file(gchar *location)
 {
+    MusicPluginInfo *info;
 
+    void * (*register_func)();
+    GType type;
+    gpointer plugin_obj;
+    
+   info = g_malloc(sizeof(MusicPluginInfo));
+   info->module = g_module_open(location,G_MODULE_BIND_LAZY);
+
+    /* extract symbols from the lib */
+	if (!g_module_symbol (info->module, "register_music_plugin", (void *)&register_func)) {
+		g_warning ("%s", g_module_error ());
+	     g_module_close(info->module);
+		return FALSE;
+	}
+
+    type =(GType )register_func();
+    plugin_obj = g_object_new  (type,
+                                NULL,
+                                NULL);
+    
+    
+    g_module_close(info->module);
+
+    
+    return TRUE;
     
 }
 
