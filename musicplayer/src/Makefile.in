@@ -40,6 +40,7 @@ am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
@@ -54,14 +55,15 @@ am_musicplayer_OBJECTS = musicplayer-music-main-window.$(OBJEXT) \
 	musicplayer-pl-reader.$(OBJEXT) \
 	musicplayer-xspf-reader.$(OBJEXT) \
 	musicplayer-m3u-reader.$(OBJEXT) \
-	musicplayer-plugin-engine.$(OBJEXT)
+	musicplayer-plugin-engine.$(OBJEXT) \
+	musicplayer-utils.$(OBJEXT)
 musicplayer_OBJECTS = $(am_musicplayer_OBJECTS)
 am__DEPENDENCIES_1 =
 musicplayer_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 musicplayer_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(musicplayer_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-DEFAULT_INCLUDES = -I.@am__isrc@
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -202,7 +204,7 @@ musicplayer_CPPFLAGS = $(common_defines) $(AM_CPPFLAGS)
 musicplayer_CFLAGS = $(GST_CFLAGS) $(GLIB_CFLAGS) $(GTK_CFLAGS) $(WARN_CFLAGS)
 musicplayer_LDADD = $(GLIB_LIBS) $(INTI_LIBS) $(GST_LIBS) 
 musicplayer_SOURCES = music-main-window.c musicseek.c player.c main.c music-queue.c music-volume.c  tag-scanner.c music-queue.h  music-volume.h  music-main-window.h music-seek.h player.h tag-scanner.h  music-store.c music-store.h jump-window.h jump-window.c pl-reader.h  pl-reader.c  xspf-reader.h  xspf-reader.c m3u-reader.h  m3u-reader.c \
-	plugin-engine.c
+	plugin-engine.c  plugin-engine.h utils.c  utils.h
 
 all: all-am
 
@@ -287,6 +289,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/musicplayer-player.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/musicplayer-plugin-engine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/musicplayer-tag-scanner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/musicplayer-utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/musicplayer-xspf-reader.Po@am__quote@
 
 .c.o:
@@ -491,6 +494,20 @@ musicplayer-plugin-engine.obj: plugin-engine.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='plugin-engine.c' object='musicplayer-plugin-engine.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-plugin-engine.obj `if test -f 'plugin-engine.c'; then $(CYGPATH_W) 'plugin-engine.c'; else $(CYGPATH_W) '$(srcdir)/plugin-engine.c'; fi`
+
+musicplayer-utils.o: utils.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-utils.o -MD -MP -MF $(DEPDIR)/musicplayer-utils.Tpo -c -o musicplayer-utils.o `test -f 'utils.c' || echo '$(srcdir)/'`utils.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-utils.Tpo $(DEPDIR)/musicplayer-utils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utils.c' object='musicplayer-utils.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-utils.o `test -f 'utils.c' || echo '$(srcdir)/'`utils.c
+
+musicplayer-utils.obj: utils.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -MT musicplayer-utils.obj -MD -MP -MF $(DEPDIR)/musicplayer-utils.Tpo -c -o musicplayer-utils.obj `if test -f 'utils.c'; then $(CYGPATH_W) 'utils.c'; else $(CYGPATH_W) '$(srcdir)/utils.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/musicplayer-utils.Tpo $(DEPDIR)/musicplayer-utils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utils.c' object='musicplayer-utils.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(musicplayer_CPPFLAGS) $(CPPFLAGS) $(musicplayer_CFLAGS) $(CFLAGS) -c -o musicplayer-utils.obj `if test -f 'utils.c'; then $(CYGPATH_W) 'utils.c'; else $(CYGPATH_W) '$(srcdir)/utils.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -87,7 +87,7 @@ destroy_hash_element(gpointer data);
 
 static void 
 add (GtkWidget *widget,
-     gpointer user_data);
+gpointer user_data);
 
 static void 
 add_columns (MusicQueue *self);
