@@ -7,6 +7,7 @@
 #include "music-main-window.h"
 #include "xspf-reader.h"
 #include "pl-reader.h"
+#include "plugin-engine.h"
 #include <gconf/gconf-client.h>
 
 main (int argc, char *argv[])
@@ -23,6 +24,7 @@ main (int argc, char *argv[])
   gconf_init(argc, argv, NULL);
 
   mainwindow = music_main_window_new ();
+  music_plugins_engine_init(MUSIC_MAIN_WINDOW(mainwindow));
   gtk_widget_show (mainwindow);
 
   g_object_set(G_OBJECT (mainwindow), "title","squid player",NULL);

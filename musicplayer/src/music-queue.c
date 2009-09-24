@@ -12,7 +12,6 @@ G_DEFINE_TYPE (MusicQueue, music_queue, GTK_TYPE_VBOX)
 
 struct
 {
-    gchar *artist;
     gchar *title;
     gint id;    
 }typedef sortnode;
@@ -1670,10 +1669,8 @@ sort_by_artist(gpointer    callback_data,
 	   {
             //need a struture that holds artist name and ID of the element
             node = g_malloc(sizeof(sortnode));
-		    gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
-						  &iter,COLUMN_ARTIST, &(node->artist), -1);
             gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
-						  &iter,COLUMN_TITLE, &(node->title), -1);
+						  &iter,COLUMN_SONG, &(node->title), -1);
             gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
 						  &iter,COLUMN_ID, &cid, -1); 
 
@@ -1882,20 +1879,18 @@ compare_sort_nodes(sortnode *node1,
     gchar *title2 = NULL;
     
     if(node1){
-        artist1= node1->artist;
         title1=node1->title;   
     }
     
     if(node2)
     {
-        
-        artist2 = node2->artist;
+ 
         title2 = node2->title;
     }
     //title is empty
-    if(artist1 == NULL || artist2 == NULL)
+    if(title1 == NULL || title2 == NULL)
     {
-        if (artist1 == NULL && artist1 == NULL)
+        if (title1 == NULL && title2 == NULL)
             return 0;
 
         ret = (artist1== NULL) ? -1 : 1;
@@ -1903,12 +1898,12 @@ compare_sort_nodes(sortnode *node1,
     }else
     {
         //ret =g_utf8_collate(artist1,artist2);
-          ret =strcmp(artist1,artist2);
+          ret =strcmp(title1,title2);
 
-        if(ret == 0 && title1 && title2) //same artists so sort by title
-        {
-            ret =strcmp(title1,title2);
-        }
+       // if(ret == 0 && title1 && title2) //same artists so sort by title
+       // {
+      //      ret =strcmp(title1,title2);
+       // }
     }
     return ret;
 }

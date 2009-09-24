@@ -32,11 +32,21 @@ struct _MusicPluginInfo
 };
 static GHashTable *music_plugins = NULL;
 static MusicMainWindow * mainwindow;
-static gboolean music_plugins_load_all ();
-static GList * music_plugins_get_dirs ();
-static void  music_plugins_find_plugins (gchar * start,GList **list);
 
-gboolean music_plugins_engine_init (MusicMainWindow * mainwindows)
+
+
+static 
+gboolean music_plugins_load_all ();
+static GList * 
+music_plugins_get_dirs ();
+static void  
+music_plugins_find_plugins (gchar * start,
+                            GList **list);
+static void 
+load_file(gchar *location);
+
+gboolean 
+music_plugins_engine_init (MusicMainWindow * mainwindows)
 {
     
     music_plugins = g_hash_table_new_full (g_str_hash, g_str_equal, NULL,NULL);
@@ -48,7 +58,8 @@ gboolean music_plugins_engine_init (MusicMainWindow * mainwindows)
 
 }
 
-static gboolean music_plugins_load_all ()
+static 
+gboolean music_plugins_load_all ()
 {
     GList *list;
     GList *list1;
@@ -66,15 +77,25 @@ static gboolean music_plugins_load_all ()
     {   printf("file to load: %s\n",(gchar *)list1->data);
         g_free(list->data);
     }
+    
     g_list_free(list);
     
 }
 
-static void music_plugins_find_plugins (gchar * start,GList **list)
+static void 
+load_file(gchar *location)
+{
+
+    
+}
+
+static void 
+music_plugins_find_plugins (gchar * start,
+                            GList **list)
 {
     GFileEnumerator *enumer; 
     GFileInfo *info;
-    GFile *file;
+    GFile *file=NULL;
     const gchar *name;
     const gchar *filetype;
     gchar *buffer;
@@ -82,18 +103,19 @@ static void music_plugins_find_plugins (gchar * start,GList **list)
     GError *err=NULL;
     const gchar *target;
 
-
-    fprintf (stderr, "START %s\n ",start);
     file = g_file_new_for_path((gchar *)start);
 
+    if(file)
+    {
     enumer = g_file_enumerate_children (file,
                                         G_FILE_ATTRIBUTE_STANDARD_NAME ","
                                         G_FILE_ATTRIBUTE_STANDARD_TYPE ","
                                         G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE ","
                                         G_FILE_ATTRIBUTE_STANDARD_TARGET_URI ,
                                         0,NULL,
-                                        &err);
-
+                                     &err);
+    }
+    
     if (err != NULL)
     {
         /* Report error to user, and free error */
@@ -124,22 +146,24 @@ static void music_plugins_find_plugins (gchar * start,GList **list)
 
             if(g_file_info_get_file_type(info) ==  G_FILE_TYPE_DIRECTORY)
             {
-                //call recursively
+                //call recursively for child directories 
                 music_plugins_find_plugins(buffer,list);
             }
             else
             {
                 filetype = g_file_info_get_attribute_string (info, 
-                                                             G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
-            printf("%s\n",filetype);
-                if(strcmp("application/octet-stream",filetype) == 0)
+                                                             G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE);
+                if(filetype)
                 {
                    
-                    *list = g_list_append(*list,g_strdup(buffer));
+                    if(strcmp("application/x-sharedlib",filetype) == 0)
+                    {
+
+                        *list = g_list_append(*list,g_strdup(buffer));
+                    }
+
+                    g_free(buffer);
                 }
-
-                g_free(buffer);
-
             }
 
 
@@ -147,8 +171,8 @@ static void music_plugins_find_plugins (gchar * start,GList **list)
             info = g_file_enumerator_next_file(enumer,NULL,NULL);
         }
     }
-        g_object_unref(file);
-        g_object_unref(enumer);
+    g_object_unref(file);
+    g_object_unref(enumer);
 
     
 }
