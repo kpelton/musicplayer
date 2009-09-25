@@ -4,6 +4,7 @@
 #define _REAL_TEST
 
 #include <glib-object.h>
+#include "music-main-window.h"
 
 G_BEGIN_DECLS
 
@@ -26,6 +27,8 @@ G_BEGIN_DECLS
 
 typedef struct {
   GObject parent;
+    MusicMainWindow *mw;
+    gint id;
 } RealTest;
 
 typedef struct {

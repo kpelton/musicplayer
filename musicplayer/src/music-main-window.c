@@ -398,7 +398,7 @@ static void mwindow_new_file(GsPlayer *player,
 		}
 	}
 	
-     ts_metadata_free(p_track);
+    
 
     }
 

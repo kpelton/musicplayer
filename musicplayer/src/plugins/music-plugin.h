@@ -5,6 +5,7 @@
 
 #include <glib-object.h>
 #include "music-main-window.h"
+#include "plugin-engine.h"
 
 G_BEGIN_DECLS
 
@@ -27,13 +28,22 @@ struct _MusicPluginInterface {
     
   GTypeInterface parent_iface;
 
-    gboolean (*music_plugin_deactivate) ( MusicPlugin *self,MusicMainWindow *mw);
+    gboolean (*music_plugin_deactivate) ( MusicPlugin *self);
     gboolean (*music_plugin_activate) ( MusicPlugin *self,MusicMainWindow *mw);
-    
+    MusicPluginDetails * (*music_plugin_get_info) ( MusicPlugin *self);
 };
+
 GType
 music_plugin_get_type (void);
 
+gboolean 
+music_plugin_activate ( MusicPlugin *self,MusicMainWindow *mw);
+
+gboolean 
+music_plugin_deactivate ( MusicPlugin *self);
+
+MusicPluginDetails*
+music_plugin_get_info( MusicPlugin *self);
 G_END_DECLS
 
 #endif /* plugin.h */

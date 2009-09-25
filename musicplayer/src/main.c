@@ -24,10 +24,11 @@ main (int argc, char *argv[])
   gconf_init(argc, argv, NULL);
 
   mainwindow = music_main_window_new ();
-  music_plugins_engine_init(MUSIC_MAIN_WINDOW(mainwindow));
+  
   gtk_widget_show (mainwindow);
 
   g_object_set(G_OBJECT (mainwindow), "title","squid player",NULL);
+    music_plugins_engine_init(MUSIC_MAIN_WINDOW(mainwindow));
 
  if (argc >1) //command line arugment to file
 	music_main_play_file(MUSIC_MAIN_WINDOW(mainwindow),argv[1]);

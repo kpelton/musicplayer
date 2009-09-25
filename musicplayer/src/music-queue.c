@@ -10,7 +10,7 @@
 #include <string.h>
 G_DEFINE_TYPE (MusicQueue, music_queue, GTK_TYPE_VBOX)
 
-struct
+ struct
 {
     gchar *title;
     gint id;    
@@ -22,7 +22,7 @@ struct
      guint  date;
     gint id;    
 }typedef sortnodedate;
-struct
+ struct
 {
     GHashTable *htable;
     gint *order;

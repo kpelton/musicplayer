@@ -615,14 +615,13 @@ static void gst_new_tags                (const GstTagList *list,
 
 gboolean gs_get_tags(GsPlayer *player)
 {
-     metadata *track;
+
      
      
 	  if(!player->lock)
 	  { 
 	       player->track->uri = strdup(player->uri);
-	       track = copyTrack(player->track);
-	       g_signal_emit (player, signals[NEWFILE],0,track);
+	       g_signal_emit (player, signals[NEWFILE],0,player->track);
 	       player->lock = TRUE;
 	       ts_metadata_free(player->track);
 	       player->track = NULL;

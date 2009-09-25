@@ -6,26 +6,18 @@
 
 #endif
 #include "plugin-engine.h"
+#include "plugins/music-plugin.h"
 
-typedef  void  (*plugininfo)(char *);
+
 
 struct _MusicPluginInfo
 {
-	gchar        *file;
-
 	gchar        *location;
 	GModule  *module;
 
-	gchar        *name;
-	gchar        *desc;
-	gchar        **authors;
-	gchar        *copyright;
-	gchar        *website;
-
-	//gchar        *icon_name;
-	//GdkPixbuf    *icon_pixbuf;
-
-	//MusicPlugin   *plugin;
+    MusicPluginDetails *details;
+    
+	MusicPlugin   *plugin;
 
 	gboolean     builtin;
 	gboolean     active;
@@ -33,35 +25,39 @@ struct _MusicPluginInfo
 	guint        active_notification_id;
 	guint        visible_notification_id;
 };
+
+
+
 static GHashTable *music_plugins = NULL;
-static MusicMainWindow * mainwindow;
+
 
 
 static 
-gboolean music_plugins_load_all ();
+gboolean music_plugins_load_all (MusicMainWindow * mainwindows);
 static GList * 
 music_plugins_get_dirs ();
 static void  
 music_plugins_find_plugins (gchar * start,
                             GList **list);
 static gboolean
-load_file(gchar *location);
+load_file(gchar *location,MusicMainWindow * mainwindows);
+
+static void
+music_plugins_free_details(MusicPluginDetails *details);
 
 gboolean 
-music_plugins_engine_init (MusicMainWindow * mainwindows)
+music_plugins_engine_init (MusicMainWindow * mainwindow)
 {
     
     music_plugins = g_hash_table_new_full (g_str_hash, g_str_equal, NULL,NULL);
-    mainwindow = mainwindows;
-    g_object_ref(mainwindow);
-    music_plugins_load_all ();
+    music_plugins_load_all (mainwindow);
     
     return TRUE;
 
 }
 
 static 
-gboolean music_plugins_load_all ()
+gboolean music_plugins_load_all (MusicMainWindow * mainwindow)
 {
     GList *list;
     GList *list1;
@@ -78,7 +74,7 @@ gboolean music_plugins_load_all ()
   for(list1 = list->next; list1!=NULL; list1 = list1->next)
     {   printf("file to load: %s\n",(gchar *)list1->data);
 
-        load_file(list1->data);
+        load_file(list1->data,mainwindow);
         g_free(list1->data);
     }
     
@@ -87,16 +83,18 @@ gboolean music_plugins_load_all ()
 }
 
 static gboolean
-load_file(gchar *location)
+load_file(gchar*            location,
+          MusicMainWindow * mainwindow)
 {
     MusicPluginInfo *info;
 
-    void * (*register_func)();
+    GType (*register_func)();
     GType type;
     gpointer plugin_obj;
     
    info = g_malloc(sizeof(MusicPluginInfo));
    info->module = g_module_open(location,G_MODULE_BIND_LAZY);
+   
 
     /* extract symbols from the lib */
 	if (!g_module_symbol (info->module, "register_music_plugin", (void *)&register_func)) {
@@ -106,17 +104,39 @@ load_file(gchar *location)
 	}
 
     type =(GType )register_func();
-    plugin_obj = g_object_new  (type,
-                                NULL,
-                                NULL);
-    
-    
-    g_module_close(info->module);
+    info->location = strdup(location);
+    info->plugin = g_object_new  (type,
+                                  NULL,
+                                  NULL);
 
+    g_hash_table_insert (music_plugins, info->location, info);
     
+    music_plugin_activate(info->plugin,mainwindow); 
+    
+    info->details = music_plugin_get_info(info->plugin);
+    
+    music_plugins_free_details(info->details);
     return TRUE;
     
 }
+
+static void
+music_plugins_free_details(MusicPluginDetails *details)
+{
+    //still needs authors
+    if(details)
+    {
+        if(details->name)
+            g_free(details->name);
+        if(details->desc)
+            g_free(details->desc);
+        if(details->name)
+            g_free(details->copyright);
+        if(details->name)
+            g_free(details->website);
+    }
+}
+
 
 static void 
 music_plugins_find_plugins (gchar * start,
