@@ -261,7 +261,7 @@ static gboolean gs_checkEnd(gpointer data)
 	  {	     
 	       pos= gs_getPercentage(me);
 	       //check to see if file is done
-	       if(pos >= 99.9){
+	       if(pos >= 99.8){
 	       //EOF found
 	       g_signal_emit (data, signals[EOS], 0 /* details */);
 	       }
