@@ -488,9 +488,8 @@ real_la-real.lo: real.c real.h /usr/include/glib-2.0/glib-object.h \
   /usr/include/semaphore.h /usr/include/bits/semaphore.h \
   ../../../src/music-queue.h ../../../src/pl-reader.h \
   ../../../src/xspf-reader.h ../../../src/m3u-reader.h \
-  ../../../src/music-seek.h ../../../src/music-volume.h \
-  ../../../src/plugins/music-plugin.h ../../../src/plugin-engine.h \
-  ../../../src/music-main-window.h ../../../src/tag-scanner.h \
+  ../../../src/music-seek.h ../../../src/music-volume.h ../music-plugin.h \
+  ../../../src/plugins/music-plugin.h ../../../src/tag-scanner.h \
   /usr/include/libnotify/notify.h /usr/include/libnotify/notification.h \
   /usr/include/libnotify/notify-enum-types.h
 
@@ -1630,11 +1629,9 @@ real.h:
 
 ../../../src/music-volume.h:
 
+../music-plugin.h:
+
 ../../../src/plugins/music-plugin.h:
-
-../../../src/plugin-engine.h:
-
-../../../src/music-main-window.h:
 
 ../../../src/tag-scanner.h:
 

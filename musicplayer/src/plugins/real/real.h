@@ -5,6 +5,7 @@
 
 #include <glib-object.h>
 #include "music-main-window.h"
+#include "../music-plugin.h"
 
 G_BEGIN_DECLS
 
@@ -26,13 +27,14 @@ G_BEGIN_DECLS
   (G_TYPE_INSTANCE_GET_CLASS ((obj), REAL_TYPE_TEST, RealTestClass))
 
 typedef struct {
-  GObject parent;
+  MusicPlugin parent;
     MusicMainWindow *mw;
-    gint id;
+    gint id1;
+    gint id2;
 } RealTest;
 
 typedef struct {
-  GObjectClass parent_class;
+  MusicPluginClass parent_class;
 } RealTestClass;
 
 GType real_test_get_type (void);

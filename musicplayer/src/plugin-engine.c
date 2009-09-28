@@ -6,30 +6,15 @@
 
 #endif
 #include "plugin-engine.h"
-#include "plugins/music-plugin.h"
 
 
 
-struct _MusicPluginInfo
-{
-	gchar        *location;
-	GModule  *module;
 
-    MusicPluginDetails *details;
-    
-	MusicPlugin   *plugin;
-
-	gboolean     builtin;
-	gboolean     active;
-	gboolean     visible;
-	guint        active_notification_id;
-	guint        visible_notification_id;
-};
 
 
 
 static GHashTable *music_plugins = NULL;
-
+static MusicMainWindow *mw = NULL;
 
 
 static 
@@ -45,12 +30,16 @@ load_file(gchar *location,MusicMainWindow * mainwindows);
 static void
 music_plugins_free_details(MusicPluginDetails *details);
 
+static void
+music_plugins_engine_unload_plugin(MusicPluginInfo *info);
+
 gboolean 
 music_plugins_engine_init (MusicMainWindow * mainwindow)
 {
     
-    music_plugins = g_hash_table_new_full (g_str_hash, g_str_equal, NULL,NULL);
+    music_plugins = g_hash_table_new (g_str_hash, g_str_equal);//, NULL,NULL);
     music_plugins_load_all (mainwindow);
+    mw = mainwindow;
     
     return TRUE;
 
@@ -74,6 +63,7 @@ gboolean music_plugins_load_all (MusicMainWindow * mainwindow)
   for(list1 = list->next; list1!=NULL; list1 = list1->next)
     {   printf("file to load: %s\n",(gchar *)list1->data);
 
+        //need to check if it has a gconf entry to save it
         load_file(list1->data,mainwindow);
         g_free(list1->data);
     }
@@ -91,6 +81,7 @@ load_file(gchar*            location,
     GType (*register_func)();
     GType type;
     gpointer plugin_obj;
+    MusicPluginDetails * (*get_details_func)();
     
    info = g_malloc(sizeof(MusicPluginInfo));
    info->module = g_module_open(location,G_MODULE_BIND_LAZY);
@@ -103,21 +94,59 @@ load_file(gchar*            location,
 		return FALSE;
 	}
 
-    type =(GType )register_func();
-    info->location = strdup(location);
-    info->plugin = g_object_new  (type,
-                                  NULL,
-                                  NULL);
+        /* extract symbols from the lib */
+	if (!g_module_symbol (info->module, "get_details",(void *) &get_details_func)) {
+		g_warning ("%s", g_module_error ());
+	     g_module_close(info->module);
+		return FALSE;
+	}
 
+    info->type =(GType )register_func();
+    info->location = strdup(location);
+    info->active = FALSE;
+    info->details = get_details_func();
     g_hash_table_insert (music_plugins, info->location, info);
     
-    music_plugin_activate(info->plugin,mainwindow); 
     
-    info->details = music_plugin_get_info(info->plugin);
-    
-    music_plugins_free_details(info->details);
     return TRUE;
     
+}
+
+
+gboolean
+music_plugins_engine_plugin_is_active(MusicPluginInfo *info)
+{
+    return info->active;
+}
+gboolean
+music_plugins_engine_activate_plugin(MusicPluginInfo *info)
+{
+    info->active = TRUE;
+    info->plugin = g_object_new  (info->type,
+                                  NULL,
+                                  NULL);
+    music_plugin_activate(info->plugin,mw);
+
+    return TRUE;
+        
+}
+gboolean
+music_plugins_engine_deactivate_plugin(MusicPluginInfo *info)
+{
+    info->active = FALSE;
+     music_plugin_deactivate(info->plugin);
+    g_object_unref(info->plugin);
+    info->plugin=NULL;
+    return TRUE;
+}
+
+static void
+music_plugins_engine_unload_plugin(MusicPluginInfo *info)
+{
+    music_plugins_free_details(info->details);
+
+    g_object_unref(info->plugin);
+   
 }
 
 static void
@@ -137,7 +166,14 @@ music_plugins_free_details(MusicPluginDetails *details)
     }
 }
 
-
+GList *
+music_plugins_get_list()
+{
+       if(music_plugins) 
+        return g_hash_table_get_values (music_plugins);
+    else
+        return NULL;
+}
 static void 
 music_plugins_find_plugins (gchar * start,
                             GList **list)

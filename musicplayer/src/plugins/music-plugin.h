@@ -5,33 +5,49 @@
 
 #include <glib-object.h>
 #include "music-main-window.h"
-#include "plugin-engine.h"
+
 
 G_BEGIN_DECLS
 
 #define MUSIC_TYPE_PLUGIN music_plugin_get_type()
 
+
 #define MUSIC_PLUGIN(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), MUSIC_TYPE_PLUGIN, MusicPlugin))
+
+#define MUSIC_PLUGIN_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST ((klass), MUSIC_TYPE_PLUGIN, MusicPluginClass))
 
 #define MUSIC_IS_PLUGIN(obj) \
   (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MUSIC_TYPE_PLUGIN))
 
-#define MUSIC_PLUGIN_GET_INTERFACE(inst) \
-(G_TYPE_INSTANCE_GET_INTERFACE ((inst), MUSIC_TYPE_PLUGIN, MusicPluginInterface))
+#define MUSIC_IS_PLUGIN_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), MUSIC_TYPE_PLUGIN))
 
+#define MUSIC_PLUGIN_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), MUSIC_TYPE_PLUGIN, MusicPluginClass))
 
-typedef struct _MusicPlugin MusicPlugin;
-typedef struct _MusicPluginInterface MusicPluginInterface;
-
-struct _MusicPluginInterface {
+typedef struct MusicPluginDetails{
     
-  GTypeInterface parent_iface;
+    gchar        *name;
+	gchar        *desc;
+	gchar        **authors;
+	gchar        *copyright;
+	gchar        *website;
+}MusicPluginDetails;
 
-    gboolean (*music_plugin_deactivate) ( MusicPlugin *self);
+typedef struct MusicPlugin{
+  GObject parent;
+  
+} MusicPlugin;
+
+typedef struct {
+  GObjectClass parent_class;
+     gboolean (*music_plugin_deactivate) ( MusicPlugin *self);
     gboolean (*music_plugin_activate) ( MusicPlugin *self,MusicMainWindow *mw);
-    MusicPluginDetails * (*music_plugin_get_info) ( MusicPlugin *self);
-};
+     
+} MusicPluginClass;
+
 
 GType
 music_plugin_get_type (void);
@@ -42,8 +58,7 @@ music_plugin_activate ( MusicPlugin *self,MusicMainWindow *mw);
 gboolean 
 music_plugin_deactivate ( MusicPlugin *self);
 
-MusicPluginDetails*
-music_plugin_get_info( MusicPlugin *self);
+
 G_END_DECLS
 
 #endif /* plugin.h */

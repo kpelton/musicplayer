@@ -1,4 +1,3 @@
-#SUBDIRS = plugins
 bin_PROGRAMS = musicplayer 
 
 common_defines =-DPLUGIN_DIR=\""$(libdir)/musicplayer/plugins"\"

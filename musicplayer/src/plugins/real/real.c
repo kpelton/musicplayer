@@ -14,36 +14,27 @@ static const char WEBSITE[] = "www.squidman.net";
 
 
 gboolean 
-real_test_music_plugin_activate ( MusicPlugin *self,MusicMainWindow *mw);
+real_test_music_plugin_activate ( MusicPlugin  *self,MusicMainWindow *mw);
 
 gboolean 
 real_test_music_plugin_deactivate ( MusicPlugin *self);
 
 MusicPluginDetails * 
-real_test_get_info(MusicPlugin *parent);
+real_test_get_info(MusicPlugin  *parent);
 
 static void real_test_new_file(GsPlayer *player,
 			     metadata* p_track,gpointer user_data);
 
-static void
-real_test_interface_init(MusicPluginInterface *iface);
 
-G_DEFINE_TYPE_WITH_CODE (RealTest, real_test, G_TYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (MUSIC_TYPE_PLUGIN,real_test_interface_init));
 
-static void
-real_test_interface_init(MusicPluginInterface *iface)
-{
+G_DEFINE_TYPE (RealTest, real_test, MUSIC_TYPE_PLUGIN);
 
-    iface->music_plugin_activate = real_test_music_plugin_activate;
-    iface->music_plugin_deactivate = real_test_music_plugin_deactivate;
-    iface->music_plugin_get_info = real_test_get_info;
-}
+
 
 MusicPluginDetails * 
-real_test_get_info(MusicPlugin *parent)
+get_details()
 {   
-    RealTest * self = (RealTest *)parent;
+
     MusicPluginDetails *info;
 
     info = g_malloc(sizeof(MusicPluginDetails));
@@ -54,7 +45,7 @@ real_test_get_info(MusicPlugin *parent)
     info->website = g_strdup(WEBSITE);
 
     return info;
-    
+  
     
 }
 /*
@@ -70,24 +61,24 @@ typedef struct{
 
 static gboolean real_test_eof(gpointer player,RealTest * self)
 {
-    g_signal_handler_unblock(player,self->id);
+    g_signal_handler_unblock(player,self->id2);
 }
-gboolean real_test_music_plugin_activate ( MusicPlugin *self,MusicMainWindow *mw)
+gboolean real_test_music_plugin_activate (MusicPlugin *self,MusicMainWindow *mw)
 {
 RealTest * real = (RealTest *)self;
      real->mw = mw;
      printf("it's working\n\n");
-    g_object_ref(real->mw);
+     g_object_ref(real->mw);
 
-    g_signal_connect(mw->player, "eof",
+    real->id1 =g_signal_connect(mw->player, "eof",
 				 G_CALLBACK(real_test_eof),
 				 self);
     
-   real->id = g_signal_connect (mw->player, "new-file",
+   real->id2 = g_signal_connect (mw->player, "new-file",
                       G_CALLBACK(real_test_new_file),
                       (gpointer)real);
     
-    g_signal_handler_block(mw->player,real->id); 
+    g_signal_handler_block(mw->player,real->id2); 
 }
 
 static void real_test_new_file(GsPlayer *player,
@@ -99,7 +90,7 @@ static void real_test_new_file(GsPlayer *player,
     {
     // initiate notify
   
-
+    notify_init("mplayer");
     // create a new notification
     
     example = notify_notification_new(p_track->artist,p_track->title,NULL,NULL);
@@ -122,16 +113,21 @@ static void real_test_new_file(GsPlayer *player,
     notify_notification_show(example,&error);
         
     }
-    g_signal_handler_block(player,self->id); 
+    g_signal_handler_block(player,self->id2); 
   
 }
-gboolean real_test_music_plugin_deactivate ( MusicPlugin *self)
+gboolean real_test_music_plugin_deactivate ( MusicPlugin *user_data)
 {
+    RealTest * self = (RealTest *)user_data;
     notify_uninit();  
-    RealTest * real = (RealTest *)self;
+    g_signal_handler_disconnect (G_OBJECT (self->mw->player),
+				    self->id1);
+    g_signal_handler_disconnect (G_OBJECT (self->mw->player),
+				    self->id2);
+
      printf("destruction \n");
-         g_object_unref(real->mw);
-        g_object_unref(real);
+    g_object_unref(self->mw);
+
 }
 
 GType 
@@ -140,15 +136,39 @@ register_music_plugin()
     return real_test_get_type();
 }
 
+
 static void
-real_test_class_init (RealTestClass *klass)
+real_test_dispose (GObject *object)
 {
+
+     G_OBJECT_CLASS (real_test_parent_class)->dispose (object);
+  
 }
 
 static void
+real_test_finalize (GObject *object)
+{
+    
+   
+     G_OBJECT_CLASS (real_test_parent_class)->finalize (object);
+}
+static void
 real_test_init (RealTest *self)
 {
-   notify_init("mplayer");
+   
+}
+static void
+real_test_class_init (RealTestClass *klass)
+{
+   MusicPluginClass  *class = MUSIC_PLUGIN_CLASS (klass);
+    GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  /* implement pure virtual class function. */
+  class->music_plugin_activate=real_test_music_plugin_activate;
+  class->music_plugin_deactivate=real_test_music_plugin_deactivate;
+   object_class->dispose = real_test_dispose;
+    object_class->finalize = real_test_finalize;
+
+
 }
 
 RealTest*
