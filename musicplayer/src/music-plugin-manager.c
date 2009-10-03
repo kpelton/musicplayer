@@ -21,8 +21,10 @@ enum
 	INFO_COLUMN,
 	N_COLUMNS
 };
-
-
+static void
+row_activated_cb(GtkTreeView *treeview,
+                      gpointer arg1,
+                      gpointer data);
 static void 
 music_plugin_init_widgets(MusicPluginManager *self);
 static void
@@ -128,10 +130,10 @@ music_plugin_init_widgets(MusicPluginManager *self)
 	self->priv->about = gtk_button_new_from_stock (GTK_STOCK_ABOUT);
 	gtk_container_add (GTK_CONTAINER (hbuttonbox), self->priv->about);
 
-   
+  
 	self->priv->config = gtk_button_new_from_stock( GTK_STOCK_PREFERENCES);
 	gtk_container_add (GTK_CONTAINER (hbuttonbox), self->priv->config);
-
+    
 
 	gtk_widget_set_size_request (GTK_WIDGET (viewport), 270, 100);
 /*
@@ -207,11 +209,13 @@ music_plugin_manager_construct_tree (MusicPluginManager *self)
 			  "cursor_changed",
 			  G_CALLBACK (cursor_changed_cb),
 			  pm);
-	g_signal_connect (pm->priv->tree,
-			  "row_activated",
+    */
+    /*
+	g_signal_connect (self->priv->tree,
+			"button-press-event",
 			  G_CALLBACK (row_activated_cb),
-			  pm);
-
+			  self);
+   /*
 	g_signal_connect (pm->priv->tree,
 			  "button-press-event",
 			  G_CALLBACK (button_press_event_cb),
@@ -223,6 +227,34 @@ music_plugin_manager_construct_tree (MusicPluginManager *self)
     */
 	gtk_widget_show (self->priv->tree);
 }
+static void
+row_activated_cb(GtkTreeView *treeview,
+                        gpointer arg1,
+                      gpointer data)
+{
+    MusicPluginManager *self = (MusicPluginManager *)data;
+    GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (treeview));
+    MusicPluginDetails *info;
+    GtkTreeIter iter;
+    GtkTreeSelection *selection;
+    selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (treeview));
+
+   gtk_tree_selection_select_iter(selection,&iter);
+         
+            
+            	gtk_tree_model_get (model, &iter, INFO_COLUMN, &info, -1);
+
+	             g_return_if_fail (info != NULL);
+
+              gtk_widget_set_sensitive (GTK_WIDGET (self->priv->config),
+					TRUE);
+        
+    
+  
+
+                          
+}
+
 static void
 active_toggled_cb (GtkCellRendererToggle *cell,
                    gchar                 *path_str,
@@ -312,9 +344,9 @@ music_plugin_manager_populate_lists (MusicPluginManager *pm)
 		plugins = plugins->next;
 	}
 
-	if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (model), &iter))
-	{
-		
+
+if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (model), &iter))
+	{    
 
 		selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (pm->priv->tree));
 		g_return_if_fail (selection != NULL);
@@ -324,8 +356,8 @@ music_plugin_manager_populate_lists (MusicPluginManager *pm)
 		gtk_tree_model_get (GTK_TREE_MODEL (model), &iter,
 				    INFO_COLUMN, &info, -1);
 
-		//gtk_widget_set_sensitive (GTK_WIDGET (pm->priv->configure_button),
-		//			  gedit_plugin_info_is_configurable (info));
+		gtk_widget_set_sensitive (GTK_WIDGET (pm->priv->config),
+					  info->details->is_configurable);
 	}
     if(plugins)
         g_list_free(plugins);

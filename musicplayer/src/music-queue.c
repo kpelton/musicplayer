@@ -2,6 +2,7 @@
 #include "music-store.h"
 #include "music-queue.h"
 #include "jump-window.h"
+#include "plugin-engine.h"
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
 #include <gdk/gdkkeysyms.h>
@@ -1423,7 +1424,7 @@ getcontextmenu(gpointer user_data)
 {
     
     GtkItemFactory *item_factory;
-    GtkWidget  *menu,*font,*repeat,*sort,*sort2,*seperator;
+    GtkWidget  *menu,*font,*repeat,*sort,*sort2,*seperator,*plugins;
 	gboolean test;
 	
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1433,6 +1434,7 @@ getcontextmenu(gpointer user_data)
 		
     self->priv->delete = gtk_image_menu_item_new_from_stock(GTK_STOCK_DELETE,NULL);
 	font   = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_FONT,NULL);
+    //plugins   = gtk_image_menu_item_new_from_stock(GTK_STOCK_PLUGIN,NULL);
     repeat =  gtk_check_menu_item_new_with_label("Repeat");
     seperator = gtk_separator_menu_item_new ();
     sort   = gtk_menu_item_new_with_label("Sort By Artist");

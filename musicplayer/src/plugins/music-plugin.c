@@ -46,3 +46,6 @@ gboolean music_plugin_activate ( MusicPlugin *self,MusicMainWindow *mw)
      return MUSIC_PLUGIN_GET_CLASS (self)->music_plugin_activate(self,mw);
    
 }
+
+
+                                       

@@ -10,7 +10,6 @@ typedef struct MusicPluginInfo{
 	GModule  *module;
     GType   type;
     MusicPluginDetails *details;
-    MusicPluginDetails * (*get_details_func)();
 	MusicPlugin   *plugin;
 
 	gboolean     builtin;

@@ -105,6 +105,7 @@ load_file(gchar*            location,
     info->location = strdup(location);
     info->active = FALSE;
     info->details = get_details_func();
+    info->details->is_configurable = FALSE;
     g_hash_table_insert (music_plugins, info->location, info);
     
     
@@ -121,10 +122,13 @@ music_plugins_engine_plugin_is_active(MusicPluginInfo *info)
 gboolean
 music_plugins_engine_activate_plugin(MusicPluginInfo *info)
 {
+
+
     info->active = TRUE;
     info->plugin = g_object_new  (info->type,
                                   NULL,
                                   NULL);
+    
     music_plugin_activate(info->plugin,mw);
 
     return TRUE;
@@ -134,10 +138,11 @@ gboolean
 music_plugins_engine_deactivate_plugin(MusicPluginInfo *info)
 {
     info->active = FALSE;
-     music_plugin_deactivate(info->plugin);
+    music_plugin_deactivate(info->plugin);
     g_object_unref(info->plugin);
     info->plugin=NULL;
-    return TRUE;
+
+     return TRUE;
 }
 
 static void

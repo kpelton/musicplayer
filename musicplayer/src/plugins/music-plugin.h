@@ -34,6 +34,8 @@ typedef struct MusicPluginDetails{
 	gchar        **authors;
 	gchar        *copyright;
 	gchar        *website;
+    gboolean     is_configurable;
+    
 }MusicPluginDetails;
 
 typedef struct MusicPlugin{
@@ -43,9 +45,8 @@ typedef struct MusicPlugin{
 
 typedef struct {
   GObjectClass parent_class;
-     gboolean (*music_plugin_deactivate) ( MusicPlugin *self);
+    gboolean (*music_plugin_deactivate) ( MusicPlugin *self);
     gboolean (*music_plugin_activate) ( MusicPlugin *self,MusicMainWindow *mw);
-     
 } MusicPluginClass;
 
 
@@ -57,7 +58,6 @@ music_plugin_activate ( MusicPlugin *self,MusicMainWindow *mw);
 
 gboolean 
 music_plugin_deactivate ( MusicPlugin *self);
-
 
 G_END_DECLS
 

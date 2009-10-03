@@ -11,7 +11,7 @@ static const char DESC[] = "A real example of a working plugin";
 //tatic const char AUTHORS[][] = {"Kyle Pelton","\0"};
 static const char COPYRIGHT[] = "Kyle Pelton";
 static const char WEBSITE[] = "www.squidman.net";
-
+static gboolean is_configurable = FALSE;
 
 gboolean 
 real_test_music_plugin_activate ( MusicPlugin  *self,MusicMainWindow *mw);
@@ -43,25 +43,18 @@ get_details()
     info->desc = g_strdup(DESC);
     info->copyright = g_strdup(COPYRIGHT);
     info->website = g_strdup(WEBSITE);
+    info->is_configurable = is_configurable;
 
     return info;
   
     
 }
-/*
-typedef struct{
-    
-    gchar        *name;
-	gchar        *desc;
-	gchar        **authors;
-	gchar        *copyright;
-	gchar        *website;
-}MusicPluginDetails;
-*/
+
+
 
 static gboolean real_test_eof(gpointer player,RealTest * self)
 {
-    g_signal_handler_unblock(player,self->id1);
+    g_signal_handler_unblock(player,self->id2);
 }
 gboolean real_test_music_plugin_activate (MusicPlugin *self,MusicMainWindow *mw)
 {
@@ -165,6 +158,8 @@ real_test_class_init (RealTestClass *klass)
   /* implement pure virtual class function. */
   class->music_plugin_activate=real_test_music_plugin_activate;
   class->music_plugin_deactivate=real_test_music_plugin_deactivate;
+
+    
    object_class->dispose = real_test_dispose;
     object_class->finalize = real_test_finalize;
 
