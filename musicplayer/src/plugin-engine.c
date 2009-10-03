@@ -36,10 +36,11 @@ music_plugins_engine_unload_plugin(MusicPluginInfo *info);
 gboolean 
 music_plugins_engine_init (MusicMainWindow * mainwindow)
 {
+    mw = mainwindow;
     
     music_plugins = g_hash_table_new (g_str_hash, g_str_equal);//, NULL,NULL);
     music_plugins_load_all (mainwindow);
-    mw = mainwindow;
+    
     
     return TRUE;
 
@@ -81,6 +82,10 @@ load_file(gchar*            location,
     GType (*register_func)();
     GType type;
     gpointer plugin_obj;
+    GConfClient* client;
+    client = gconf_client_get_default ();
+     gchar *gconf_path;
+    
     MusicPluginDetails * (*get_details_func)();
     
    info = g_malloc(sizeof(MusicPluginInfo));
@@ -104,11 +109,29 @@ load_file(gchar*            location,
 
     info->type =(GType )register_func();
     info->location = strdup(location);
-    info->active = FALSE;
+  
     info->details = get_details_func();
+   
+    gconf_path = g_strjoin("/","/apps/musicplayer",info->details->name,"active",NULL);
     info->details->is_configurable = FALSE;
     g_hash_table_insert (music_plugins, info->location, info);
     
+     if(gconf_client_get_bool (client,gconf_path,NULL))
+    {
+         info->active = TRUE;
+        music_plugins_engine_activate_plugin(info);
+        
+    }
+    else
+    {
+        info->active = FALSE;
+    }
+
+    
+    
+    
+    g_object_unref(client);
+    g_free(gconf_path);
     
     return TRUE;
     
@@ -123,14 +146,25 @@ music_plugins_engine_plugin_is_active(MusicPluginInfo *info)
 gboolean
 music_plugins_engine_activate_plugin(MusicPluginInfo *info)
 {
+    GConfClient* client;
+    gchar *gconf_path;
+    
+    
+    client = gconf_client_get_default ();
+    
+    gconf_path = g_strjoin("/","/apps/musicplayer",info->details->name,"active",NULL);
+    
+    gconf_client_set_bool (client,gconf_path,TRUE,NULL);
 
-
+    
     info->active = TRUE;
     info->plugin = g_object_new  (info->type,
                                   NULL,
                                   NULL);
     
     music_plugin_activate(info->plugin,mw);
+    g_object_unref(client);
+    g_free(gconf_path);
 
     return TRUE;
         
@@ -138,10 +172,22 @@ music_plugins_engine_activate_plugin(MusicPluginInfo *info)
 gboolean
 music_plugins_engine_deactivate_plugin(MusicPluginInfo *info)
 {
+    GConfClient* client;
+    gchar *gconf_path;
+    
+    
+    client = gconf_client_get_default ();
+    
+    gconf_path = g_strjoin("/","/apps/musicplayer",info->details->name,"active",NULL);
+    
+    gconf_client_set_bool (client,gconf_path,FALSE,NULL);
+    
     info->active = FALSE;
     music_plugin_deactivate(info->plugin);
     g_object_unref(info->plugin);
     info->plugin=NULL;
+    g_object_unref(client);
+    g_free(gconf_path);
 
      return TRUE;
 }

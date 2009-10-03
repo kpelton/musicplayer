@@ -43,7 +43,7 @@ get_details()
     info->desc = g_strdup(DESC);
     info->copyright = g_strdup(COPYRIGHT);
     info->website = g_strdup(WEBSITE);
-    info->is_configurable = is_configurable;
+    info->is_configurable = FALSE;
 
     return info;
   

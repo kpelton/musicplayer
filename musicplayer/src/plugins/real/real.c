@@ -6,8 +6,8 @@
 
 #include<libnotify/notify.h>
 
-static const char PLUGIN_NAME[] = "real Plugin Test";
-static const char DESC[] = "A real example of a working plugin";
+static const char PLUGIN_NAME[] = "Notify";
+static const char DESC[] = "Inform user when the song changes";
 //tatic const char AUTHORS[][] = {"Kyle Pelton","\0"};
 static const char COPYRIGHT[] = "Kyle Pelton";
 static const char WEBSITE[] = "www.squidman.net";
