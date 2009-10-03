@@ -27,11 +27,10 @@ main (int argc, char *argv[])
     mainwindow = music_main_window_new ();
 
     music_plugins_engine_init(MUSIC_MAIN_WINDOW(mainwindow));
-    MusicPluginManager* test = music_plugin_manager_new ();
   
   
   gtk_widget_show (mainwindow);
-  gtk_widget_show ((GtkWidget *)test); 
+
 
   g_object_set(G_OBJECT (mainwindow), "title","squid player",NULL);
     

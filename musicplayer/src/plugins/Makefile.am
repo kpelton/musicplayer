@@ -1,1 +1,1 @@
-SUBDIRS =  real
+SUBDIRS =  real visual

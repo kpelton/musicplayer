@@ -13892,7 +13892,7 @@ _ACEOF
 
 fi
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/plugins/Makefile src/plugins/real/Makefile src/plugins/plugins/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/plugins/Makefile src/plugins/real/Makefile src/plugins/visual/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -14789,7 +14789,7 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/plugins/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/Makefile" ;;
     "src/plugins/real/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/real/Makefile" ;;
-    "src/plugins/plugins/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/plugins/Makefile" ;;
+    "src/plugins/visual/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/visual/Makefile" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 $as_echo "$as_me: error: invalid argument: $ac_config_target" >&2;}

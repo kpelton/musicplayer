@@ -1,6 +1,6 @@
 bin_PROGRAMS = musicplayer 
 
-common_defines =-DPLUGIN_DIR=\""$(libdir)/musicplayer/plugins"\"
+common_defines =-DPLUGIN_DIR=\""$(libdir)/musicplayer"\"
 
 musicplayer_CPPFLAGS =$(common_defines) $(AM_CPPFLAGS)
 

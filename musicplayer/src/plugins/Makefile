@@ -174,7 +174,7 @@ target_alias =
 top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
-SUBDIRS = real
+SUBDIRS = real visual
 all: all-recursive
 
 .SUFFIXES:

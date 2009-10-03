@@ -2,7 +2,7 @@
 #include "music-store.h"
 #include "music-queue.h"
 #include "jump-window.h"
-#include "plugin-engine.h"
+#include "music-plugin-manager.h"
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
 #include <gdk/gdkkeysyms.h>
@@ -100,10 +100,10 @@ music_queue_read_start_playlist(gchar *location,
                                 MusicQueue *self);
 //static void playfile (GtkTreeSelection *selection, gpointer data);
 static void 
-nextFile (GsPlayer *player,
+next_file (GsPlayer *player,
           gpointer user_data);
 static void
-onDragDataReceived(GtkWidget *wgt, GdkDragContext *context, int x, int y,
+on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
                         GtkSelectionData *seldata, guint info, guint time,
                         gpointer userdata);
 
@@ -115,34 +115,34 @@ playfile (GtkTreeView *treeview,
 
 
 static void  
-rowchanged  (GtkTreeModel *tree_model,
+row_changed  (GtkTreeModel *tree_model,
              GtkTreePath  *path,
              GtkTreeIter  *iter,
              gpointer      user_data);
 
 
 static gboolean  
-grabfocuscb (GtkWidget *widget,
+grab_focus_cb (GtkWidget *widget,
              GdkEventButton *event,
              gpointer user_date);
 
 static gboolean 
-lostgrabfocuscb (GtkWidget *widget,
+lost_grab_focus_cb(GtkWidget *widget,
 			 GdkEventButton *event,
 			 gpointer user_date);
 
 static void 
-dragend (GtkWidget *widget,
+drag_end (GtkWidget *widget,
          GdkDragContext *contex,
          gpointer user_data);
 
 static void 
-dragbegin (GtkWidget *widget,
+drag_begin (GtkWidget *widget,
            GdkDragContext *contex,
            gpointer user_data);
 
 static GtkWidget * 
-getcontextmenu(gpointer user_data);
+get_context_menu(gpointer user_data);
 
 static void 
 remove_files(GtkMenuItem *item, 
@@ -203,6 +203,11 @@ traverse_tree (gpointer data,
 
 static gboolean 
 check_type_supported(const gchar *type);
+
+static void 
+plugins_item_selected  (gpointer    callback_data,
+                        guint       callback_action,
+                        GtkWidget  *widget);
 
 
 //end priv functions
@@ -583,11 +588,11 @@ init_widgets(MusicQueue *self)
 	                  self);
 
 	g_signal_connect (G_OBJECT (self->priv->store), "row-changed",
-	                  G_CALLBACK (rowchanged),
+	                  G_CALLBACK (row_changed),
 	                  self);
 
 	g_signal_connect (G_OBJECT (self->priv->treeview), "button_press_event",
-	                  G_CALLBACK (grabfocuscb),
+	                  G_CALLBACK (grab_focus_cb),
 	                  self);
 
 	g_signal_connect (G_OBJECT (self->priv->treeview), "key_press_event",
@@ -596,19 +601,19 @@ init_widgets(MusicQueue *self)
 
 
 	g_signal_connect (G_OBJECT (self->priv->treeview), "button_release_event",
-	                  G_CALLBACK (lostgrabfocuscb),
+	                  G_CALLBACK (lost_grab_focus_cb),
 	                  self);
 
 	g_signal_connect (G_OBJECT (self->priv->treeview), "drag_begin",
-	                  G_CALLBACK (dragbegin), 
+	                  G_CALLBACK (drag_begin), 
 	                  self);
 
 	g_signal_connect (G_OBJECT (self->priv->treeview), "drag_end",
-	                  G_CALLBACK (dragend), 
+	                  G_CALLBACK (drag_end), 
 	                  self);
 
 	g_signal_connect(self->priv->treeview, "drag_data_received",
-	                 G_CALLBACK(onDragDataReceived),
+	                 G_CALLBACK(on_drag_data_received),
 	                 self);
 
 	
@@ -639,7 +644,7 @@ init_widgets(MusicQueue *self)
 
 
 
-	self->priv->menu = getcontextmenu(self);
+	self->priv->menu = get_context_menu(self);
 	gtk_widget_show_all(self->priv->menu);
 	gtk_menu_attach_to_widget(GTK_MENU(self->priv->menu),self->priv->treeview,NULL);
 }
@@ -651,7 +656,7 @@ init_widgets(MusicQueue *self)
 
 
 static void
-onDragDataReceived(GtkWidget *wgt, GdkDragContext *context, int x, int y,
+on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
                         GtkSelectionData *seldata, guint info, guint time,
                         gpointer userdata)
 {
@@ -1164,7 +1169,7 @@ music_queue_new_with_player(GsPlayer *player)
     self->priv->player =player;
     
     g_signal_connect (player, "eof",
-                      G_CALLBACK(nextFile),
+                      G_CALLBACK(next_file),
                       (gpointer)self);
     
     
@@ -1173,7 +1178,7 @@ music_queue_new_with_player(GsPlayer *player)
     return GTK_WIDGET(self);
 }
 static void 
-nextFile              (GsPlayer      *player,
+next_file            (GsPlayer      *player,
                        gpointer         user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1233,13 +1238,6 @@ add_columns(MusicQueue *self)
     
     gtk_tree_view_column_set_resizable(GTK_TREE_VIEW_COLUMN (column),TRUE);
     
-    //gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->treeview), column);
-    //gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 5);
-    
-    //set sortable
-   // gtk_tree_view_column_set_sort_column_id(column,SORTID_ARTIST);
-    
-    
     
     renderer = gtk_cell_renderer_text_new ();
     g_object_set(G_OBJECT(renderer),"ellipsize",PANGO_ELLIPSIZE_END,NULL);
@@ -1252,8 +1250,6 @@ add_columns(MusicQueue *self)
 											"text",
 											COLUMN_TITLE,
 											NULL);
-
-	// gtk_tree_view_column_set_sort_column_id(column,SORTID_TITLE);
 
 	
  	renderer = gtk_cell_renderer_text_new ();
@@ -1274,17 +1270,7 @@ add_columns(MusicQueue *self)
 
 	gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->treeview), column);
 
-	
-    //gtk_tree_view_column_set_resizable(GTK_TREE_VIEW_COLUMN (column),TRUE);
-    
-    //gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 20);
-    
-    //sort
-  
-    
-    //gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->treeview), column);
 
-	
     renderer = gtk_cell_renderer_text_new ();
     
     
@@ -1312,7 +1298,7 @@ add_columns(MusicQueue *self)
     
 }
 static void  
-rowchanged  (GtkTreeModel *tree_model,
+row_changed  (GtkTreeModel *tree_model,
              GtkTreePath  *path,
              GtkTreeIter  *iter,
              gpointer      user_data) 
@@ -1339,7 +1325,7 @@ rowchanged  (GtkTreeModel *tree_model,
 
 
 static 
-gboolean grabfocuscb (GtkWidget *widget,
+gboolean grab_focus_cb (GtkWidget *widget,
                       GdkEventButton *event,
                       gpointer user_data)
 {
@@ -1370,7 +1356,7 @@ gboolean grabfocuscb (GtkWidget *widget,
 
 
 static gboolean 
-lostgrabfocuscb (GtkWidget *widget,
+lost_grab_focus_cb (GtkWidget *widget,
                  GdkEventButton *event,
                  gpointer user_data)
 {
@@ -1391,7 +1377,7 @@ lostgrabfocuscb (GtkWidget *widget,
 
 
 static void 
-dragbegin (GtkWidget *widget,
+drag_begin (GtkWidget *widget,
            GdkDragContext *contex,
            gpointer user_data)
 {
@@ -1403,7 +1389,7 @@ dragbegin (GtkWidget *widget,
 
 
 static void 
-dragend (GtkWidget *widget,
+drag_end (GtkWidget *widget,
          GdkDragContext *contex,
          gpointer user_data)
 {
@@ -1420,7 +1406,7 @@ dragend (GtkWidget *widget,
 
 
 static GtkWidget * 
-getcontextmenu(gpointer user_data)
+get_context_menu(gpointer user_data)
 {
     
     GtkItemFactory *item_factory;
@@ -1434,7 +1420,7 @@ getcontextmenu(gpointer user_data)
 		
     self->priv->delete = gtk_image_menu_item_new_from_stock(GTK_STOCK_DELETE,NULL);
 	font   = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_FONT,NULL);
-    //plugins   = gtk_image_menu_item_new_from_stock(GTK_STOCK_PLUGIN,NULL);
+    plugins   = gtk_menu_item_new_with_label("Plugins");
     repeat =  gtk_check_menu_item_new_with_label("Repeat");
     seperator = gtk_separator_menu_item_new ();
     sort   = gtk_menu_item_new_with_label("Sort By Artist");
@@ -1462,14 +1448,20 @@ getcontextmenu(gpointer user_data)
     g_signal_connect (G_OBJECT (sort2), "activate",
                       G_CALLBACK (sort_by_date),
                       user_data);
+     g_signal_connect (G_OBJECT (plugins), "activate",
+                      G_CALLBACK (plugins_item_selected),
+                      user_data);
 
     
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),self->priv->delete);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),font);
+    gtk_menu_shell_append (GTK_MENU_SHELL(menu),plugins);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),repeat);
+    
     gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator);
     gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort);
     gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort2);
+    
 	
 	   
     return menu;
@@ -1521,6 +1513,15 @@ gotJump(JumpWindow *jwindow,
     playfile(GTK_TREE_VIEW(self->priv->treeview),path,NULL,user_data);
 }
     
+static void 
+plugins_item_selected  (gpointer    callback_data,
+                        guint       callback_action,
+                        GtkWidget  *widget)
+{
+    GtkWidget* dialog = (GtkWidget *)music_plugin_manager_new ();
+
+    gtk_widget_show(dialog);
+}
 
 static void 
 set_font   (gpointer    callback_data,

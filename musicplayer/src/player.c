@@ -99,11 +99,18 @@ gs_player_class_init (GsPlayerClass *klass)
 static void
 gs_player_init (GsPlayer *me)
 {
-     
+     GstElement *goom;
+     GstElement *xv;
+
+    
      me->play = gst_element_factory_make ("playbin", "playbin");
 	 me->gconf = gst_element_factory_make("gconfaudiosink","audio-sink");
-	
+     goom = gst_element_factory_make("gstgoom","sink");
+     xv  = gst_element_factory_make("xvimagesink","video-sink");
+
+   
 	 g_object_set(G_OBJECT(me->play),"audio-sink",me->gconf,NULL);
+    
 	 	
      me->isPlaying = FALSE;
      

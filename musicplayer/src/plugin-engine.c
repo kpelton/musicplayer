@@ -84,8 +84,9 @@ load_file(gchar*            location,
     MusicPluginDetails * (*get_details_func)();
     
    info = g_malloc(sizeof(MusicPluginInfo));
-   info->module = g_module_open(location,G_MODULE_BIND_LAZY);
    
+   if(!(info->module = g_module_open(location,G_MODULE_BIND_LAZY)))
+        g_warning ("%s", g_module_error ());
 
     /* extract symbols from the lib */
 	if (!g_module_symbol (info->module, "register_music_plugin", (void *)&register_func)) {

@@ -322,7 +322,7 @@ on `(hostname || uname -n) 2>/dev/null | sed 1q`
 "
 
 # Files that config.status was made for.
-config_files=" Makefile src/Makefile src/plugins/Makefile src/plugins/real/Makefile src/plugins/plugins/Makefile"
+config_files=" Makefile src/Makefile src/plugins/Makefile src/plugins/real/Makefile src/plugins/visual/Makefile"
 config_headers=" config.h"
 config_commands=" depfiles libtool"
 
@@ -489,7 +489,7 @@ FGREP='/bin/grep -F'
 LD='/usr/bin/ld'
 NM='/usr/bin/nm -B'
 LN_S='ln -s'
-max_cmd_len='805306365'
+max_cmd_len='1572864'
 ac_objext='o'
 exeext=''
 lt_unset='unset'
@@ -657,7 +657,7 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/plugins/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/Makefile" ;;
     "src/plugins/real/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/real/Makefile" ;;
-    "src/plugins/plugins/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/plugins/Makefile" ;;
+    "src/plugins/visual/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/visual/Makefile" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 $as_echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
