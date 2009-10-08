@@ -491,9 +491,7 @@ visual_la-visual.lo: visual.c visual.h \
   ../../../src/xspf-reader.h ../../../src/m3u-reader.h \
   ../../../src/music-seek.h ../../../src/music-volume.h ../music-plugin.h \
   ../../../src/player.h ../../../src/plugins/music-plugin.h \
-  ../../../src/tag-scanner.h /usr/include/libnotify/notify.h \
-  /usr/include/libnotify/notification.h \
-  /usr/include/libnotify/notify-enum-types.h
+  ../../../src/tag-scanner.h
 
 visual.h:
 
@@ -1638,9 +1636,3 @@ visual.h:
 ../../../src/plugins/music-plugin.h:
 
 ../../../src/tag-scanner.h:
-
-/usr/include/libnotify/notify.h:
-
-/usr/include/libnotify/notification.h:
-
-/usr/include/libnotify/notify-enum-types.h:

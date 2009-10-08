@@ -4,7 +4,7 @@
 #include "music-plugin.h"
 #include "tag-scanner.h"
 
-#include<libnotify/notify.h>
+
 
 static const char PLUGIN_NAME[] = "Visualize";
 static const char DESC[] = "various visualizations ";
@@ -48,15 +48,60 @@ gboolean visual_plugin_activate (MusicPlugin *user_data,MusicMainWindow *mw)
 {
   VisualPlugin * self = (VisualPlugin *)user_data;
     self->mw = mw;
+    GstMessage *msg;
+    GstElement *vis_capsfilter;
+    GstPad *pad;
+    GstElement *vis_bin;
+     GstCaps *caps = NULL;
 
-
+    
+        
+  vis_capsfilter = gst_element_factory_make ("capsfilter",
+        "vis_capsfilter");
+    
+   
+   vis_bin = gst_bin_new("vis_bin");
    self->goom = gst_element_factory_make("goom","sink");
-   self->video  = gst_element_factory_make("xvimagesink","video-sink");
+   
+    
+   
+    gst_bin_add_many (GST_BIN (vis_bin), self->goom,vis_capsfilter,NULL);
+ /* Sink ghostpad */
+    pad = gst_element_get_static_pad (self->goom, "sink");
+    gst_element_add_pad (vis_bin, gst_ghost_pad_new ("sink", pad));
+    gst_object_unref (pad);
+    
+    
+    pad = gst_element_get_static_pad (vis_capsfilter, "src");
+    gst_element_add_pad (vis_bin, gst_ghost_pad_new ("src", pad));
+    gst_element_link_pads (self->goom, "src", vis_capsfilter, "sink");
+
+    pad = gst_element_get_static_pad (self->goom, "src");
+    caps = gst_pad_get_allowed_caps (pad);
+    
+    gst_object_unref (pad);
+    int i;
+
+     caps = gst_caps_make_writable (caps);
+
+  
+       /* Get visualization size */
+        GstStructure *s = gst_caps_get_structure (caps, 0);
+      
+        /* Fixate */
+        gst_structure_fixate_field_nearest_int (s, "width", 800);
+        gst_structure_fixate_field_nearest_int (s, "height", 600);
+      
+
+        /* set this */
+         g_object_set (vis_capsfilter, "caps", caps, NULL);
 
     
 
-   g_object_set(G_OBJECT(self->mw->player->play),"video-sink",self->video,NULL);
-   g_object_set(G_OBJECT(self->mw->player->play),"vis-plugin",self->goom,NULL);
+   self->bin = vis_bin;
+   g_object_set(G_OBJECT(self->mw->player->play),"vis-plugin",vis_bin,NULL);
+
+    
 }
 
 
@@ -64,18 +109,15 @@ gboolean visual_plugin_activate (MusicPlugin *user_data,MusicMainWindow *mw)
 gboolean visual_plugin_deactivate ( MusicPlugin *user_data)
 {
     VisualPlugin * self = (VisualPlugin *)user_data;
-    gpointer blah = NULL;
+
+
+    gst_element_set_state (self->bin, GST_STATE_NULL);
+    gst_element_set_state (self->mw->player->play, GST_STATE_NULL);
     
-    // g_object_unref(self->video);
+    g_object_set(G_OBJECT(self->mw->player->play),"vis-plugin",NULL,NULL);
+
+    g_object_unref(self->bin);
    
-  
-    
-   g_object_set(G_OBJECT(self->mw->player->play),"video-sink",blah,NULL);
-   g_object_set(G_OBJECT(self->mw->player->play),"vis-plugin",blah,NULL);
-
-
-    
-
 }
 
 GType 

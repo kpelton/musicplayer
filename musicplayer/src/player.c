@@ -105,24 +105,18 @@ gs_player_init (GsPlayer *me)
     
      me->play = gst_element_factory_make ("playbin", "playbin");
 	 me->gconf = gst_element_factory_make("gconfaudiosink","audio-sink");
-     goom = gst_element_factory_make("gstgoom","sink");
-     xv  = gst_element_factory_make("xvimagesink","video-sink");
+ 
 
    
 	 g_object_set(G_OBJECT(me->play),"audio-sink",me->gconf,NULL);
     
-	 	
+	 	 gst_element_set_state (me->play, GST_STATE_READY);
      me->isPlaying = FALSE;
      
      me->bus = gst_pipeline_get_bus (GST_PIPELINE (me->play));
      gst_bus_add_watch (me->bus, my_bus_callback, me);
      
-     me->taglist =  gst_tag_list_new ();
-     gst_bus_set_flushing(me->bus,TRUE);
-     //gs_Set_Volume(me,3);
-
-     //add timeout to check for end of file
-     g_timeout_add      (2000,
+     g_timeout_add      (1000,
 				  gs_checkEnd,
 				  me);
      
@@ -593,14 +587,12 @@ static void gst_new_tags                (const GstTagList *list,
 	  }
      }
      else if(strcmp(tag,GST_TAG_BITRATE) == 0){
-	       	      /*   player->idle = g_idle_add    (gs_get_tags, */
-/* 				   player); */
+
+         
      }
      else if(strcmp(tag,GST_TAG_AUDIO_CODEC)== 0){
 	  if(gst_tag_list_get_string (list, GST_TAG_AUDIO_CODEC, &str) == TRUE){
 
-	      /*   player->idle = g_idle_add    (gs_get_tags, */
-/* 				   player); */
 	       track->codec = strdup(str);
 		    g_free(str);
 	  }

@@ -6,7 +6,7 @@
 #include <glib-object.h>
 #include "music-main-window.h"
 #include "../music-plugin.h"
-
+#include "player.h"
 G_BEGIN_DECLS
 
 #define VISUAL_TYPE_PLUGIN real_test_get_type()
@@ -29,8 +29,9 @@ G_BEGIN_DECLS
 typedef struct {
   MusicPlugin parent;
     MusicMainWindow *mw;
-    gint id1;
-    gint id2;
+    GstElement *goom;
+    GstElement *video;
+  
 } VisualPlugin;
 
 typedef struct {

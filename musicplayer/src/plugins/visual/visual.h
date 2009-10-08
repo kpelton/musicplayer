@@ -31,6 +31,7 @@ typedef struct {
     MusicMainWindow *mw;
     GstElement *goom;
     GstElement *video;
+    GstElement *bin;
   
 } VisualPlugin;
 
