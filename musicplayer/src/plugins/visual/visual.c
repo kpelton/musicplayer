@@ -11,7 +11,7 @@ static const char DESC[] = "various visualizations ";
 //tatic const char AUTHORS[][] = {"Kyle Pelton","\0"};
 static const char COPYRIGHT[] = "Kyle Pelton";
 static const char WEBSITE[] = "www.squidman.net";
-static gboolean is_configurable = FALSE;
+static gboolean is_configurable = TRUE;
 
 gboolean 
 visual_plugin_activate ( MusicPlugin  *self,MusicMainWindow *mw);
@@ -37,7 +37,7 @@ get_details()
     info->desc = g_strdup(DESC);
     info->copyright = g_strdup(COPYRIGHT);
     info->website = g_strdup(WEBSITE);
-    info->is_configurable = FALSE;
+    info->is_configurable = is_configurable;
 
     return info;
   
@@ -151,6 +151,7 @@ visual_plugin_class_init (VisualPluginClass *klass)
   /* implement pure virtual class function. */
   class->music_plugin_activate=visual_plugin_activate;
   class->music_plugin_deactivate=visual_plugin_deactivate;
+    
 
     
    object_class->dispose = visual_plugin_dispose;

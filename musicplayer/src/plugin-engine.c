@@ -14,6 +14,7 @@
 
 
 static GHashTable *music_plugins = NULL;
+
 static MusicMainWindow *mw = NULL;
 
 
@@ -113,9 +114,9 @@ load_file(gchar*            location,
     info->details = get_details_func();
    
     gconf_path = g_strjoin("/","/apps/musicplayer",info->details->name,"active",NULL);
-    info->details->is_configurable = FALSE;
+  
     g_hash_table_insert (music_plugins, info->location, info);
-    
+       
      if(gconf_client_get_bool (client,gconf_path,NULL))
     {
          info->active = TRUE;

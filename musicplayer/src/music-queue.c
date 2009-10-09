@@ -1119,7 +1119,7 @@ add_file(gpointer data,gpointer user_data)
 	//printf("%s\n",(gchar *)data);
 	if(md != NULL && md->title != NULL && md->artist !=NULL)
 	{	  
-		gtk_list_store_set(self->priv->store,&iter,COLUMN_TITLE,md->title,-1);
+        gtk_list_store_set(self->priv->store,&iter,COLUMN_TITLE,md->title,-1);
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_ARTIST,md->artist,-1);
 		
 	   	g_snprintf(buffer,strlen(md->artist)+strlen(md->title)+4,
@@ -1410,7 +1410,7 @@ get_context_menu(gpointer user_data)
 {
     
     GtkItemFactory *item_factory;
-    GtkWidget  *menu,*font,*repeat,*sort,*sort2,*seperator,*plugins;
+    GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins;
 	gboolean test;
 	
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1419,7 +1419,7 @@ get_context_menu(gpointer user_data)
 
 		
     self->priv->delete = gtk_image_menu_item_new_from_stock(GTK_STOCK_DELETE,NULL);
-	font   = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_FONT,NULL);
+	
     plugins   = gtk_menu_item_new_with_label("Plugins");
     repeat =  gtk_check_menu_item_new_with_label("Repeat");
     seperator = gtk_separator_menu_item_new ();
@@ -1436,9 +1436,7 @@ get_context_menu(gpointer user_data)
 	g_signal_connect (G_OBJECT (self->priv->delete), "activate",
 	                  G_CALLBACK (remove_files),
 	                  user_data);
-	g_signal_connect (G_OBJECT (font), "activate",
-	                  G_CALLBACK (set_font),
-	                  user_data);
+
 	g_signal_connect (G_OBJECT (repeat), "activate",
 	                  G_CALLBACK (set_repeat),
 	                  user_data);
@@ -1454,10 +1452,10 @@ get_context_menu(gpointer user_data)
 
     
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),self->priv->delete);
-	gtk_menu_shell_append (GTK_MENU_SHELL(menu),font);
-    gtk_menu_shell_append (GTK_MENU_SHELL(menu),plugins);
-	gtk_menu_shell_append (GTK_MENU_SHELL(menu),repeat);
+	
     
+	gtk_menu_shell_append (GTK_MENU_SHELL(menu),repeat);
+    gtk_menu_shell_append (GTK_MENU_SHELL(menu),plugins);
     gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator);
     gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort);
     gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort2);

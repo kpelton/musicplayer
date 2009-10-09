@@ -47,5 +47,15 @@ gboolean music_plugin_activate ( MusicPlugin *self,MusicMainWindow *mw)
    
 }
 
+GtkWidget *
+music_plugin_get_config_window(MusicPlugin *self)
+{
+  g_return_if_fail (MUSIC_IS_PLUGIN(self));
+    
+ return MUSIC_PLUGIN_GET_CLASS (self)->music_plugin_get_config_window(self);
+    
+}
+
+
 
                                        

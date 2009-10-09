@@ -21,10 +21,7 @@ enum
 	INFO_COLUMN,
 	N_COLUMNS
 };
-static void
-row_activated_cb(GtkTreeView *treeview,
-                      gpointer arg1,
-                      gpointer data);
+
 static void 
 music_plugin_init_widgets(MusicPluginManager *self);
 static void
@@ -40,6 +37,9 @@ static void
 active_toggled_cb (GtkCellRendererToggle *cell,
                    gchar                 *path_str,
                    MusicPluginManager  *self);
+static void
+row_activated_cb(GtkTreeView       *treeview,            
+                 gpointer data);
 
 static gboolean
 music_plugin_manager_set_active (MusicPluginManager *pm,
@@ -210,9 +210,9 @@ music_plugin_manager_construct_tree (MusicPluginManager *self)
 			  G_CALLBACK (cursor_changed_cb),
 			  pm);
     */
-    /*
+    
 	g_signal_connect (self->priv->tree,
-			"button-press-event",
+			"cursor-changed",
 			  G_CALLBACK (row_activated_cb),
 			  self);
    /*
@@ -228,32 +228,51 @@ music_plugin_manager_construct_tree (MusicPluginManager *self)
 	gtk_widget_show (self->priv->tree);
 }
 static void
-row_activated_cb(GtkTreeView *treeview,
-                        gpointer arg1,
-                      gpointer data)
+row_activated_cb(GtkTreeView       *treeview,
+                  
+                 gpointer data)
 {
     MusicPluginManager *self = (MusicPluginManager *)data;
-    GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (treeview));
-    MusicPluginDetails *info;
+    GtkTreeModel *model = gtk_tree_view_get_model (treeview);
+    MusicPluginInfo *info;
     GtkTreeIter iter;
-    GtkTreeSelection *selection;
-    selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (treeview));
 
-   gtk_tree_selection_select_iter(selection,&iter);
-         
-            
-            	gtk_tree_model_get (model, &iter, INFO_COLUMN, &info, -1);
+    GtkTreeSelection * selection;
+    GtkTreePath *path;
+    GList *list;
+    
+    selection   = gtk_tree_view_get_selection         (treeview);
 
-	             g_return_if_fail (info != NULL);
+    
+  list =gtk_tree_selection_get_selected_rows
+                                                        (selection,
+                                                         &model);
+    if(list)
+    {
+        path = list->data;
 
-              gtk_widget_set_sensitive (GTK_WIDGET (self->priv->config),
-					TRUE);
-        
+        if(gtk_tree_model_get_iter(model,&iter,path))
+        {
+
+
+            gtk_tree_model_get (model, &iter, INFO_COLUMN, &info, -1);
+
+            g_return_if_fail (info != NULL);
+
+            gtk_widget_set_sensitive (GTK_WIDGET (self->priv->config),
+                                      info->details->is_configurable);
+
+            g_list_foreach (list, (GFunc)gtk_tree_path_free, NULL);
+            g_list_free (list);
+        }
+    }
+
+}
     
   
 
                           
-}
+
 
 static void
 active_toggled_cb (GtkCellRendererToggle *cell,

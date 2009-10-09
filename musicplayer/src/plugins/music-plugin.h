@@ -47,6 +47,7 @@ typedef struct {
   GObjectClass parent_class;
     gboolean (*music_plugin_deactivate) ( MusicPlugin *self);
     gboolean (*music_plugin_activate) ( MusicPlugin *self,MusicMainWindow *mw);
+    GtkWidget *(*music_plugin_get_config_window)(MusicPlugin *self);
 } MusicPluginClass;
 
 
@@ -58,6 +59,10 @@ music_plugin_activate ( MusicPlugin *self,MusicMainWindow *mw);
 
 gboolean 
 music_plugin_deactivate ( MusicPlugin *self);
+
+GtkWidget *
+music_plugin_get_config_window(MusicPlugin *self);
+
 
 G_END_DECLS
 

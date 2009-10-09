@@ -11,7 +11,7 @@ static const char DESC[] = "various visualizations ";
 //tatic const char AUTHORS[][] = {"Kyle Pelton","\0"};
 static const char COPYRIGHT[] = "Kyle Pelton";
 static const char WEBSITE[] = "www.squidman.net";
-static gboolean is_configurable = FALSE;
+static gboolean is_configurable = TRUE;
 
 gboolean 
 visual_plugin_activate ( MusicPlugin  *self,MusicMainWindow *mw);
@@ -37,7 +37,7 @@ get_details()
     info->desc = g_strdup(DESC);
     info->copyright = g_strdup(COPYRIGHT);
     info->website = g_strdup(WEBSITE);
-    info->is_configurable = FALSE;
+    info->is_configurable = is_configurable;
 
     return info;
   
@@ -79,7 +79,7 @@ gboolean visual_plugin_activate (MusicPlugin *user_data,MusicMainWindow *mw)
     pad = gst_element_get_static_pad (self->goom, "src");
     caps = gst_pad_get_allowed_caps (pad);
     
- gst_object_unref (pad);
+    gst_object_unref (pad);
     int i;
 
      caps = gst_caps_make_writable (caps);

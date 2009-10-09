@@ -47,11 +47,5 @@ gboolean music_plugin_activate ( MusicPlugin *self,MusicMainWindow *mw)
    
 }
 
-gboolean music_plugin_is_configurable ( MusicPlugin *self)
-{
-    g_return_if_fail (MUSIC_IS_PLUGIN(self));
-    
-    return MUSIC_PLUGIN_GET_CLASS (self)->music_plugin_is_configurable(self); 
-}
 
                                        
