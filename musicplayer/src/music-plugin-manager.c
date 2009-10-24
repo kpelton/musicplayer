@@ -46,6 +46,11 @@ music_plugin_manager_set_active (MusicPluginManager *pm,
 			   GtkTreeIter        *iter,
 			   GtkTreeModel       *model,
 			   gboolean            active);
+
+static void
+about_button_cb(GtkButton *button,
+                gpointer userdata);
+
 static void
 music_plugin_manager_finalize (GObject *object)
 {
@@ -136,11 +141,13 @@ music_plugin_init_widgets(MusicPluginManager *self)
     
 
 	gtk_widget_set_size_request (GTK_WIDGET (viewport), 270, 100);
-/*
-	g_signal_connect (pm->priv->about_button,
+
+	g_signal_connect (self->priv->about,
 			  "clicked",
 			  G_CALLBACK (about_button_cb),
-			  pm);
+			  self);
+
+    /*
 	g_signal_connect (pm->priv->configure_button,
 			  "clicked",
 			  G_CALLBACK (configure_button_cb),
@@ -148,6 +155,56 @@ music_plugin_init_widgets(MusicPluginManager *self)
 */
     gtk_widget_show_all(pm);
    
+}
+static void
+about_button_cb(GtkButton *button,
+                gpointer userdata)
+{
+
+    MusicPluginManager *self = (MusicPluginManager *)userdata;
+    GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW(self->priv->tree));
+    MusicPluginInfo *info;
+    GtkTreeIter iter;
+    GtkWidget *dialog;
+    GtkTreeSelection * selection;
+    GtkTreePath *path;
+    GList *list;
+       
+    selection   = gtk_tree_view_get_selection         (GTK_TREE_VIEW(self->priv->tree));
+
+    
+  list =gtk_tree_selection_get_selected_rows
+                                                        (selection,
+                                                         &model);
+  
+    if(list)
+    {
+        path = list->data;
+
+        if(gtk_tree_model_get_iter(model,&iter,path))
+        {
+
+
+            gtk_tree_model_get (model, &iter, INFO_COLUMN, &info, -1);
+
+            g_return_if_fail (info != NULL);
+
+            dialog = gtk_about_dialog_new();
+
+            gtk_about_dialog_set_program_name   (GTK_ABOUT_DIALOG(dialog),
+                                                         info->details->name);
+
+            gtk_about_dialog_set_comments   (GTK_ABOUT_DIALOG(dialog),
+                                                         info->details->desc);
+
+            gtk_dialog_run(dialog);
+            
+             g_list_foreach (list, (GFunc)gtk_tree_path_free, NULL);
+            g_list_free (list);
+        }
+    
+
+    }
 }
 
 static void

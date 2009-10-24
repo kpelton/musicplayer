@@ -32,8 +32,10 @@ music_volume_new_with_player (GsPlayer *player)
     me->player = player;
     client = gconf_client_get_default ();
 
-    if((vol = gconf_client_get_float (client,"/apps/musicplayer/volume",NULL)) > 0){
+    if((vol = gconf_client_get_float (client,"/apps/musicplayer/volume",NULL)) >= 0){
+        
         gtk_scale_button_set_value (GTK_SCALE_BUTTON(me),vol); 
+        gs_Set_Volume(player,vol);
     }else{
 
         gtk_scale_button_set_value (GTK_SCALE_BUTTON(me),gs_Get_Volume(me->player));

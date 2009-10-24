@@ -39,6 +39,7 @@ get_details()
     info->website = g_strdup(WEBSITE);
     info->is_configurable = is_configurable;
 
+    
     return info;
   
     
@@ -55,7 +56,7 @@ gboolean visual_plugin_activate (MusicPlugin *user_data,MusicMainWindow *mw)
      GstCaps *caps = NULL;
 
     
-        
+      
   vis_capsfilter = gst_element_factory_make ("capsfilter",
         "vis_capsfilter");
     

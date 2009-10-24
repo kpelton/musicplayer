@@ -151,6 +151,7 @@ visual_plugin_class_init (VisualPluginClass *klass)
   /* implement pure virtual class function. */
   class->music_plugin_activate=visual_plugin_activate;
   class->music_plugin_deactivate=visual_plugin_deactivate;
+    
 
     
    object_class->dispose = visual_plugin_dispose;

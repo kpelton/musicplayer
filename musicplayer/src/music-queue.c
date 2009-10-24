@@ -316,13 +316,21 @@ music_queue_dispose (GObject *object)
         GList *list;
         gboolean repeat;	
         gchar *font;
+        const char *home;
+        char *outputdir;
+        
+
+        home = g_getenv ("HOME");
+
+        outputdir = g_strdup_printf("%s/.musicplayer/pl.xspf",home);
 
         if (self->priv->client)
         {
 
             if((list = get_list(self)) != NULL)
             {
-                playlist_reader_write_list(self->priv->read,"/home/kyle/test.xspf",list);
+                playlist_reader_write_list(self->priv->read,outputdir,list);
+                free(outputdir);
                 g_list_free(list);
             }
 
@@ -505,6 +513,16 @@ music_queue_init (MusicQueue *self)
 {
 	gboolean repeat=FALSE;
     gchar *font;
+    char *outputdir;
+    const char *home;
+        
+
+    home = g_getenv ("HOME");
+
+    outputdir = g_strdup_printf("%s/.musicplayer/pl.xspf",home);
+    
+
+    
     //need to pull in gconf stuff here
 
      self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, MUSIC_TYPE_QUEUE, 
@@ -525,9 +543,9 @@ music_queue_init (MusicQueue *self)
      self->priv->ts = NULL;
      self->priv->read = PLAYLIST_READER(xspf_reader_new());
      
-     music_queue_read_start_playlist("/home/kyle/test.xspf",self);
+     music_queue_read_start_playlist(outputdir,self);
      
-     
+    g_free(outputdir);   
   
 } 
 
