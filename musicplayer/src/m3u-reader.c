@@ -72,7 +72,7 @@ m3u_reader_read_list(PlaylistReader *plist,
             ts = tag_scanner_new ();
             for(i=0; lines[i] != NULL; i++)
             {
-                if( *lines[i] != '\0' && *lines[i] != '#')
+                if( *lines[i] != '\0' && *lines[i] != '#' && *lines[i] != '\r')
                 {
                     if(lines[i][strlen(lines[i])-1] == '\r' || lines[i][strlen(lines[i])-1] == '\n')
                         lines[i][strlen(lines[i])-1] = '\0';  

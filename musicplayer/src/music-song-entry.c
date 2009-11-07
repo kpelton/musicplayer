@@ -69,7 +69,7 @@ static void
 music_song_entry_init (MusicSongEntry *self)
 {
  self->text = NULL;
- g_timeout_add(500,
+ g_timeout_add(200,
 		translate_text,
 		self);
 	  gtk_widget_set_size_request(GTK_WIDGET(self),150,30);
@@ -96,7 +96,7 @@ static void
 music_song_entry_draw(GtkWidget *self,cairo_t *cr)
 {
 	  double radius,x,y;
-	  MusicSongEntry *  test = music_song_entry(self);
+	  MusicSongEntry *  test = MUSIC_SONG_ENTRY(self);
 	  cairo_pattern_t *pattern;
 	  PangoLayout *layout;
 	  PangoFontDescription *desc;

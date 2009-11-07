@@ -17,7 +17,7 @@ old_library='real.a'
 inherited_linker_flags=' -pthread'
 
 # Libraries that this one depends upon.
-dependency_libs=' /usr/lib/libnotify.la -L//lib -lfreetype /usr/lib/libgtk-x11-2.0.la /usr/lib/libgdk-x11-2.0.la /usr/lib/libatk-1.0.la /usr/lib/libpangoft2-1.0.la /usr/lib/libgdk_pixbuf-2.0.la /usr/lib/libpangocairo-1.0.la /usr/lib/libgio-2.0.la /usr/lib/libcairo.la -lpixman-1 -lpng12 -lxcb-render-util -lxcb-render -lxcb -lXrender -lX11 -lm /usr/lib/libpango-1.0.la /usr/lib/libfreetype.la -lz -lfontconfig /usr/lib/libgmodule-2.0.la -ldbus-glib-1 -ldbus-1 /usr/lib/libgobject-2.0.la /usr/lib/libglib-2.0.la'
+dependency_libs=' /usr/lib/libnotify.la'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''

@@ -2,6 +2,7 @@
 
 #include "music-main-window.h"
 #include "music-queue.h"
+#include "music-song-entry.h"
 #include "tag-scanner.h"
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
@@ -123,7 +124,9 @@ static void init_widgets(MusicMainWindow *self)
    
      gint dwidth;
      gint dhight;
-
+     GtkWidget *test;
+     GtkWidget *hbox;
+	  
      //init player window
      self->player = gs_player_new();
 
@@ -133,13 +136,21 @@ static void init_widgets(MusicMainWindow *self)
 	
      //add mainvbox to mainwindow
      self->mainvbox = gtk_vbox_new(FALSE,0);
+	  hbox = gtk_hbox_new(FALSE,0);
 
      gtk_container_add (GTK_CONTAINER (self), self->mainvbox);
+	  
 
      //song label
-     self->songlabel = gtk_label_new ("No file loaded");
-     gtk_box_pack_start (GTK_BOX (self->mainvbox), self->songlabel, FALSE, FALSE,0);
-
+     self->songlabel = music_song_entry_new();
+	  
+	  music_song_entry_set_text(MUSIC_SONG_ENTRY(self->songlabel),"No File Loaded");
+     gtk_box_pack_start (GTK_BOX (self->mainvbox), hbox, FALSE, FALSE,0);
+	  
+		//gtk_box_pack_start (GTK_BOX (hbox), test, FALSE, FALSE,0);
+	  gtk_box_pack_start (GTK_BOX (hbox), self->songlabel, TRUE, TRUE,5);
+	  
+	  
      //seek widget
      self->musicseek = music_seek_new_with_adj_and_player(GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 100, 1, 1, 1)),self->player);
 
@@ -193,7 +204,7 @@ static void init_widgets(MusicMainWindow *self)
      gtk_window_set_default_size         (GTK_WINDOW(self),
 					  self->dwidth,
 					  self->dhight);
-     gtk_label_set_ellipsize(GTK_LABEL(self->songlabel),PANGO_ELLIPSIZE_END);
+     
      gtk_label_set_ellipsize(GTK_LABEL(self->albumlabel),PANGO_ELLIPSIZE_END);
 
      //buttons
@@ -211,6 +222,7 @@ static void init_widgets(MusicMainWindow *self)
      gtk_widget_show(self->volumebutton);
      gtk_widget_show(self->queue);
      gtk_widget_show(self->expander);
+	  gtk_widget_show_all(hbox);
 
     
     //signals
@@ -357,8 +369,7 @@ static void mwindow_new_file(GsPlayer *player,
 		gtk_window_set_title(GTK_WINDOW(self),title);
 		escaped_artist = g_markup_escape_text(p_track->artist,-1);
 		escaped_title  = g_markup_escape_text(p_track->title,-1);
-		g_snprintf(output,1023,"<span foreground=\"blue\" size=\"large\">%s - %s</span>",escaped_artist,escaped_title);
-		gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
+		music_song_entry_set_text(MUSIC_SONG_ENTRY(self->songlabel),title);
 		g_free(escaped_title);
 		g_free(escaped_artist);
 		if(p_track->album)
@@ -387,8 +398,8 @@ static void mwindow_new_file(GsPlayer *player,
 			gtk_window_set_title(GTK_WINDOW(self),*tokens2);
 			escaped = g_markup_escape_text(*tokens2,-1);
 			
-			g_snprintf(output,1023,"<span foreground=\"blue\" size=\"large\">%s</span>",escaped);
-			gtk_label_set_markup(GTK_LABEL(self->songlabel),output);
+			
+			music_song_entry_set_text(MUSIC_SONG_ENTRY(self->songlabel),*tokens2);
 			g_strfreev(tokens2);  
 			g_strfreev(tokens);  
 			g_free(out);

@@ -8,7 +8,7 @@
 
 G_BEGIN_DECLS
 
-#define MUSIC_TYPE_SONG_ENTRY MUSIC_SONG_ENTRY_get_type()
+#define MUSIC_TYPE_SONG_ENTRY music_song_entry_get_type()
 
 #define MUSIC_SONG_ENTRY(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), MUSIC_TYPE_SONG_ENTRY, MusicSongEntry))

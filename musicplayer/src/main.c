@@ -1,7 +1,7 @@
 #include <gtk/gtk.h>
 
 
-
+#include "utils.h"
 #include "player.h"
 #include "music-queue.h"
 #include "music-main-window.h"
@@ -17,7 +17,7 @@ main (int argc, char *argv[])
   MusicMainWindow *m;
 
     g_type_init();   
-
+    make_pref_folder();
     
   gst_init (&argc, &argv);
   

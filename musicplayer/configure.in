@@ -86,6 +86,7 @@ if test x$ENABLE_RUN_IN_SOURCE_TREE = xyes; then
 	AC_DEFINE(TOTEM_RUN_IN_SOURCE_TREE, 1, [enable search for UI files and plugins in local directory])
 fi
 
+PKG_CHECK_MODULES(LIBNOTIFY, libnotify )
 AC_OUTPUT([
 Makefile
 src/Makefile
