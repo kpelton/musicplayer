@@ -14,8 +14,6 @@ static void gst_new_tags                (const GstTagList *list,
 static void gs_player_dispose (GObject *object);
 static void gs_player_finalize (GObject *object);
 
-static gboolean gs_checkEnd(gpointer data);
-static void ts_event_loop(GsPlayer* self, GstBus *bus);
 gboolean gs_get_tags(GsPlayer *);
 static metadata * copyTrack(metadata *track);
 
@@ -116,11 +114,6 @@ gs_player_init (GsPlayer *me)
      me->bus = gst_pipeline_get_bus (GST_PIPELINE (me->play));
      gst_bus_add_watch (me->bus, my_bus_callback, me);
      
-     g_timeout_add      (1000,
-				  gs_checkEnd,
-				  me);
-     
-
      me->track = NULL;
 }
 
@@ -139,7 +132,12 @@ void gs_playFile(GsPlayer *me , char *location)
 {
      gst_element_set_state (me->play, GST_STATE_NULL);
 
-      
+     if(me->track)
+       free(me->track);
+
+      me->track = ts_metadata_new();
+     
+     
     
     
      g_object_set (G_OBJECT (me->play), "uri",location, NULL);
@@ -147,11 +145,10 @@ void gs_playFile(GsPlayer *me , char *location)
 
      strcpy(me->uri,location);
          me->lock = FALSE;
-	 //gst_bus_add_watch (me->bus, my_bus_callback, me);
-	 ts_event_loop(me,me->bus);
+	 gst_bus_add_watch (me->bus, my_bus_callback, me);
+	 //ts_event_loop(me,me->bus);
 	 
-    
-     
+  
     
     
        
@@ -250,25 +247,6 @@ gboolean gs_getLength(GsPlayer *me)
   
 }
 
-
-
-static gboolean gs_checkEnd(gpointer data)
-{
-     GsPlayer *me = (GsPlayer *)data;
-     gdouble pos;
-
-
-     if (isPlaying(me) || isPaused(me))
-	  {	     
-	       pos= gs_getPercentage(me);
-	       //check to see if file is done
-	       if(pos >= 99.8){
-	       //EOF found
-	       g_signal_emit (data, signals[EOS], 0 /* details */);
-	       }
-	  }
-     return TRUE;
-}
 
 gdouble gs_getPercentage(GsPlayer *me)
 {
@@ -428,34 +406,6 @@ gdouble gs_Get_Volume(GsPlayer *player)
 
 }
 
-static void ts_event_loop(GsPlayer* self, GstBus *bus)
-{
-     GstMessage *message;
-     gboolean val = FALSE;
-     message = gst_bus_timed_pop(bus,GST_SECOND/3);
-     metadata *track;
-
-     track = ts_metadata_new();
-     self->track = track;
-     
-     while( val != TRUE && message != NULL)
-     {
-	  
-	  if(message != NULL)
-	  {
-	       val = my_bus_callback(bus,message,self);
-	      
-	       gst_message_unref(message);
-
-	  }
-	  
-	  message = gst_bus_timed_pop(bus,GST_SECOND/3);
-     }
-
-     self->idle = g_idle_add    ((gpointer)gs_get_tags,
-				  self);
-     
-}
 
 static gboolean
 my_bus_callback (GstBus     *bus,
@@ -472,7 +422,7 @@ my_bus_callback (GstBus     *bus,
      gchar *str;
      mtrack * track;
         
-     // g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
+     //g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
      switch (GST_MESSAGE_TYPE (message)) {
      case GST_MESSAGE_ERROR: {
 	  GError *err;
@@ -501,12 +451,15 @@ my_bus_callback (GstBus     *bus,
 	  
 	  gst_tag_list_free (list);
 
-	  if(player->track->duration != 0 || player->track->codec != NULL)
+	  if(player->track->codec != NULL)
 	  {
-	       return TRUE;
+	    
+	    
+	    return TRUE;
 	  }
 	  
-	  
+	  player->idle = g_idle_add    ((gpointer)gs_get_tags,
+				  player);
 	  
      break;
 	       
@@ -519,14 +472,14 @@ my_bus_callback (GstBus     *bus,
 
   default:
 
-       return FALSE;
+       return TRUE;
        
        /* unhandled message */
        break;
      }
      
      
-     return FALSE;
+     return TRUE;
 
     
 }
@@ -593,8 +546,9 @@ static void gst_new_tags                (const GstTagList *list,
      else if(strcmp(tag,GST_TAG_AUDIO_CODEC)== 0){
 	  if(gst_tag_list_get_string (list, GST_TAG_AUDIO_CODEC, &str) == TRUE){
 
-	       track->codec = strdup(str);
+	    //track->codec = strdup(str);
 		    g_free(str);
+  
 	  }
 	  
      }
@@ -622,8 +576,6 @@ gboolean gs_get_tags(GsPlayer *player)
 	       player->track->uri = strdup(player->uri);
 	       g_signal_emit (player, signals[NEWFILE],0,player->track);
 	       player->lock = TRUE;
-	       ts_metadata_free(player->track);
-	       player->track = NULL;
 	       return FALSE;
 	  
 	  }
