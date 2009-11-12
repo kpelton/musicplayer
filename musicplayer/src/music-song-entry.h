@@ -29,6 +29,7 @@ typedef struct {
   GtkDrawingArea parent;
   gchar * text;
   gint trans2;
+  gint type;
 	  
 } MusicSongEntry;
 

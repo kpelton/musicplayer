@@ -10,6 +10,9 @@ G_DEFINE_TYPE (MusicSongEntry, music_song_entry, GTK_TYPE_DRAWING_AREA)
 static gboolean
 music_song_entry_expose (GtkWidget *self, GdkEventExpose *event);
 
+static gboolean
+mouse_released(GtkWidget      *widget,
+		       GdkEventButton *event);
 
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), MUSIC_TYPE_SONG_ENTRY, MusicSongEntryPrivate))
@@ -21,7 +24,12 @@ struct _MusicSongEntryPrivate {
     char *text;
 
 };
-
+enum scroll
+{
+    AUTO_SCROLL,
+    NEVER_SCROLL
+};
+   
 static void
 music_song_entry_dispose (GObject *object)
 {
@@ -37,15 +45,17 @@ music_song_entry_finalize (GObject *object)
 static void
 music_song_entry_class_init (MusicSongEntryClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(klass);
-  g_type_class_add_private (klass, sizeof (MusicSongEntryPrivate));
+    GObjectClass *object_class = G_OBJECT_CLASS (klass);
+    GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(klass);
+    g_type_class_add_private (klass, sizeof (MusicSongEntryPrivate));
 
-  object_class->dispose = music_song_entry_dispose;
-  object_class->finalize = music_song_entry_finalize;
+    object_class->dispose = music_song_entry_dispose;
+    object_class->finalize = music_song_entry_finalize;
 
 
-  widget_class->expose_event =music_song_entry_expose;
+    widget_class->expose_event =music_song_entry_expose;
+    widget_class->button_press_event= mouse_released;
+    
 
 }
 static gboolean
@@ -65,15 +75,32 @@ translate_text(gpointer data)
          gdk_region_destroy (region);
 	return TRUE;
 }
+static gboolean
+mouse_released(GtkWidget      *widget,
+		       GdkEventButton *event)
+{
+    MusicSongEntry *self = MUSIC_SONG_ENTRY(widget);
+
+        if(self->type == 1) 
+            self->type= 0;
+        else
+           self->type++;
+    
+}
 static void
 music_song_entry_init (MusicSongEntry *self)
 {
  self->text = NULL;
- g_timeout_add(200,
+ self->type = AUTO_SCROLL;   
+ g_timeout_add(25,
 		translate_text,
 		self);
 	  gtk_widget_set_size_request(GTK_WIDGET(self),150,30);
+   gtk_widget_set_events(GTK_WIDGET(self),GDK_BUTTON_RELEASE_MASK |GDK_BUTTON_PRESS_MASK );
 
+    
+
+   
 }
 void music_song_entry_set_text(MusicSongEntry *self,char *text)
 {
@@ -113,15 +140,13 @@ music_song_entry_draw(GtkWidget *self,cairo_t *cr)
 
 			 int delta =  strlen(test->text) *-8;
 
-			 test->trans2+=10;
+			 test->trans2+=1;
 			 trans = x - test->trans2;
 			 if(trans <= delta)
 					test->trans2=0;
-			 /* Center coordinates on the middle of the region we are drawing
-			  */
-
-			 /* Create a angoLayout, set the font and text */
-			 if(strlen(test->text) *8 >x)
+		
+			 if((test->type == AUTO_SCROLL && strlen(test->text) *8 >x)) 
+             
 
 
 					cairo_move_to(cr, trans,y/2-6); 
