@@ -82,10 +82,14 @@ mouse_released(GtkWidget      *widget,
     MusicSongEntry *self = MUSIC_SONG_ENTRY(widget);
 
         if(self->type == 1) 
+        {
             self->type= 0;
+        }
         else
-           self->type++;
-    
+        {
+            self->trans2=0;
+            self->type++;
+        }
 }
 static void
 music_song_entry_init (MusicSongEntry *self)
@@ -122,13 +126,17 @@ music_song_entry_new (void)
 static void
 music_song_entry_draw(GtkWidget *self,cairo_t *cr)
 {
-	  double radius,x,y;
+	  gdouble radius,x,y;
 	  MusicSongEntry *  test = MUSIC_SONG_ENTRY(self);
 	  cairo_pattern_t *pattern;
 	  PangoLayout *layout;
 	  PangoFontDescription *desc;
-	  int i;
-	  int trans;
+	  gint i;
+	  gint trans;
+      gint delta =0; 
+      gint len;
+      gchar *copy=NULL;
+    
 
 	  if(test->text)
 	  {
@@ -138,27 +146,30 @@ music_song_entry_draw(GtkWidget *self,cairo_t *cr)
 			 x=self->allocation.width;
 			 y= self->allocation.height;
 
-			 int delta =  strlen(test->text) *-8;
-
-			 test->trans2+=1;
-			 trans = x - test->trans2;
-			 if(trans <= delta)
-					test->trans2=0;
-		
+			
+		layout = pango_cairo_create_layout (cr);
+          
 			 if((test->type == AUTO_SCROLL && strlen(test->text) *8 >x)) 
+          {
+
+              delta =  strlen(test->text) *-8;
+
+              test->trans2+=1;
+              trans = x - test->trans2;
+              if(trans <= delta)
+                  test->trans2=0;
+
+              cairo_move_to(cr, trans,y/2-6); 
+              pango_layout_set_text (layout, test->text, -1);
+
+          }else{
+              cairo_move_to(cr, 0,y/2-6);  
+          
+                      pango_layout_set_text (layout, test->text, -1);
+                  }
+              
+          
              
-
-
-					cairo_move_to(cr, trans,y/2-6); 
-
-
-			 else{
-
-
-					cairo_move_to(cr, 0,y/2-6);  
-			 }
-			 layout = pango_cairo_create_layout (cr);
-			 pango_layout_set_text (layout, test->text, -1);
 			 desc = pango_font_description_from_string ("Sans bold 10");
 			 pango_layout_set_font_description (layout, desc);
 			 pango_font_description_free (desc);
@@ -209,7 +220,8 @@ music_song_entry_draw(GtkWidget *self,cairo_t *cr)
 
 
 
-
+    if(copy)
+                  g_free(copy);
 			 cairo_stroke(cr);
 	  }
 }

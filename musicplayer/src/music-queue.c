@@ -1711,7 +1711,7 @@ sort_by_artist(gpointer    callback_data,
 								&iter));
      
         
-                //need to write compare function that compares the two artist strings
+                
         str.htable=htable;
         str.order = g_malloc(sizeof(gint)*i+1);        
         str.curr=0; //reset our counter for our new order
