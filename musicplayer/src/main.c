@@ -10,22 +10,24 @@
 #include "plugin-engine.h"
 #include "music-plugin-manager.h"
 #include <gconf/gconf-client.h>
+#include <unique/unique.h>
 
 main (int argc, char *argv[])
 {
-  GtkWidget *mainwindow;
-  MusicMainWindow *m;
+    GtkWidget *mainwindow;
+    MusicMainWindow *m;
+    UniqueApp* musicplayer;
 
     g_type_init();   
     make_pref_folder();
-    
-  gst_init (&argc, &argv);
-  
-  gtk_init (&argc, &argv);
-    
-  gconf_init(argc, argv, NULL);
-    mainwindow = music_main_window_new ();
 
+    gst_init (&argc, &argv);
+
+    gtk_init (&argc, &argv);
+
+    gconf_init(argc, argv, NULL);
+    mainwindow = music_main_window_new ();
+    
     
   
   

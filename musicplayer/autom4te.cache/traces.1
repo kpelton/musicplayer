@@ -2567,15 +2567,21 @@ m4trace:configure.in:89: -1- m4_pattern_allow([^LIBNOTIFY_LIBS$])
 m4trace:configure.in:89: -1- PKG_CHECK_EXISTS([libnotify ], [pkg_cv_[]LIBNOTIFY_CFLAGS=`$PKG_CONFIG --[]cflags "libnotify " 2>/dev/null`], [pkg_failed=yes])
 m4trace:configure.in:89: -1- PKG_CHECK_EXISTS([libnotify ], [pkg_cv_[]LIBNOTIFY_LIBS=`$PKG_CONFIG --[]libs "libnotify " 2>/dev/null`], [pkg_failed=yes])
 m4trace:configure.in:89: -1- _PKG_SHORT_ERRORS_SUPPORTED
-m4trace:configure.in:90: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
+m4trace:configure.in:90: -1- PKG_CHECK_MODULES([UNIQUE], [unique-1.0])
+m4trace:configure.in:90: -1- m4_pattern_allow([^UNIQUE_CFLAGS$])
+m4trace:configure.in:90: -1- m4_pattern_allow([^UNIQUE_LIBS$])
+m4trace:configure.in:90: -1- PKG_CHECK_EXISTS([unique-1.0], [pkg_cv_[]UNIQUE_CFLAGS=`$PKG_CONFIG --[]cflags "unique-1.0" 2>/dev/null`], [pkg_failed=yes])
+m4trace:configure.in:90: -1- PKG_CHECK_EXISTS([unique-1.0], [pkg_cv_[]UNIQUE_LIBS=`$PKG_CONFIG --[]libs "unique-1.0" 2>/dev/null`], [pkg_failed=yes])
+m4trace:configure.in:90: -1- _PKG_SHORT_ERRORS_SUPPORTED
+m4trace:configure.in:91: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])
-m4trace:configure.in:90: -1- m4_pattern_allow([^LIB@&t@OBJS$])
-m4trace:configure.in:90: -1- m4_pattern_allow([^LTLIBOBJS$])
-m4trace:configure.in:90: -1- AM_CONDITIONAL([am__EXEEXT], [test -n "$EXEEXT"])
-m4trace:configure.in:90: -1- m4_pattern_allow([^am__EXEEXT_TRUE$])
-m4trace:configure.in:90: -1- m4_pattern_allow([^am__EXEEXT_FALSE$])
-m4trace:configure.in:90: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_TRUE])
-m4trace:configure.in:90: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_FALSE])
-m4trace:configure.in:90: -1- _AC_AM_CONFIG_HEADER_HOOK(["$ac_file"])
-m4trace:configure.in:90: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS
-m4trace:configure.in:90: -1- _LT_PROG_LTMAIN
+m4trace:configure.in:91: -1- m4_pattern_allow([^LIB@&t@OBJS$])
+m4trace:configure.in:91: -1- m4_pattern_allow([^LTLIBOBJS$])
+m4trace:configure.in:91: -1- AM_CONDITIONAL([am__EXEEXT], [test -n "$EXEEXT"])
+m4trace:configure.in:91: -1- m4_pattern_allow([^am__EXEEXT_TRUE$])
+m4trace:configure.in:91: -1- m4_pattern_allow([^am__EXEEXT_FALSE$])
+m4trace:configure.in:91: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_TRUE])
+m4trace:configure.in:91: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_FALSE])
+m4trace:configure.in:91: -1- _AC_AM_CONFIG_HEADER_HOOK(["$ac_file"])
+m4trace:configure.in:91: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS
+m4trace:configure.in:91: -1- _LT_PROG_LTMAIN

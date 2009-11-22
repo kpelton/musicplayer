@@ -2,10 +2,10 @@ bin_PROGRAMS = musicplayer
 
 common_defines =-DPLUGIN_DIR=\""$(libdir)/musicplayer"\"
 
-musicplayer_CPPFLAGS =$(common_defines) $(AM_CPPFLAGS)
+musicplayer_CPPFLAGS =$(common_defines) $(AM_CPPFLAGS) 
 
-musicplayer_CFLAGS =   $(GST_CFLAGS) $(GLIB_CFLAGS) $(GTK_CFLAGS) $(WARN_CFLAGS)	
-musicplayer_LDADD =  $(GLIB_LIBS) $(INTI_LIBS) $(GST_LIBS) $(AM_LDFLAGS)	
+musicplayer_CFLAGS =   $(GST_CFLAGS) $(GLIB_CFLAGS) $(GTK_CFLAGS) $(WARN_CFLAGS) $(UNIQUE_CFLAGS)	
+musicplayer_LDADD =  $(GLIB_LIBS) $(INTI_LIBS) $(GST_LIBS) $(AM_LDFLAGS) $(UNIQUE_LIBS)		
 
 
 

@@ -87,6 +87,7 @@ if test x$ENABLE_RUN_IN_SOURCE_TREE = xyes; then
 fi
 
 PKG_CHECK_MODULES(LIBNOTIFY, libnotify )
+PKG_CHECK_MODULES([UNIQUE], unique-1.0)
 AC_OUTPUT([
 Makefile
 src/Makefile

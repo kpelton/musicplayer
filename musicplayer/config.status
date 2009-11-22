@@ -570,7 +570,7 @@ FGREP='/bin/grep -F'
 LD='/usr/bin/ld'
 NM='/usr/bin/nm -B'
 LN_S='ln -s'
-max_cmd_len='1572864'
+max_cmd_len='805306365'
 ac_objext='o'
 exeext=''
 lt_unset='unset'
@@ -806,6 +806,11 @@ S["am__EXEEXT_FALSE"]=""
 S["am__EXEEXT_TRUE"]="#"
 S["LTLIBOBJS"]=""
 S["LIBOBJS"]=""
+S["UNIQUE_LIBS"]="-lunique-1.0 -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lpangoft2-1.0 -lgdk_pixbuf-2.0 -lm -lpangocairo-1.0 -lgio-2.0 -lcairo -lpango-1.0 -lfreetype -lf"\
+"ontconfig -lgobject-2.0 -lgmodule-2.0 -lglib-2.0  "
+S["UNIQUE_CFLAGS"]="-D_REENTRANT -I/usr/include/unique-1.0 -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/"\
+"pango-1.0 -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/directfb -I/usr/include/libpng12 -I/usr/include/glib-2.0 -I/usr/lib/glib-2"\
+".0/include  "
 S["LIBNOTIFY_LIBS"]="-L/lib -lnotify -lgtk-x11-2.0 -ldbus-glib-1 -lgdk-x11-2.0 -latk-1.0 -lpangoft2-1.0 -lgdk_pixbuf-2.0 -lm -lpangocairo-1.0 -lgio-2.0 -lcairo -lpango-1"\
 ".0 -lfreetype -lfontconfig -lgmodule-2.0 -ldbus-1 -lpthread -lrt -lgobject-2.0 -lglib-2.0  "
 S["LIBNOTIFY_CFLAGS"]="-D_REENTRANT -I/usr/include/gtk-2.0 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/l"\
