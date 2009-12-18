@@ -2491,7 +2491,6 @@ m4trace:configure.in:22: -1- PKG_CHECK_MODULES([GLIB], [
   gtk+-2.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
-  libgnome-2.0
   ])
 m4trace:configure.in:22: -1- PKG_PROG_PKG_CONFIG
 m4trace:configure.in:22: -1- m4_pattern_forbid([^_?PKG_[A-Z_]+$])
@@ -2506,14 +2505,12 @@ m4trace:configure.in:22: -1- PKG_CHECK_EXISTS([
   gtk+-2.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
-  libgnome-2.0
   ], [pkg_cv_[]GLIB_CFLAGS=`$PKG_CONFIG --[]cflags "
   glib-2.0 >= $GLIB_REQS
   gio-2.0
   gtk+-2.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
-  libgnome-2.0
   " 2>/dev/null`], [pkg_failed=yes])
 m4trace:configure.in:22: -1- PKG_CHECK_EXISTS([
   glib-2.0 >= $GLIB_REQS
@@ -2521,67 +2518,65 @@ m4trace:configure.in:22: -1- PKG_CHECK_EXISTS([
   gtk+-2.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
-  libgnome-2.0
   ], [pkg_cv_[]GLIB_LIBS=`$PKG_CONFIG --[]libs "
   glib-2.0 >= $GLIB_REQS
   gio-2.0
   gtk+-2.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
-  libgnome-2.0
   " 2>/dev/null`], [pkg_failed=yes])
 m4trace:configure.in:22: -1- _PKG_SHORT_ERRORS_SUPPORTED
-m4trace:configure.in:31: -1- m4_pattern_allow([^GLIB_CFLAGS$])
-m4trace:configure.in:32: -1- m4_pattern_allow([^GLIB_LDFLAGS$])
-m4trace:configure.in:34: -1- PKG_CHECK_MODULES([GST], [
+m4trace:configure.in:30: -1- m4_pattern_allow([^GLIB_CFLAGS$])
+m4trace:configure.in:31: -1- m4_pattern_allow([^GLIB_LDFLAGS$])
+m4trace:configure.in:33: -1- PKG_CHECK_MODULES([GST], [
   gstreamer-0.10 >= $GSTPLUG_REQS
   ])
-m4trace:configure.in:34: -1- m4_pattern_allow([^GST_CFLAGS$])
-m4trace:configure.in:34: -1- m4_pattern_allow([^GST_LIBS$])
-m4trace:configure.in:34: -1- PKG_CHECK_EXISTS([
+m4trace:configure.in:33: -1- m4_pattern_allow([^GST_CFLAGS$])
+m4trace:configure.in:33: -1- m4_pattern_allow([^GST_LIBS$])
+m4trace:configure.in:33: -1- PKG_CHECK_EXISTS([
   gstreamer-0.10 >= $GSTPLUG_REQS
   ], [pkg_cv_[]GST_CFLAGS=`$PKG_CONFIG --[]cflags "
   gstreamer-0.10 >= $GSTPLUG_REQS
   " 2>/dev/null`], [pkg_failed=yes])
-m4trace:configure.in:34: -1- PKG_CHECK_EXISTS([
+m4trace:configure.in:33: -1- PKG_CHECK_EXISTS([
   gstreamer-0.10 >= $GSTPLUG_REQS
   ], [pkg_cv_[]GST_LIBS=`$PKG_CONFIG --[]libs "
   gstreamer-0.10 >= $GSTPLUG_REQS
   " 2>/dev/null`], [pkg_failed=yes])
-m4trace:configure.in:34: -1- _PKG_SHORT_ERRORS_SUPPORTED
-m4trace:configure.in:40: -1- m4_pattern_allow([^GST_CFLAGS$])
-m4trace:configure.in:41: -1- m4_pattern_allow([^GST_LDFLAGS$])
-m4trace:configure.in:74: -1- PKG_CHECK_MODULES([GTK], [gtk+-2.0 gthread-2.0])
-m4trace:configure.in:74: -1- m4_pattern_allow([^GTK_CFLAGS$])
-m4trace:configure.in:74: -1- m4_pattern_allow([^GTK_LIBS$])
-m4trace:configure.in:74: -1- PKG_CHECK_EXISTS([gtk+-2.0 gthread-2.0], [pkg_cv_[]GTK_CFLAGS=`$PKG_CONFIG --[]cflags "gtk+-2.0 gthread-2.0" 2>/dev/null`], [pkg_failed=yes])
-m4trace:configure.in:74: -1- PKG_CHECK_EXISTS([gtk+-2.0 gthread-2.0], [pkg_cv_[]GTK_LIBS=`$PKG_CONFIG --[]libs "gtk+-2.0 gthread-2.0" 2>/dev/null`], [pkg_failed=yes])
-m4trace:configure.in:74: -1- _PKG_SHORT_ERRORS_SUPPORTED
-m4trace:configure.in:78: -2- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
+m4trace:configure.in:33: -1- _PKG_SHORT_ERRORS_SUPPORTED
+m4trace:configure.in:39: -1- m4_pattern_allow([^GST_CFLAGS$])
+m4trace:configure.in:40: -1- m4_pattern_allow([^GST_LDFLAGS$])
+m4trace:configure.in:73: -1- PKG_CHECK_MODULES([GTK], [gtk+-2.0 gthread-2.0])
+m4trace:configure.in:73: -1- m4_pattern_allow([^GTK_CFLAGS$])
+m4trace:configure.in:73: -1- m4_pattern_allow([^GTK_LIBS$])
+m4trace:configure.in:73: -1- PKG_CHECK_EXISTS([gtk+-2.0 gthread-2.0], [pkg_cv_[]GTK_CFLAGS=`$PKG_CONFIG --[]cflags "gtk+-2.0 gthread-2.0" 2>/dev/null`], [pkg_failed=yes])
+m4trace:configure.in:73: -1- PKG_CHECK_EXISTS([gtk+-2.0 gthread-2.0], [pkg_cv_[]GTK_LIBS=`$PKG_CONFIG --[]libs "gtk+-2.0 gthread-2.0" 2>/dev/null`], [pkg_failed=yes])
+m4trace:configure.in:73: -1- _PKG_SHORT_ERRORS_SUPPORTED
+m4trace:configure.in:77: -2- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/general.m4:230: AC_HELP_STRING is expanded from...
-configure.in:78: the top level])
-m4trace:configure.in:86: -1- m4_pattern_allow([^TOTEM_RUN_IN_SOURCE_TREE$])
-m4trace:configure.in:89: -1- PKG_CHECK_MODULES([LIBNOTIFY], [libnotify ])
-m4trace:configure.in:89: -1- m4_pattern_allow([^LIBNOTIFY_CFLAGS$])
-m4trace:configure.in:89: -1- m4_pattern_allow([^LIBNOTIFY_LIBS$])
-m4trace:configure.in:89: -1- PKG_CHECK_EXISTS([libnotify ], [pkg_cv_[]LIBNOTIFY_CFLAGS=`$PKG_CONFIG --[]cflags "libnotify " 2>/dev/null`], [pkg_failed=yes])
-m4trace:configure.in:89: -1- PKG_CHECK_EXISTS([libnotify ], [pkg_cv_[]LIBNOTIFY_LIBS=`$PKG_CONFIG --[]libs "libnotify " 2>/dev/null`], [pkg_failed=yes])
+configure.in:77: the top level])
+m4trace:configure.in:85: -1- m4_pattern_allow([^TOTEM_RUN_IN_SOURCE_TREE$])
+m4trace:configure.in:88: -1- PKG_CHECK_MODULES([LIBNOTIFY], [libnotify ])
+m4trace:configure.in:88: -1- m4_pattern_allow([^LIBNOTIFY_CFLAGS$])
+m4trace:configure.in:88: -1- m4_pattern_allow([^LIBNOTIFY_LIBS$])
+m4trace:configure.in:88: -1- PKG_CHECK_EXISTS([libnotify ], [pkg_cv_[]LIBNOTIFY_CFLAGS=`$PKG_CONFIG --[]cflags "libnotify " 2>/dev/null`], [pkg_failed=yes])
+m4trace:configure.in:88: -1- PKG_CHECK_EXISTS([libnotify ], [pkg_cv_[]LIBNOTIFY_LIBS=`$PKG_CONFIG --[]libs "libnotify " 2>/dev/null`], [pkg_failed=yes])
+m4trace:configure.in:88: -1- _PKG_SHORT_ERRORS_SUPPORTED
+m4trace:configure.in:89: -1- PKG_CHECK_MODULES([UNIQUE], [unique-1.0])
+m4trace:configure.in:89: -1- m4_pattern_allow([^UNIQUE_CFLAGS$])
+m4trace:configure.in:89: -1- m4_pattern_allow([^UNIQUE_LIBS$])
+m4trace:configure.in:89: -1- PKG_CHECK_EXISTS([unique-1.0], [pkg_cv_[]UNIQUE_CFLAGS=`$PKG_CONFIG --[]cflags "unique-1.0" 2>/dev/null`], [pkg_failed=yes])
+m4trace:configure.in:89: -1- PKG_CHECK_EXISTS([unique-1.0], [pkg_cv_[]UNIQUE_LIBS=`$PKG_CONFIG --[]libs "unique-1.0" 2>/dev/null`], [pkg_failed=yes])
 m4trace:configure.in:89: -1- _PKG_SHORT_ERRORS_SUPPORTED
-m4trace:configure.in:90: -1- PKG_CHECK_MODULES([UNIQUE], [unique-1.0])
-m4trace:configure.in:90: -1- m4_pattern_allow([^UNIQUE_CFLAGS$])
-m4trace:configure.in:90: -1- m4_pattern_allow([^UNIQUE_LIBS$])
-m4trace:configure.in:90: -1- PKG_CHECK_EXISTS([unique-1.0], [pkg_cv_[]UNIQUE_CFLAGS=`$PKG_CONFIG --[]cflags "unique-1.0" 2>/dev/null`], [pkg_failed=yes])
-m4trace:configure.in:90: -1- PKG_CHECK_EXISTS([unique-1.0], [pkg_cv_[]UNIQUE_LIBS=`$PKG_CONFIG --[]libs "unique-1.0" 2>/dev/null`], [pkg_failed=yes])
-m4trace:configure.in:90: -1- _PKG_SHORT_ERRORS_SUPPORTED
-m4trace:configure.in:91: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
+m4trace:configure.in:90: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])
-m4trace:configure.in:91: -1- m4_pattern_allow([^LIB@&t@OBJS$])
-m4trace:configure.in:91: -1- m4_pattern_allow([^LTLIBOBJS$])
-m4trace:configure.in:91: -1- AM_CONDITIONAL([am__EXEEXT], [test -n "$EXEEXT"])
-m4trace:configure.in:91: -1- m4_pattern_allow([^am__EXEEXT_TRUE$])
-m4trace:configure.in:91: -1- m4_pattern_allow([^am__EXEEXT_FALSE$])
-m4trace:configure.in:91: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_TRUE])
-m4trace:configure.in:91: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_FALSE])
-m4trace:configure.in:91: -1- _AC_AM_CONFIG_HEADER_HOOK(["$ac_file"])
-m4trace:configure.in:91: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS
-m4trace:configure.in:91: -1- _LT_PROG_LTMAIN
+m4trace:configure.in:90: -1- m4_pattern_allow([^LIB@&t@OBJS$])
+m4trace:configure.in:90: -1- m4_pattern_allow([^LTLIBOBJS$])
+m4trace:configure.in:90: -1- AM_CONDITIONAL([am__EXEEXT], [test -n "$EXEEXT"])
+m4trace:configure.in:90: -1- m4_pattern_allow([^am__EXEEXT_TRUE$])
+m4trace:configure.in:90: -1- m4_pattern_allow([^am__EXEEXT_FALSE$])
+m4trace:configure.in:90: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_TRUE])
+m4trace:configure.in:90: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_FALSE])
+m4trace:configure.in:90: -1- _AC_AM_CONFIG_HEADER_HOOK(["$ac_file"])
+m4trace:configure.in:90: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS
+m4trace:configure.in:90: -1- _LT_PROG_LTMAIN

@@ -3,18 +3,14 @@
 #include "tag-scanner.h"
 #include "music-queue.h"
 #include <string.h>
-#include <libgnomevfs/gnome-vfs.h>
-#include <libgnomevfs/gnome-vfs-utils.h>
-
 //#define DEBUG
 
 
 
 G_DEFINE_TYPE (TagScanner, tag_scanner, G_TYPE_OBJECT)
 
-//#define GET_PRIVATE(o)					/		
-//    (G_TYPE_INSTANCE_GET_PRIVATE ((o), TAG_TYPE_SCANNER, TagScannerPrivate))
-//static gboolean isPlaying(TagScanner *self);
+
+
 static void ts_event_loop(TagScanner * self, GstBus *bus, metadata *data);
 
 static gboolean
@@ -156,54 +152,7 @@ metadata * ts_get_metadata(gchar * uri,TagScanner * self){
      return track;
 
 }
-metadata * ts_parse_file_name( gchar *uri)
-{
-     
-     gchar *parse;
-     gchar *parse2;
-     gchar *parse3;
-     gchar *artist;
-     gchar *out;
-     gchar **tokens;
-     char *saveptr1,*saveptr2;
-     gint i = 0;
-     gint j = 0;
-     metadata *track = NULL;
-     
-     const gchar toke[] ="/";
-     const gchar toke2[] ="-";
-     tokens = g_malloc(sizeof(char) * 20);
-     if( uri)
-     {
-     out = gnome_vfs_get_local_path_from_uri(uri);
-    
-     parse = strtok_r(out,"/",&saveptr1);
-     
-     while((parse = strtok_r(NULL,"/",&saveptr1)) != NULL){
-	  tokens[i] = parse;
-	  i++;
-     }
-     parse2 = strtok_r(tokens[i-1],"-",&saveptr1);
 
-
-     if(parse2 != NULL)
-     {
-	  track = ts_metadata_new();
-	  parse2 = strtok_r(NULL,"-",&saveptr1);
-	  parse3 = strtok_r(parse2,".",&saveptr2);
-
-	  printf("Artist:%s\tTitle:%s\n",tokens[i-1], parse3);
-	  track->title = g_malloc(strlen(tokens[i-1]+1));
-	  track->artist = g_malloc(strlen(parse2+1));			  
-	  strcpy(track->artist,tokens[i-1]);
-	  strcpy(track->title,parse2);
-     }
-     g_free(tokens);
-     g_free(out);
-     
-     }
-     return track;
-}
 
 void ts_metadata_free(metadata *track)
 {
@@ -350,7 +299,7 @@ tag_scanner_init (TagScanner *self)
      //create all
      self->pipeline = gst_pipeline_new ("pipeline");
      self->bus = gst_pipeline_get_bus (GST_PIPELINE (self->pipeline));
-     self->filesrc = gst_element_factory_make ("gnomevfssrc", "source");
+     self->filesrc = gst_element_factory_make ("giosrc", "source");
      self->dec  = gst_element_factory_make ("decodebin", "decodebin");
      self->fakesink = gst_element_factory_make ("fakesink", "sink");
 

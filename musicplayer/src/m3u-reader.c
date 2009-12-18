@@ -4,8 +4,6 @@
 #include "pl-reader.h"
 #include "tag-scanner.h"
 #include <gio/gio.h>
-#include <libgnomevfs/gnome-vfs.h>
-#include <libgnomevfs/gnome-vfs-utils.h>
 #include <glib.h>
 #include <string.h>
 
@@ -59,11 +57,20 @@ m3u_reader_read_list(PlaylistReader *plist,
         *(uri)='\0';
 
     uri = uribeg;
+    file =g_file_new_for_commandline_arg(location);
+    if(!file)
+    {
+        printf("Error opening playlist\n");
+        return 0;
         
-    g_file_get_contents               (gnome_vfs_get_local_path_from_uri (location),
+    }
+    g_file_load_contents    (file,
+        				NULL,      				
                                       &buffer,
                                       &count,
+        				NULL,
                                       &err);
+    g_object_unref(file);
 
     if(count >0)
     {
@@ -89,10 +96,11 @@ m3u_reader_read_list(PlaylistReader *plist,
                 
                     escaped = g_uri_escape_string(lineptr,NULL,TRUE);
                     newuri = g_malloc(sizeof(gchar) *strlen(escaped)+strlen(uri)+10);
-                    g_snprintf(newuri,strlen(escaped)+strlen(uri)+10,"%s/%s",uri,escaped);
-
-                    if( g_file_test(gnome_vfs_get_local_path_from_uri (newuri),
-                                    G_FILE_TEST_EXISTS))
+                    g_snprintf(newuri,strlen(escaped)+strlen(uri)+20,"%s/%s",uri,escaped);
+	        	file =g_file_new_for_commandline_arg(newuri);
+	        
+	
+                    if( file)
                     {
                         md=ts_get_metadata (newuri,ts);
 
@@ -106,8 +114,9 @@ m3u_reader_read_list(PlaylistReader *plist,
                          md = ts_metadata_new ();
                          md->uri = strdup(newuri);
                          *list = g_list_append(*list,md);
-                        }
-                    }
+                        }	
+		g_object_unref(file);
+	        }
                  g_free(escaped);
                  g_free(newuri);   
                 }

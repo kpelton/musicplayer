@@ -79,6 +79,8 @@ main (int argc, char *argv[])
                            G_CALLBACK (message_received_cb), 
                            mainwindow);
 
+            if(argc >1)
+                music_main_play_file(MUSIC_MAIN_WINDOW(mainwindow),argv[1]);
 
 
         gtk_main ();
@@ -119,7 +121,6 @@ message_received_cb (UniqueApp         *app,
         g_free(text);    
         res = UNIQUE_RESPONSE_OK;
       
-      break;
       break;
     default:
       res = UNIQUE_RESPONSE_OK;

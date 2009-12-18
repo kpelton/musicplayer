@@ -4,8 +4,7 @@
 #include "music-queue.h"
 #include "music-song-entry.h"
 #include "tag-scanner.h"
-#include <libgnomevfs/gnome-vfs.h>
-#include <libgnomevfs/gnome-vfs-utils.h>
+#include <gio/gio.h>
 #include <gdk/gdkkeysyms.h>
 #include <gconf/gconf-client.h>
 
@@ -362,6 +361,8 @@ static void mwindow_new_file(GsPlayer *player,
 	gchar *escaped;
 	gchar *escaped_artist;
 	gchar *escaped_title;
+    	GFile *file;
+    	   GFileInfo *info;
 
 
 	if(p_track->artist){
@@ -384,16 +385,15 @@ static void mwindow_new_file(GsPlayer *player,
 	}
 	else
 	{
-		g_strchomp((gchar *)p_track->uri);
-		out = gnome_vfs_get_local_path_from_uri((gchar *)p_track->uri);
 
-		tokens=g_strsplit(out,toke,10);
+	    file =g_file_new_for_commandline_arg((gchar *)p_track->uri);
+	    info= g_file_query_info(file,"standard::display-name",
+	        G_FILE_QUERY_INFO_NONE,  NULL,NULL);    
+	    out = g_file_info_get_attribute_as_string(info,
+            "standard::display-name"); 
 
-		if(tokens)
-		{
-			for(i=1; tokens[i] != NULL; i++);
-
-			tokens2=g_strsplit(tokens[i-1],toke2,2);
+	 
+			tokens2=g_strsplit(out,toke2,2);
 					
 			gtk_window_set_title(GTK_WINDOW(self),*tokens2);
 			escaped = g_markup_escape_text(*tokens2,-1);
@@ -401,13 +401,14 @@ static void mwindow_new_file(GsPlayer *player,
 			
 			music_song_entry_set_text(MUSIC_SONG_ENTRY(self->songlabel),*tokens2);
 			g_strfreev(tokens2);  
-			g_strfreev(tokens);  
+
 			g_free(out);
 			g_free(escaped);
-
+		    g_object_unref(file);
+		    g_object_unref(info);
 			gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
 		}
-	}
+	
 	
     
 
@@ -416,10 +417,25 @@ static void mwindow_new_file(GsPlayer *player,
 void music_main_play_file(MusicMainWindow *self,gchar * location)
 {
 	gchar *valid;
-	valid = gnome_vfs_make_uri_from_input(location);
+    	GFile *file = NULL;
+
+    	file =g_file_new_for_commandline_arg(location);
+
+    	if(file)
+    {
+    //need to check if the file exists before adding to queue and playing
+            valid =  g_file_get_uri(file);	
 	add_file_ext(valid,self->queue);
 	gs_playFile(self->player,valid);
 	g_free(valid);
+        	g_object_unref(file);
+
+    }
+    else
+    {
+        printf("Error adding file\n");
+    }
+    
 }
 
 void            on_size_allocate                      (GtkWidget     *widget,

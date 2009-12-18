@@ -25,7 +25,6 @@ PKG_CHECK_MODULES(GLIB,[
   gtk+-2.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
-  libgnome-2.0
   ])
 
 AC_SUBST(GLIB_CFLAGS)
