@@ -49,6 +49,7 @@ typedef struct {
      GstTagList *taglist;
      metadata *track;
 	 GstElement *gconf;
+    	 GstElement *gio;
      gchar uri[1500];
      gboolean lock;
      int idle;

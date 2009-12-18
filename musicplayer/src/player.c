@@ -103,10 +103,11 @@ gs_player_init (GsPlayer *me)
     
      me->play = gst_element_factory_make ("playbin", "playbin");
 	 me->gconf = gst_element_factory_make("gconfaudiosink","audio-sink");
- 
+
 
    
 	 g_object_set(G_OBJECT(me->play),"audio-sink",me->gconf,NULL);
+  
     
 	 	 gst_element_set_state (me->play, GST_STATE_READY);
      me->isPlaying = FALSE;
