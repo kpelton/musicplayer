@@ -222,7 +222,12 @@ music_song_entry_draw(GtkWidget *self,cairo_t *cr)
 
     if(copy)
                   g_free(copy);
+
+	     
+
+	      	
 			 cairo_stroke(cr);
+	       	g_object_unref(layout);
 	  }
 }
 static gboolean
