@@ -5,7 +5,6 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
-
 G_BEGIN_DECLS
 
 #define MUSIC_TYPE_SONG_ENTRY music_song_entry_get_type()
@@ -29,8 +28,7 @@ typedef struct {
   GtkDrawingArea parent;
   gchar * text;
   gint trans2;
-  gint type;
-	  
+  gint type;   
 } MusicSongEntry;
 
 typedef struct {

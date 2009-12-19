@@ -101,7 +101,7 @@ gs_player_init (GsPlayer *me)
      GstElement *xv;
 
     
-     me->play = gst_element_factory_make ("playbin", "playbin");
+     me->play = gst_element_factory_make ("playbin2", "playbin");
 	 me->gconf = gst_element_factory_make("gconfaudiosink","audio-sink");
 
 

@@ -914,6 +914,7 @@ gboolean check_for_folders(GSList *list)
             g_object_unref(file);
             g_object_unref(info);
         }
+       
     }
     return ret;
 }

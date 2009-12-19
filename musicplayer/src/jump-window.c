@@ -82,12 +82,22 @@ jump_window_finalize (GObject *object)
 }
 
 static void
+jump_window_dispose (GObject *object)
+{
+	JumpWindow *self = JUMP_WINDOW(object);
+    
+  G_OBJECT_CLASS (jump_window_parent_class)->dispose (object);
+ 
+}
+
+static void
 jump_window_class_init (JumpWindowClass *klass)
 {
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
 	GtkWindowClass* parent_class = GTK_WINDOW_CLASS (klass);
 
 	object_class->finalize = jump_window_finalize;
+	object_class->dispose = jump_window_dispose;
 
 	signals[JUMP]= g_signal_new ("jump",
 				     G_TYPE_FROM_CLASS (klass),
