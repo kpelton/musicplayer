@@ -4,6 +4,7 @@
 #include "music-queue.h"
 #include "music-song-entry.h"
 #include "tag-scanner.h"
+#include "utils.h"
 #include <gio/gio.h>
 #include <gdk/gdkkeysyms.h>
 #include <gconf/gconf-client.h>
@@ -349,20 +350,15 @@ static void mwindow_new_file(GsPlayer *player,
 {
 	MusicMainWindow *self = (MusicMainWindow *)user_data;
 	gchar title[200];
-	const gchar toke[] ="/";
-	const gchar toke2[] =".";
 	gchar buffer[50];
-	gchar *out;
 	gint i;
-	gchar **tokens;
-	gchar **tokens2;
 	gchar output[1024];
 	gchar output2[1024];
 	gchar *escaped;
 	gchar *escaped_artist;
 	gchar *escaped_title;
     	GFile *file;
-    	   GFileInfo *info;
+
 
 
 	if(p_track->artist){
@@ -381,35 +377,23 @@ static void mwindow_new_file(GsPlayer *player,
 			
 		}else{
 			gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
+		    	
 		}
 	}
 	else
 	{
+	 file =g_file_new_for_commandline_arg((gchar *)p_track->uri);
 
-	    file =g_file_new_for_commandline_arg((gchar *)p_track->uri);
-	    info= g_file_query_info(file,"standard::display-name",
-	        G_FILE_QUERY_INFO_NONE,  NULL,NULL);    
-	    out = g_file_info_get_attribute_as_string(info,
-            "standard::display-name"); 
-
-	 
-			tokens2=g_strsplit(out,toke2,2);
-					
-			gtk_window_set_title(GTK_WINDOW(self),*tokens2);
-			escaped = g_markup_escape_text(*tokens2,-1);
-			
-			
-			music_song_entry_set_text(MUSIC_SONG_ENTRY(self->songlabel),*tokens2);
-			g_strfreev(tokens2);  
-
-			g_free(out);
-			g_free(escaped);
-		    g_object_unref(file);
-		    g_object_unref(info);
-			gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
-		}
-	
-	
+	escaped   = parse_file_name(file);
+	if(escaped)
+	    {
+	    	music_song_entry_set_text(MUSIC_SONG_ENTRY(self->songlabel),escaped);
+	        	gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
+	        	gtk_window_set_title(GTK_WINDOW(self),escaped);
+	     	g_object_unref(file);
+	        	g_free(escaped);
+	    }
+	}
     
 
     }

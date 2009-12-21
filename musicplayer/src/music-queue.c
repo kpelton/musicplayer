@@ -152,7 +152,7 @@ remove_files_via_press(GtkWidget *widget,
                        gpointer user_data);
 
 static void 
-add_file(gpointer data,gpointer user_data);
+add_file(gpointer data,gpointer user_data,metadata *track);
 
 gboolean 
 has_selected(gpointer user_data);
@@ -419,98 +419,9 @@ foreach_playlist_file(gpointer data,
                       gpointer user_data)
 {
 
-	metadata *track = (metadata *)data;
-	MusicQueue *self = (MusicQueue *)user_data;
-	GtkTreeIter iter;
-	gchar *out;
-    	gchar  *name;
-	gchar **tokens;
-    	GError *err = NULL;
-	const gchar toke[] =".";
-	gchar buffer[60000];
-    GFile *file;
-    GFileInfo *info;
-    guint64 mod;
-    	gchar *valid;
-	int i;
-
-	if(data)
-	{
-
-	    file =g_file_new_for_commandline_arg((gchar *)track->uri);
-	    info= g_file_query_info(file,"standard::display-name,time::modfied",
-	        G_FILE_QUERY_INFO_NONE,  NULL,&err);    
-
-	    if(err != NULL)
-	    {       
-	        printf("%s\n",err->message);
-	        g_object_unref(file);
-	        g_object_unref(info);
-	         g_error_free(err);
-	        return;
-
-	    }
-	    out =  g_file_get_uri(file);
-
-	    self->priv->i++;
-
-	    gtk_list_store_append(self->priv->store, &iter);
-
-
-	    gtk_list_store_set(self->priv->store,&iter,COLUMN_URI,track->uri,-1);  
-
-	    g_snprintf(buffer,10,"%i",self->priv->i);
-	    gtk_list_store_set(self->priv->store,&iter,COLUMN_ID,buffer,-1);
-	    
-    
-        
-        
-        mod = g_file_info_get_attribute_uint64(info,
-                                               G_FILE_ATTRIBUTE_TIME_MODIFIED); 
-
-      g_snprintf(buffer,20,"%lu",(unsigned long int)mod);
-
-        
-	  gtk_list_store_set(self->priv->store,&iter,COLUMN_MOD,buffer,-1);
-       
-      
-	
-		
-
-	
-
-		 if(track->title!= NULL && track->artist !=NULL)
-		 {	
-			 gtk_list_store_set(self->priv->store,&iter,COLUMN_TITLE,track->title,-1);
-			 gtk_list_store_set(self->priv->store,&iter,COLUMN_ARTIST,track->artist,-1);
-			 g_snprintf(buffer,strlen(track->artist)+strlen(track->title) +10
-                       ,"%s - %s",track->artist,track->title);
-			 
-		     gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,buffer,-1);
-			 
-		 }
-		 else //no metadata
-		 { 
-		     name = g_file_info_get_attribute_as_string(info,
-		         "standard::display-name"); 
-
-
-		     //take out the file extension;
-		     tokens=g_strsplit(name,toke,2);
-			 //without
-			 gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,(gpointer *)tokens[0]);   
-		     if(tokens)
-		         g_strfreev(tokens);  
-		     if(name)
-		         g_free(name);
-		 }  
-
-		 ts_metadata_free(track);
-		
-		 g_free(out);
-	    g_object_unref(file);
-	    g_object_unref(info);
-	}
+    metadata *track = (metadata *)data;
+if(data)
+    	add_file(track->uri,user_data,track);
 }
 
 static void 
@@ -879,18 +790,11 @@ void
 add_file_ext(gpointer data,
              gpointer user_data)
 {
-    GFile *file;
-    gchar *uri;
-    MusicQueue *self = (MusicQueue *) user_data;
-    file = g_file_new_for_commandline_arg (data);
-    uri = g_file_get_uri(file);
+  MusicQueue *self = user_data;
     self->priv->ts = tag_scanner_new(); 
-    if(uri){
-        scan_file_action (uri,self);
-        g_free(uri);
-    }
+	add_file(data,user_data,NULL);
     g_object_unref(self->priv->ts);
-    g_object_unref(file);
+
  }
 static 
 gboolean check_for_folders(GSList *list)
@@ -981,7 +885,7 @@ traverse_folders(gpointer data,
                                               G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
                         if(check_type_supported(filetype))
                         {
-                            add_file(buffer,user_data);
+                            add_file(buffer,user_data,NULL);
                         }
                     }
                   
@@ -1044,6 +948,9 @@ scan_file_action(gpointer data,
         choose_file_action(uri,type,user_data);
         
     }
+    g_object_unref(file);
+    g_object_unref(info);
+
     
     
 }
@@ -1061,19 +968,19 @@ choose_file_action(gchar * uri,
     
     if(strcmp(type,"audio/mpeg") == 0)
     {
-        add_file(uri,user_data);
+        add_file(uri,user_data,NULL);
     }
     else if(strcmp(type,"audio/ogg")  == 0)
     {
-        add_file(uri,user_data);
+        add_file(uri,user_data,NULL);
     }
     else if(strcmp(type,"audio/x-flac") == 0)
     {
-        add_file(uri,user_data);
+        add_file(uri,user_data,NULL);
     }
     else if(strcmp(type,"audio/wma")  == 0)
     {
-        add_file(uri,user_data);
+        add_file(uri,user_data,NULL);
     }
     else if(strcmp(type,"application/xspf+xml")  == 0)
     {
@@ -1102,22 +1009,18 @@ choose_file_action(gchar * uri,
     
 }
 static void 
-add_file(gpointer data,gpointer user_data)
+add_file(gpointer data,gpointer user_data,metadata *track)
 {
     MusicQueue *self = (MusicQueue *) user_data;
     GtkTreeIter   iter;
-    gchar *out;
+    gchar *name;
     GError *err =NULL;
-    gchar **tokens;
-    gchar **tokens2;
-    const gchar toke[] ="/";
-    const gchar toke2[] =".";
     gchar buffer[1024];
     gchar *valid;
     GFile *file;
     GFileInfo *info;
     guint64 mod;
-    int i;
+    gint i;
     metadata *md = NULL;
 
     self->priv->i++;
@@ -1132,12 +1035,12 @@ add_file(gpointer data,gpointer user_data)
         printf("%s\n",err->message);
         g_object_unref(file);
         g_object_unref(info);
-        return;
+          return;
 
     }
     valid =  g_file_get_uri(file);
 
-    gtk_list_store_append(self->priv->store, &iter);
+	gtk_list_store_append(self->priv->store, &iter);
 
     //gtk_list_store_set(self->priv->store,&iter,COLUMN_TITLE,out,-1);    
     gtk_list_store_set(self->priv->store,&iter,COLUMN_URI,valid,-1);  
@@ -1146,27 +1049,29 @@ add_file(gpointer data,gpointer user_data)
     gtk_list_store_set(self->priv->store,&iter,COLUMN_ID,buffer,-1);  
 
 
-
+                          
 
 
     mod = g_file_info_get_attribute_uint64(info,
-        G_FILE_ATTRIBUTE_TIME_MODIFIED); 
+                                           G_FILE_ATTRIBUTE_TIME_MODIFIED); 
 
     g_snprintf(buffer,20,"%lu",(unsigned long int)mod);
 
-
-    gtk_list_store_set(self->priv->store,&iter,COLUMN_MOD,buffer,-1);
-
-
-
-    //get meta data info
-    md=ts_get_metadata(valid,self->priv->ts);
-
+  
+        
+		gtk_list_store_set(self->priv->store,&iter,COLUMN_MOD,buffer,-1);
+       
+       
+    if(!track)
+	md=ts_get_metadata(valid,self->priv->ts);
+  else
+        md = track;
+    
     if(md != NULL && md->title != NULL && md->artist !=NULL)
     {	  
         gtk_list_store_set(self->priv->store,&iter,COLUMN_TITLE,md->title,-1);
         gtk_list_store_set(self->priv->store,&iter,COLUMN_ARTIST,md->artist,-1);
-
+        
         g_snprintf(buffer,strlen(md->artist)+strlen(md->title)+4,
             "%s - %s",md->artist,md->title);
         gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,buffer,-1);
@@ -1175,21 +1080,14 @@ add_file(gpointer data,gpointer user_data)
     }
     else
     {
-        out = g_file_info_get_attribute_as_string(info,
-            "standard::display-name"); 
+        name = parse_file_name(file);
 
-
-        //take out the file extension;
-        tokens2=g_strsplit(out,toke2,2);
-        gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,(gpointer *)tokens2[0]);
-        if(tokens2)
-	g_strfreev(tokens2);  
-        if(out)
-	g_free(out);
+        gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,name);   
+        g_free(name);
     }
 
-
-
+   
+   
     g_free(valid);
     g_object_unref(file);
     g_object_unref(info);

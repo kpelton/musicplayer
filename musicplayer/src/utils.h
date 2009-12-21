@@ -7,3 +7,4 @@
  ****************************************************************************/
 
 void make_pref_folder();
+gchar* parse_file_name(GFile *file);
