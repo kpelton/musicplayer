@@ -48,6 +48,11 @@ main (int argc, char *argv[])
         
 
          message = unique_message_data_new();
+        	if(argc <2)
+        {
+	printf("Music Player already running\nexiting\n");
+	exit(1);
+        }
         unique_message_data_set_text (message,argv[1],strlen(argv[1])+1);
         /* send_message() will block until we get our response back */
         response = unique_app_send_message (app, COMMAND_PLAY, message);

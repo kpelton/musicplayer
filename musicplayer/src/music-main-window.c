@@ -416,7 +416,7 @@ static void mwindow_new_file(GsPlayer *player,
 
 void music_main_play_file(MusicMainWindow *self,gchar * location)
 {
-	gchar *valid;
+	gchar *valid=NULL;
     	GFile *file = NULL;
 
     	file =g_file_new_for_commandline_arg(location);
@@ -425,10 +425,13 @@ void music_main_play_file(MusicMainWindow *self,gchar * location)
     {
     //need to check if the file exists before adding to queue and playing
             valid =  g_file_get_uri(file);	
+        	if(valid)
+        {
 	add_file_ext(valid,self->queue);
 	gs_playFile(self->player,valid);
 	g_free(valid);
         	g_object_unref(file);
+        }
 
     }
     else

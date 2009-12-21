@@ -142,7 +142,7 @@ metadata * ts_get_metadata(gchar * uri,TagScanner * self){
     
      ts_event_loop(self,self->bus,track);
          
-     //gst_element_set_state (self->pipeline, GST_STATE_NULL);
+     gst_element_set_state (self->pipeline, GST_STATE_NULL);
      track = self->track;
 
      //if(track->artist == NULL || track->title == NULL)
@@ -299,7 +299,7 @@ tag_scanner_init (TagScanner *self)
      //create all
      self->pipeline = gst_pipeline_new ("pipeline");
      self->bus = gst_pipeline_get_bus (GST_PIPELINE (self->pipeline));
-     self->filesrc = gst_element_factory_make ("giosrc", "source");
+     self->filesrc = gst_element_factory_make ("gnomevfssrc", "source");
      self->dec  = gst_element_factory_make ("decodebin", "decodebin");
      self->fakesink = gst_element_factory_make ("fakesink", "sink");
 

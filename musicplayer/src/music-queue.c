@@ -1104,40 +1104,40 @@ choose_file_action(gchar * uri,
 static void 
 add_file(gpointer data,gpointer user_data)
 {
-	MusicQueue *self = (MusicQueue *) user_data;
-	GtkTreeIter   iter;
-	gchar *out;
-            GError *err =NULL;
-	gchar **tokens;
-	gchar **tokens2;
-	const gchar toke[] ="/";
-	const gchar toke2[] =".";
-	gchar buffer[60000];
-	gchar *valid;
-     GFile *file;
+    MusicQueue *self = (MusicQueue *) user_data;
+    GtkTreeIter   iter;
+    gchar *out;
+    GError *err =NULL;
+    gchar **tokens;
+    gchar **tokens2;
+    const gchar toke[] ="/";
+    const gchar toke2[] =".";
+    gchar buffer[1024];
+    gchar *valid;
+    GFile *file;
     GFileInfo *info;
     guint64 mod;
     int i;
-	metadata *md = NULL;
+    metadata *md = NULL;
 
-	self->priv->i++;
+    self->priv->i++;
 
 
-	    file =g_file_new_for_commandline_arg((gchar *)data);
-             info= g_file_query_info(file,"standard::display-name,time::modfied",
+    file =g_file_new_for_commandline_arg((gchar *)data);
+    info= g_file_query_info(file,"time::modified,standard::display-name",
         G_FILE_QUERY_INFO_NONE,  NULL,&err);    
 
-            if(err != NULL)
-            {       
-                printf("%s\n",err->message);
-                g_object_unref(file);
-                g_object_unref(info);
-                        return;
-                
-            }
-                 valid =  g_file_get_uri(file);
+    if(err != NULL)
+    {       
+        printf("%s\n",err->message);
+        g_object_unref(file);
+        g_object_unref(info);
+        return;
 
-	gtk_list_store_append(self->priv->store, &iter);
+    }
+    valid =  g_file_get_uri(file);
+
+    gtk_list_store_append(self->priv->store, &iter);
 
     //gtk_list_store_set(self->priv->store,&iter,COLUMN_TITLE,out,-1);    
     gtk_list_store_set(self->priv->store,&iter,COLUMN_URI,valid,-1);  
@@ -1146,27 +1146,27 @@ add_file(gpointer data,gpointer user_data)
     gtk_list_store_set(self->priv->store,&iter,COLUMN_ID,buffer,-1);  
 
 
-                          
+
 
 
     mod = g_file_info_get_attribute_uint64(info,
-                                           G_FILE_ATTRIBUTE_TIME_MODIFIED); 
+        G_FILE_ATTRIBUTE_TIME_MODIFIED); 
 
     g_snprintf(buffer,20,"%lu",(unsigned long int)mod);
-  
-        
-		gtk_list_store_set(self->priv->store,&iter,COLUMN_MOD,buffer,-1);
-       
-       
-    
-	//get meta data info
-	md=ts_get_metadata(valid,self->priv->ts);
-  
+
+
+    gtk_list_store_set(self->priv->store,&iter,COLUMN_MOD,buffer,-1);
+
+
+
+    //get meta data info
+    md=ts_get_metadata(valid,self->priv->ts);
+
     if(md != NULL && md->title != NULL && md->artist !=NULL)
     {	  
         gtk_list_store_set(self->priv->store,&iter,COLUMN_TITLE,md->title,-1);
         gtk_list_store_set(self->priv->store,&iter,COLUMN_ARTIST,md->artist,-1);
-        
+
         g_snprintf(buffer,strlen(md->artist)+strlen(md->title)+4,
             "%s - %s",md->artist,md->title);
         gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,buffer,-1);
@@ -1177,19 +1177,19 @@ add_file(gpointer data,gpointer user_data)
     {
         out = g_file_info_get_attribute_as_string(info,
             "standard::display-name"); 
-	
+
 
         //take out the file extension;
         tokens2=g_strsplit(out,toke2,2);
         gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,(gpointer *)tokens2[0]);
         if(tokens2)
-    	 g_strfreev(tokens2);  
+	g_strfreev(tokens2);  
         if(out)
-	 g_free(out);
+	g_free(out);
     }
 
-   
-   
+
+
     g_free(valid);
     g_object_unref(file);
     g_object_unref(info);
