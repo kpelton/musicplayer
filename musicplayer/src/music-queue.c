@@ -433,7 +433,7 @@ music_queue_read_start_playlist(gchar *location,
      playlist_reader_read_list(self->priv->read,location,&list);
 
      g_list_foreach(list,foreach_playlist_file,self);
-
+    
      g_list_free(list);
      
 }
@@ -989,6 +989,7 @@ choose_file_action(gchar * uri,
         playlist_reader_read_list(read,uri,&list);
         g_list_foreach(list,foreach_playlist_file,self);
         g_object_unref(read);
+
         g_list_free(list);
     }
     
@@ -1025,6 +1026,7 @@ add_file(gpointer data,gpointer user_data,metadata *track)
 
     self->priv->i++;
 
+ 
 
     file =g_file_new_for_commandline_arg((gchar *)data);
     info= g_file_query_info(file,"time::modified,standard::display-name",
@@ -1062,9 +1064,9 @@ add_file(gpointer data,gpointer user_data,metadata *track)
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_MOD,buffer,-1);
        
        
-    if(!track)
+   if(!track)
 	md=ts_get_metadata(valid,self->priv->ts);
-  else
+ else
         md = track;
     
     if(md != NULL && md->title != NULL && md->artist !=NULL)
@@ -1076,8 +1078,14 @@ add_file(gpointer data,gpointer user_data,metadata *track)
             "%s - %s",md->artist,md->title);
         gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,buffer,-1);
 
+       if (track)
+	ts_metadata_free(track);
+        else
         ts_metadata_free(md);
     }
+
+
+    
     else
     {
         name = parse_file_name(file);

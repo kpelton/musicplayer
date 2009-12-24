@@ -59,7 +59,7 @@ music_main_window_dispose (GObject *object)
     MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);	
     
   G_OBJECT_CLASS (music_main_window_parent_class)->dispose (object);
-    gtk_exit(0);
+   gtk_exit(0);
  
 }
 
@@ -72,7 +72,7 @@ music_main_window_finalize (GObject *object)
 
         g_object_unref(G_OBJECT(self->player));
         self->player = NULL;
-	 	//g_object_unref(G_OBJECT(self->queue));
+	//g_object_unref(G_OBJECT(self->queue));
         
     
 	 G_OBJECT_CLASS (music_main_window_parent_class)->finalize (object);
@@ -382,7 +382,7 @@ static void mwindow_new_file(GsPlayer *player,
 	}
 	else
 	{
-	 file =g_file_new_for_commandline_arg((gchar *)p_track->uri);
+	 file =g_file_new_for_uri((gchar *)p_track->uri);
 
 	escaped   = parse_file_name(file);
 	if(escaped)

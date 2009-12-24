@@ -36,7 +36,9 @@ gchar* parse_file_name(GFile *file)
 
     tokens=g_strsplit(out,filetypes,2);
 
-    escaped = g_markup_escape_text(*tokens,-1);
+   
+    escaped = strndup(*tokens,strlen(*tokens)+10);
+    	
 
     g_strfreev(tokens);  
 

@@ -23,6 +23,12 @@ static void gst_new_tags                (const GstTagList *list,
 					 const gchar *tag,
 					 gpointer user_data);
 
+static void
+cb_newpad (GstElement *decodebin,
+	   GstPad     *pad,
+	   gboolean    last,
+	   gpointer    data);
+
 
 typedef struct _TagScannerPrivate TagScannerPrivate;
 
@@ -55,9 +61,7 @@ static void
 tag_scanner_dispose (GObject *object)
 {
      TagScanner *self = TAG_SCANNER(object);
-     gst_element_set_state (self->pipeline, GST_STATE_NULL);
-     //unref pipeline to free memory
-     g_object_unref(self->pipeline);
+ 
      
      G_OBJECT_CLASS (tag_scanner_parent_class)->dispose (object);
   
@@ -66,7 +70,12 @@ tag_scanner_dispose (GObject *object)
 static void
 tag_scanner_finalize (GObject *object)
 {
+    printf("Free ts\n");
      TagScanner *self = TAG_SCANNER(object);
+    if(self->pipeline !=NULL)
+    gst_object_unref(self->pipeline);
+
+     
    
      G_OBJECT_CLASS (tag_scanner_parent_class)->finalize (object);
 }
@@ -90,9 +99,8 @@ static void ts_event_loop(TagScanner * self, GstBus *bus, metadata *data)
 {
      GstMessage *message;
      gboolean val = FALSE;
-     message = gst_bus_timed_pop(bus,GST_SECOND/10);
-     
-     while( val != TRUE && message != NULL)
+     message = gst_bus_timed_pop  (bus,GST_CLOCK_TIME_NONE); 
+     while( val != TRUE )
      {
 	  
 	  if(message != NULL)
@@ -102,11 +110,11 @@ static void ts_event_loop(TagScanner * self, GstBus *bus, metadata *data)
 	       gst_message_unref(message);
 
 	  }
-	  
-	  message = gst_bus_timed_pop(bus,GST_SECOND/10);
+	  if(!val)
+	  message = gst_bus_timed_pop  (bus,GST_CLOCK_TIME_NONE); 
      }
 
-     
+    
 }
 
 //~ static gboolean isPlaying(TagScanner *self)
@@ -128,31 +136,57 @@ metadata * ts_get_metadata(gchar * uri,TagScanner * self){
      metadata *track;
      
      self->track = NULL;
-     
-     
-     
-     self->bus = gst_pipeline_get_bus (GST_PIPELINE (self->pipeline)); 
-     
-     
-     gst_element_set_state (self->pipeline, GST_STATE_READY);
-     g_object_set (G_OBJECT (self->filesrc), "location", uri, NULL);
+
+    //create all
+     self->pipeline = gst_pipeline_new ("pipeline");
+     self->bus = gst_pipeline_get_bus (GST_PIPELINE (self->pipeline));
+     self->filesrc = gst_element_factory_make ("giosrc", "source");
+     self->dec  = gst_element_factory_make ("decodebin", "decodebin");
+     self->fakesink = gst_element_factory_make ("fakesink", "sink");
+
+
+     //signals
+     g_signal_connect (self->dec, "new-decoded-pad", G_CALLBACK (cb_newpad),self->fakesink);
+    
+
+	
+     //connect everything
+    gst_bin_add (GST_BIN (self->pipeline), self->filesrc);
+     gst_bin_add (GST_BIN (self->pipeline), self->fakesink);
+     gst_bin_add (GST_BIN (self->pipeline), self->dec);
+
+    gst_element_link (self->filesrc,self->dec);
+
+     self->already_found = FALSE;
+
+
+    g_object_set (G_OBJECT (self->filesrc), "location", uri, NULL);
      //gst_bus_add_watch (self->bus, my_bus_callback, self);
-     gst_element_set_state (self->pipeline, GST_STATE_PLAYING);
+     gst_element_set_state (self->pipeline, GST_STATE_PAUSED);
      
     
      ts_event_loop(self,self->bus,track);
          
      gst_element_set_state (self->pipeline, GST_STATE_NULL);
      track = self->track;
+    
 
-     //if(track->artist == NULL || track->title == NULL)
-     //  ts_parse_file_name(track,uri);
-
-
+    gst_object_unref(self->pipeline);
+     gst_object_unref (GST_OBJECT (self->bus));	
+    self->pipeline = NULL;
      return track;
 
 }
 
+void ts_metadata_list_free(GList *head)
+{
+	GList *node;
+
+    	for(node=head; node!=NULL; node=node->next)
+        		if(node->data)	
+    			ts_metadata_free(node->data);
+
+}
 
 void ts_metadata_free(metadata *track)
 {
@@ -196,8 +230,9 @@ my_bus_callback (GstBus     *bus,
 		 gpointer    data
      )
 {
-     //g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
-
+#ifdef DEBUG    
+     g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
+#endif
      
      TagScanner * self = (TagScanner *)data;
      GstTagList *list;
@@ -214,11 +249,12 @@ my_bus_callback (GstBus     *bus,
 	  g_print ("Error: %s\n", err->message);
 	  g_error_free (err);
 	  g_free (debug);
+        return TRUE;
 
 	  break;
      }
      case GST_MESSAGE_ASYNC_DONE:
-	  //return TRUE;
+	  return TRUE;
 	  break;
 
      case GST_MESSAGE_TAG:
@@ -238,7 +274,7 @@ my_bus_callback (GstBus     *bus,
 		 
 	  gst_tag_list_free (list);
 	  
-	  if(track->title != NULL || track->artist !=NULL || track->genre != NULL)
+	  if(track->title != NULL || track->artist !=NULL || track->genre != NULL )
 	  {
 	       self->track = track;
 	       return TRUE;
@@ -250,7 +286,7 @@ my_bus_callback (GstBus     *bus,
 
 	  break;
      default:
-	 
+	 return FALSE;
 	  break;
       
      }
@@ -279,15 +315,10 @@ cb_newpad (GstElement *decodebin,
      GstStructure *str;
      GstPad *audiopad;
      GstElement *fakesink = (GstElement *) data;
-
  
-     audiopad = gst_element_get_static_pad (fakesink , "sink");
-     if (GST_PAD_IS_LINKED (audiopad)) {
-	  g_object_unref (audiopad);
-	  return;
-     }
+     audiopad = gst_element_get_pad (fakesink, "sink");
 
-  
+
      gst_pad_link (pad, audiopad);
 }
 
@@ -295,30 +326,8 @@ cb_newpad (GstElement *decodebin,
 static void
 tag_scanner_init (TagScanner *self)
 {
+     printf("New ts\n");
      
-     //create all
-     self->pipeline = gst_pipeline_new ("pipeline");
-     self->bus = gst_pipeline_get_bus (GST_PIPELINE (self->pipeline));
-     self->filesrc = gst_element_factory_make ("gnomevfssrc", "source");
-     self->dec  = gst_element_factory_make ("decodebin", "decodebin");
-     self->fakesink = gst_element_factory_make ("fakesink", "sink");
-
-
-     //signals
-     g_signal_connect (self->dec, "new-decoded-pad", G_CALLBACK (cb_newpad),self->fakesink);
-    
-
-	
-     //connect everything
-     gst_bin_add (GST_BIN (self->pipeline), self->filesrc);
-     gst_bin_add (GST_BIN (self->pipeline), self->fakesink);
-     gst_bin_add (GST_BIN (self->pipeline), self->dec);
-
-     gst_element_link (self->filesrc,self->dec);
-
-     self->already_found = FALSE;
-     //gst_bus_set_flushing(self->bus,TRUE);
-     //gst_bus_add_watch (self->bus, my_bus_callback, self);
 }
 
 TagScanner*

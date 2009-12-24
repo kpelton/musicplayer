@@ -70,6 +70,7 @@ xspf_reader_read_list(PlaylistReader *plist,
             }
         }
     }
+      xmlFreeDoc(doc);
 
     return TRUE;
 }

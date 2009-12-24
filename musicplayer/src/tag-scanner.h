@@ -57,7 +57,7 @@ typedef struct {
 GType tag_scanner_get_type (void);
 
 TagScanner* tag_scanner_new (void);
-
+void ts_metadata_list_free(GList *head);
 
 
 
