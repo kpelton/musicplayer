@@ -232,6 +232,7 @@ struct _MusicQueuePrivate{
     gchar *lastdir;
 	gboolean drag_started;
 	gboolean repeat;
+    	GSList *list;
 };
 
 //end private varibles
@@ -685,6 +686,7 @@ void music_queue_play_selected (MusicQueue *self)
 
 
 
+
 static void 
 add(GtkWidget *widget,
     gpointer user_data)
@@ -736,6 +738,38 @@ add(GtkWidget *widget,
 
 
 }
+gpointer add_threaded_folders(gpointer user_data)
+{
+    	MusicQueue *self = (MusicQueue *) user_data;
+    	GSList *node = self->priv->list;
+
+   	for(; node != NULL; node=node->next)
+    		{
+        			traverse_folders (node->data,self);
+			if(node->data)
+				g_free(node->data);
+		 }
+    	        g_slist_free(self->priv->list);
+                g_object_unref(self->priv->ts);
+
+}
+gpointer add_threaded(gpointer user_data)
+{
+    	MusicQueue *self = (MusicQueue *) user_data;
+    	GSList *node = self->priv->list;
+
+   	for(; node != NULL; node=node->next)
+    		{
+        			scan_file_action (node->data,self);
+			if(node->data)
+				g_free(node->data);
+		 }
+    	        g_slist_free(self->priv->list);
+                g_object_unref(self->priv->ts);
+
+}
+
+
 static void 
 file_chooser_cb(GtkWidget *data, 
                 gint response,
@@ -743,8 +777,7 @@ file_chooser_cb(GtkWidget *data,
 {
     MusicQueue *self = (MusicQueue *) data;
     gboolean b = TRUE;
-    GSList *list;
-    GtkFileFilter *filter;
+
     GtkWidget *dialog = GTK_WIDGET(user_data);
     
     gchar *lastdir = NULL;
@@ -757,7 +790,7 @@ file_chooser_cb(GtkWidget *data,
     else if (response  == GTK_RESPONSE_ACCEPT)
     {
 
-        list =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
+        self->priv->list =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
         //set our last dir to one they chose
 
         g_object_set(G_OBJECT(self),"musicqueue-lastdir",
@@ -766,26 +799,23 @@ file_chooser_cb(GtkWidget *data,
 
 
         gtk_widget_destroy (dialog);
-        g_slist_foreach (list,scan_file_action,self);
-        g_slist_free (list);
-        g_object_unref(self->priv->ts);
+        g_thread_create                 (add_threaded,self,FALSE,NULL);        
     }
    else if(response == 1) //folder(s) selected
     {
 
-        list = gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
-        if(check_for_folders(list))
+        self->priv->list = gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
+        if(check_for_folders(self->priv->list))
         {
             gtk_widget_destroy (dialog);
-            //need to check if the selection is a folder
-            g_slist_foreach (list,traverse_folders,self);
-            g_object_unref(self->priv->ts);
+	  g_thread_create                 (add_threaded_folders,self,FALSE,NULL);                                      
         }
-        g_slist_free (list);
     }
 
 
 }
+
+
 void 
 add_file_ext(gpointer data,
              gpointer user_data)

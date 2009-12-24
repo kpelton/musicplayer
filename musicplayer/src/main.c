@@ -70,6 +70,7 @@ main (int argc, char *argv[])
         gst_init (&argc, &argv);
 
         gconf_init(argc, argv, NULL);
+  
         mainwindow = music_main_window_new ();
 
         unique_app_watch_window (app, GTK_WINDOW (mainwindow));
@@ -87,10 +88,11 @@ main (int argc, char *argv[])
             if(argc >1)
                 music_main_play_file(MUSIC_MAIN_WINDOW(mainwindow),argv[1]);
 
+         gdk_threads_enter();
 
         gtk_main ();
-
-
+	gdk_threads_leave();	
+ 
     }
     
     g_object_unref (app);
