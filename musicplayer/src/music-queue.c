@@ -233,6 +233,8 @@ struct _MusicQueuePrivate{
 	gboolean drag_started;
 	gboolean repeat;
     	GSList *list;
+    	GMutex *mutex;
+    	GThread *thread;
 };
 
 //end private varibles
@@ -317,11 +319,15 @@ music_queue_dispose (GObject *object)
         gchar *font;
         const char *home;
         char *outputdir;
-        
 
+
+       
+        
         home = g_getenv ("HOME");
 
         outputdir = g_strdup_printf("%s/.musicplayer/pl.xspf",home);
+
+        	self->priv->read = PLAYLIST_READER(xspf_reader_new());
 
         if (self->priv->client)
         {
@@ -331,7 +337,7 @@ music_queue_dispose (GObject *object)
                 playlist_reader_write_list(self->priv->read,outputdir,list);
                 free(outputdir);
                 g_list_free(list);
-            }
+            } 
 
 
             g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
@@ -353,7 +359,10 @@ music_queue_dispose (GObject *object)
             self->priv->client = NULL;
             g_free(font);
             //g_object_unref(self->priv->store);
-            //g_object_unref(self->priv->read);
+            g_object_unref(self->priv->read);
+
+	if(self->priv->thread == NULL)
+	  g_mutex_free(self->priv->mutex);	
 
 
             G_OBJECT_CLASS (music_queue_parent_class)->dispose (object);
@@ -363,8 +372,11 @@ music_queue_dispose (GObject *object)
 static void
 music_queue_finalize (GObject *object)
 {
+
      MusicQueue *self = MUSIC_QUEUE(object);
+   
      G_OBJECT_CLASS (music_queue_parent_class)->finalize (object);
+
 }
   
 static void
@@ -431,9 +443,14 @@ music_queue_read_start_playlist(gchar *location,
 {
      GList *list = g_list_alloc();
     
+    
      playlist_reader_read_list(self->priv->read,location,&list);
 
      g_list_foreach(list,foreach_playlist_file,self);
+
+      //ts_metadata_list_free(list);
+
+    g_object_unref(self->priv->read);
     
      g_list_free(list);
      
@@ -473,6 +490,9 @@ music_queue_init (MusicQueue *self)
      self->priv->drag_started=FALSE;
      self->priv->ts = NULL;
      self->priv->read = PLAYLIST_READER(xspf_reader_new());
+      self->priv->mutex = g_mutex_new ();
+    self->priv->thread = NULL;
+     
      
      music_queue_read_start_playlist(outputdir,self);
      
@@ -615,18 +635,20 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
     int i;
 
      //add to list;
-    self->priv->ts = tag_scanner_new();
+    
 
      //check to see if it was internal
     if(gtk_drag_get_source_widget (context)  == NULL){
 	 list = g_uri_list_extract_uris ((char *)seldata->data);
+        	self->priv->ts = tag_scanner_new();
 	 for(i=0; list[i] != NULL; i++)
 	 {
 	      
 	    scan_file_action (list[i],self);
+	     
 	 }
 	 // gtk_drag_finish (context, TRUE, FALSE, time);
-
+	g_object_unref(self->priv->ts);
 	g_strfreev (list);  
     }
     //internal drag 
@@ -634,7 +656,7 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
      self->priv->changed = TRUE;
     }
     
-    g_object_unref(self->priv->ts);
+    
 }
 
 
@@ -698,6 +720,8 @@ add(GtkWidget *widget,
     GtkFileFilter *filter;
     gchar *lastdir = NULL;	
     gint response;
+    
+
 
     filter = gtk_file_filter_new ();
 
@@ -711,6 +735,7 @@ add(GtkWidget *widget,
 
     g_object_get(G_OBJECT(self),"musicqueue-lastdir",&lastdir,NULL);	
 
+    
     dialog = gtk_file_chooser_dialog_new ("Open File",
                                           NULL,
                                           GTK_FILE_CHOOSER_ACTION_OPEN,
@@ -719,13 +744,12 @@ add(GtkWidget *widget,
                                           GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
                                           NULL);
 
-
-
+      
     g_object_set(G_OBJECT(dialog),"select-multiple",TRUE,NULL);
 
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog),filter);
     gtk_file_chooser_set_local_only (GTK_FILE_CHOOSER(dialog),FALSE);
-    self->priv->ts = tag_scanner_new();
+   
     gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (dialog),lastdir);
 
     g_signal_connect_swapped (dialog,
@@ -742,6 +766,9 @@ gpointer add_threaded_folders(gpointer user_data)
 {
     	MusicQueue *self = (MusicQueue *) user_data;
     	GSList *node = self->priv->list;
+       g_mutex_lock(self->priv->mutex); 
+    self->priv->ts = tag_scanner_new();
+    
 
    	for(; node != NULL; node=node->next)
     		{
@@ -751,12 +778,16 @@ gpointer add_threaded_folders(gpointer user_data)
 		 }
     	        g_slist_free(self->priv->list);
                 g_object_unref(self->priv->ts);
-
+  g_mutex_unlock(self->priv->mutex); 
 }
 gpointer add_threaded(gpointer user_data)
 {
     	MusicQueue *self = (MusicQueue *) user_data;
     	GSList *node = self->priv->list;
+
+      g_mutex_lock(self->priv->mutex); 
+    self->priv->ts = tag_scanner_new();
+    
 
    	for(; node != NULL; node=node->next)
     		{
@@ -766,7 +797,7 @@ gpointer add_threaded(gpointer user_data)
 		 }
     	        g_slist_free(self->priv->list);
                 g_object_unref(self->priv->ts);
-
+  g_mutex_unlock(self->priv->mutex); 
 }
 
 
@@ -777,19 +808,19 @@ file_chooser_cb(GtkWidget *data,
 {
     MusicQueue *self = (MusicQueue *) data;
     gboolean b = TRUE;
+    	
 
     GtkWidget *dialog = GTK_WIDGET(user_data);
     
     gchar *lastdir = NULL;
     if(response == GTK_RESPONSE_CANCEL)
     {
-        g_object_unref(self->priv->ts);
         gtk_widget_destroy (dialog);
     }
 
     else if (response  == GTK_RESPONSE_ACCEPT)
     {
-
+  g_mutex_lock(self->priv->mutex); 
         self->priv->list =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
         //set our last dir to one they chose
 
@@ -799,18 +830,26 @@ file_chooser_cb(GtkWidget *data,
 
 
         gtk_widget_destroy (dialog);
-        g_thread_create                 (add_threaded,self,FALSE,NULL);        
+        	
+        self->priv->thread = g_thread_create                 (add_threaded,self,TRUE,NULL);  
+        
+        g_mutex_unlock(self->priv->mutex); 
+	
     }
    else if(response == 1) //folder(s) selected
     {
-
+ g_mutex_lock(self->priv->mutex); 
         self->priv->list = gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
         if(check_for_folders(self->priv->list))
         {
             gtk_widget_destroy (dialog);
-	  g_thread_create                 (add_threaded_folders,self,FALSE,NULL);                                      
+
+	   self->priv->thread = g_thread_create                 (add_threaded_folders,self,TRUE,NULL);  
+
         }
+        g_mutex_unlock(self->priv->mutex); 
     }
+  
 
 
 }
@@ -1549,7 +1588,7 @@ remove_files(GtkMenuItem *item,
     gchar *id;
     GtkTreeRowReference  *rowref;
     
-    
+    g_mutex_lock(self->priv->mutex); 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
     
     
@@ -1595,6 +1634,7 @@ remove_files(GtkMenuItem *item,
     g_list_free(rowref_list);
     g_list_free(rows);
     g_free(id);
+     g_mutex_unlock(self->priv->mutex); 
    
 } 
 
@@ -1602,6 +1642,7 @@ remove_files(GtkMenuItem *item,
 gboolean 
 has_selected(gpointer user_data)
 {
+    
     MusicQueue *self = (MusicQueue *) user_data;
     
     GList *rows;
@@ -1638,7 +1679,7 @@ sort_by_artist(gpointer    callback_data,
     gint currid;
     gint i=0;
     traversestr str;
-    
+    g_mutex_lock(self->priv->mutex); 
         //need to compare titles if the artists are the same
      if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter))
     {
@@ -1697,6 +1738,7 @@ sort_by_artist(gpointer    callback_data,
 
     
     }
+    g_mutex_unlock(self->priv->mutex); 
 }
 
 static void 
@@ -1718,7 +1760,7 @@ sort_by_date(gpointer    callback_data,
     gint i=0;
     traversestr str;
     
-     
+       g_mutex_lock(self->priv->mutex); 
      if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter) )
     {
        list = g_list_alloc();   
@@ -1782,6 +1824,7 @@ sort_by_date(gpointer    callback_data,
 
     
     }
+      g_mutex_unlock(self->priv->mutex); 
 }
 
 static void 
