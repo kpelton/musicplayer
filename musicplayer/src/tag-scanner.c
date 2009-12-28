@@ -386,6 +386,10 @@ static void gst_new_tags                (const GstTagList *list,
 
 	       g_free(str);
 	  }
+	  }
+         
+          else if(strcmp(tag,GST_TAG_DURATION)== 0){
+	 gst_tag_list_get_uint64 (list,GST_TAG_DURATION , &(track->duration));
      }
      else{
 #ifdef DEBUG

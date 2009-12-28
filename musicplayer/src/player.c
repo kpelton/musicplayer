@@ -116,6 +116,7 @@ gs_player_init (GsPlayer *me)
      gst_bus_add_watch (me->bus, my_bus_callback, me);
      
      me->track = NULL;
+       me->uri = NULL;
 }
 
 GsPlayer*
@@ -140,11 +141,12 @@ void gs_playFile(GsPlayer *me , char *location)
      
      
     
-    
+    	if(me->uri)
+        	g_free(me->uri);
      g_object_set (G_OBJECT (me->play), "uri",location, NULL);
      gst_element_set_state (me->play, GST_STATE_PLAYING);
 
-     strcpy(me->uri,location);
+    me->uri = g_strdup(location);
          me->lock = FALSE;
 	 gst_bus_add_watch (me->bus, my_bus_callback, me);
 	 //ts_event_loop(me,me->bus);

@@ -50,7 +50,7 @@ typedef struct {
      metadata *track;
 	 GstElement *gconf;
     	 GstElement *gio;
-     gchar uri[1500];
+     gchar  *uri;
      gboolean lock;
      int idle;
      

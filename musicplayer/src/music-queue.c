@@ -762,56 +762,59 @@ add(GtkWidget *widget,
 
 
 }
+
 gpointer add_threaded_folders(gpointer user_data)
 {
-    	MusicQueue *self = (MusicQueue *) user_data;
-    	GSList *node = self->priv->list;
-       g_mutex_lock(self->priv->mutex); 
+    MusicQueue *self = (MusicQueue *) user_data;
+    GSList *node = self->priv->list;
+    g_mutex_lock(self->priv->mutex); 
     self->priv->ts = tag_scanner_new();
-    
 
-   	for(; node != NULL; node=node->next)
-    		{
-        			traverse_folders (node->data,self);
-			if(node->data)
-				g_free(node->data);
-		 }
-    	        g_slist_free(self->priv->list);
-                g_object_unref(self->priv->ts);
-  g_mutex_unlock(self->priv->mutex); 
+
+    for(; node != NULL; node=node->next)
+    {
+        traverse_folders (node->data,self);
+        if(node->data)
+	g_free(node->data);
+    }
+    g_slist_free(self->priv->list);
+    g_object_unref(self->priv->ts);
+    g_mutex_unlock(self->priv->mutex); 
 }
 gpointer add_threaded(gpointer user_data)
 {
-    	MusicQueue *self = (MusicQueue *) user_data;
-    	GSList *node = self->priv->list;
+    MusicQueue *self = (MusicQueue *) user_data;
+    GSList *node = self->priv->list;
 
-      g_mutex_lock(self->priv->mutex); 
+    g_mutex_lock(self->priv->mutex); 
     self->priv->ts = tag_scanner_new();
-    
 
-   	for(; node != NULL; node=node->next)
-    		{
-        			scan_file_action (node->data,self);
-			if(node->data)
-				g_free(node->data);
-		 }
-    	        g_slist_free(self->priv->list);
-                g_object_unref(self->priv->ts);
-  g_mutex_unlock(self->priv->mutex); 
+
+    for(; node != NULL; node=node->next)
+    {
+        scan_file_action (node->data,self);
+        if(node->data)
+	g_free(node->data);
+    }
+    g_slist_free(self->priv->list);
+    g_object_unref(self->priv->ts);
+    g_mutex_unlock(self->priv->mutex); 
 }
 
 
 static void 
 file_chooser_cb(GtkWidget *data, 
-                gint response,
-                gpointer user_data)
+    gint response,
+    gpointer user_data)
+
+
 {
     MusicQueue *self = (MusicQueue *) data;
     gboolean b = TRUE;
-    	
+
 
     GtkWidget *dialog = GTK_WIDGET(user_data);
-    
+
     gchar *lastdir = NULL;
     if(response == GTK_RESPONSE_CANCEL)
     {
@@ -820,36 +823,36 @@ file_chooser_cb(GtkWidget *data,
 
     else if (response  == GTK_RESPONSE_ACCEPT)
     {
-  g_mutex_lock(self->priv->mutex); 
+        g_mutex_lock(self->priv->mutex); 
         self->priv->list =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
         //set our last dir to one they chose
 
         g_object_set(G_OBJECT(self),"musicqueue-lastdir",
-                     gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog))
-                     ,NULL);	
+            gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog))
+            ,NULL);	
 
 
         gtk_widget_destroy (dialog);
-        	
+
         self->priv->thread = g_thread_create                 (add_threaded,self,TRUE,NULL);  
-        
+
         g_mutex_unlock(self->priv->mutex); 
-	
+
     }
-   else if(response == 1) //folder(s) selected
+    else if(response == 1) //folder(s) selected
     {
- g_mutex_lock(self->priv->mutex); 
+        g_mutex_lock(self->priv->mutex); 
         self->priv->list = gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
         if(check_for_folders(self->priv->list))
         {
-            gtk_widget_destroy (dialog);
+	gtk_widget_destroy (dialog);
 
-	   self->priv->thread = g_thread_create                 (add_threaded_folders,self,TRUE,NULL);  
+	self->priv->thread = g_thread_create                 (add_threaded_folders,self,TRUE,NULL);  
 
         }
         g_mutex_unlock(self->priv->mutex); 
     }
-  
+
 
 
 }
@@ -1005,8 +1008,7 @@ scan_file_action(gpointer data,
     
     
     info =g_file_query_info (file,
-                                         G_FILE_ATTRIBUTE_STANDARD_NAME ","
-                                         G_FILE_ATTRIBUTE_STANDARD_TYPE ","
+                                         
                                          G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE ,
                                          0,NULL,
                                          &err);
@@ -1157,7 +1159,7 @@ add_file(gpointer data,gpointer user_data,metadata *track)
     
     else
     {
-        name = parse_file_name(file);
+        name = (gchar *)parse_file_name(file);//some kind of error here so have to cast
 
         gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,name);   
         g_free(name);
