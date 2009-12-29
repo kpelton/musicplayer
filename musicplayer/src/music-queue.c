@@ -51,6 +51,12 @@ enum
     SORTID_ARTIST,
     SORTID_TITLE
 };
+
+typedef enum {
+    NEWFILE,
+    REMOVE	
+}SIGNALS;
+
 enum
 {
     PROP_0,
@@ -59,6 +65,8 @@ enum
     PROP_MUSICQUEUE_LASTDIR,
     PROP_MUSICQUEUE_REPEAT
 };
+
+
 
 
 //priv fuctions
@@ -166,8 +174,6 @@ static void
 set_repeat   (GtkCheckMenuItem *widget,
               gpointer user_data);
 
-static GList * 
-get_list(gpointer user_data);
 
 static void 
 gotJump(JumpWindow *jwindow,
@@ -195,7 +201,7 @@ static gboolean
 traverse_tree_by_date (gpointer data,
                        gpointer userdata);
 
-static gboolean 
+static gboolean
 traverse_tree (gpointer data,
                gpointer userdata);
 
@@ -212,34 +218,35 @@ plugins_item_selected  (gpointer    callback_data,
 
 //private varibles
 struct _MusicQueuePrivate{
-	GtkWidget* treeview;
-	GtkWidget* openbutton;
-	GtkWidget* scrolledwindow;
-	GtkWidget *menu;
-	GtkWidget *delete;
+    GtkWidget* treeview;
+    GtkWidget* openbutton;
+    GtkWidget* scrolledwindow;
+    GtkWidget *menu;
+    GtkWidget *delete;
     GtkListStore *store;
     GtkTreeModel *musicstore;
     GtkTreeIter  curr;
-	GtkTreeSelection *currselection;
+    GtkTreeSelection *currselection;
     GConfClient* client;
-	GsPlayer *player;
+    GsPlayer *player;
     TagScanner *ts;
     PlaylistReader *read;
-	guint i;
-	gint currid;
+    guint i;
+    gint currid;
     gboolean changed;
-	gchar *font;
+    gchar *font;
     gchar *lastdir;
-	gboolean drag_started;
-	gboolean repeat;
-    	GSList *list;
-    	GMutex *mutex;
-    	GThread *thread;
+    gboolean drag_started;
+    gboolean repeat;
+    GSList *list;
+    GMutex *mutex;
+    GThread *thread;
 };
 
 //end private varibles
 
-
+//globals
+static signals[5];
 
 
 
@@ -332,7 +339,7 @@ music_queue_dispose (GObject *object)
         if (self->priv->client)
         {
 
-            if((list = get_list(self)) != NULL)
+            if((list = music_queue_get_list(self)) != NULL)
             {
                 playlist_reader_write_list(self->priv->read,outputdir,list);
                 free(outputdir);
@@ -417,6 +424,33 @@ music_queue_class_init (MusicQueueClass *klass)
 	                              "Set the playlist to repeat",
 	                              FALSE /* default value */,
 	                              G_PARAM_READWRITE);
+
+
+    signals[NEWFILE]= g_signal_new ("new-file",
+				     G_TYPE_FROM_CLASS (klass),
+				     G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+				     0 /* closure */,
+				     NULL /* accumulator */,
+				     NULL /* accumulator data */,
+				     g_cclosure_marshal_VOID__POINTER,                            
+				     G_TYPE_NONE /* return_tpe */,
+				     1,
+				     G_TYPE_POINTER);
+
+    signals[REMOVE]= g_signal_new ("remove-file",
+				     G_TYPE_FROM_CLASS (klass),
+				     G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+				     0 /* closure */,
+				     NULL /* accumulator */,
+				     NULL /* accumulator data */,
+				     g_cclosure_marshal_VOID__POINTER,                            
+				     G_TYPE_NONE /* return_tpe */,
+				     1,
+				     G_TYPE_POINTER);
+
+    
+
+    
 
 	g_object_class_install_property (object_class,
 	                                 PROP_MUSICQUEUE_REPEAT,
@@ -1165,7 +1199,7 @@ add_file(gpointer data,gpointer user_data,metadata *track)
         g_free(name);
     }
 
-   
+    g_signal_emit (self, signals[NEWFILE],0,NULL);
    
     g_free(valid);
     g_object_unref(file);
@@ -1629,6 +1663,7 @@ remove_files(GtkMenuItem *item,
 
       
 	   gtk_list_store_remove(GTK_LIST_STORE(self->priv->store),&iter);
+        	   g_signal_emit (self, signals[REMOVE],0,NULL);
 	   
     }
     //free everything
@@ -1965,8 +2000,8 @@ compare_sort_nodes_by_date(sortnodedate *node1,
 }
 
                                   
-static GList* 
-get_list(gpointer user_data)
+ GList* 
+music_queue_get_list(gpointer user_data)
 {
     MusicQueue *self = (MusicQueue *) user_data;
     metadata *track = NULL;

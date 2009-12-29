@@ -1,1 +1,1 @@
-SUBDIRS =  real visual
+SUBDIRS =  real visual stats

@@ -63,6 +63,9 @@ make_jump_window(MusicQueue *self);
 void 
 music_queue_play_selected (MusicQueue *self);
 
+GList* 
+music_queue_get_list(gpointer user_data);
+
 //end public methods
 G_END_DECLS
 
