@@ -116,15 +116,19 @@ static void stats_plugin_new_file(MusicQueue *queue,
    StatsPlugin * self = (StatsPlugin *)user_data;
     gchar * buffer;
     self->count++;
+	 guint id=0;
 
     buffer = g_strdup_printf("Files:%i",self->count); 
 
+	  id = gtk_statusbar_get_context_id(GTK_STATUSBAR(self->statusbar),"General stats");
 
+
+	  if(self->count > 1)
      gtk_statusbar_pop (GTK_STATUSBAR(self->statusbar),
-         			    gtk_statusbar_get_context_id(GTK_STATUSBAR(self->statusbar),"General stats")); 
+           			    id); 
     gtk_statusbar_push(GTK_STATUSBAR(self->statusbar),
-        						   gtk_statusbar_get_context_id(GTK_STATUSBAR(self->statusbar),"General stats"),
-                                                             buffer);
+        						   id,
+	 							buffer);
 
     g_free(buffer);
     
@@ -137,15 +141,19 @@ static void stats_plugin_remove_file(MusicQueue *queue,
    StatsPlugin * self = (StatsPlugin *)user_data;
     gchar * buffer;
     self->count--;
-
+	guint id=0;
     buffer = g_strdup_printf("Files:%i",self->count); 
 
 
+	   id = gtk_statusbar_get_context_id(GTK_STATUSBAR(self->statusbar),"General stats");
+
+	  if(self->count > 1)
      gtk_statusbar_pop (GTK_STATUSBAR(self->statusbar),
-         			    gtk_statusbar_get_context_id(GTK_STATUSBAR(self->statusbar),"General stats")); 
+           			    id); 
     gtk_statusbar_push(GTK_STATUSBAR(self->statusbar),
-        						   gtk_statusbar_get_context_id(GTK_STATUSBAR(self->statusbar),"General stats"),
-                                                             buffer);
+        						   id,
+	 							buffer);
+
 
     g_free(buffer);
     
