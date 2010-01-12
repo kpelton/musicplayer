@@ -67,7 +67,7 @@ GType gs_player_get_type (void);
 
 GsPlayer* gs_player_new (void);
 
-void gs_playFile(GsPlayer *me , char *location);
+void gs_playFile(GsPlayer *me , const char *location);
 void gs_pause(GsPlayer *me);
 void gs_pauseResume(GsPlayer *me);
 int gs_getLength(GsPlayer *me);

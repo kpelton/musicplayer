@@ -97,12 +97,10 @@ gs_player_class_init (GsPlayerClass *klass)
 static void
 gs_player_init (GsPlayer *me)
 {
-     GstElement *goom;
-     GstElement *xv;
 
-    
-     me->play = gst_element_factory_make ("playbin2", "playbin");
-	 me->gconf = gst_element_factory_make("gconfaudiosink","audio-sink");
+
+    me->play = gst_element_factory_make ("playbin2", "playbin");
+    me->gconf = gst_element_factory_make("gconfaudiosink","audio-sink");
 
 
    
@@ -130,7 +128,7 @@ gs_player_new (void)
 }
 
 
-void gs_playFile(GsPlayer *me , char *location)
+void gs_playFile(GsPlayer *me , const char *location)
 {
      gst_element_set_state (me->play, GST_STATE_NULL);
 
@@ -345,7 +343,7 @@ gboolean gs_CurrTime(GsPlayer *me, gchar *curr)
 		 
 	       gs_SecondsToReal(pos/GST_SECOND,real);
 	       gs_SecondsToReal(len/GST_SECOND,real2);
-	       g_sprintf(curr,"%s of %s" ,real,real2);
+	       g_snprintf(curr,49,"%s of %s" ,real,real2);
 		 return TRUE;
 	  }
 		
@@ -373,7 +371,7 @@ gboolean gs_CurrTime(GsPlayer *me, gchar *curr)
      leftover = (seconds - (minutes *60));
 //     hours =  minutes / 60.;
      
-     g_sprintf(str,"%i:%02i" ,minutes,leftover);
+     g_snprintf(str,50,"%i:%02i" ,minutes,leftover);
  
 
 
@@ -412,7 +410,7 @@ gdouble gs_Get_Volume(GsPlayer *player)
 
 static gboolean
 my_bus_callback (GstBus     *bus,
-		 GstMessage *message,
+		GstMessage *message,
 		 gpointer    data)
 {
      

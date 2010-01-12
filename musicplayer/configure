@@ -2244,7 +2244,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 ac_config_headers="$ac_config_headers config.h"
 
 PACKAGE=musicplayer
-VERSION=0.1.5
+VERSION=0.2
 
 am__api_version='1.11'
 
