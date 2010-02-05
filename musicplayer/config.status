@@ -718,7 +718,7 @@ fi
 
 
     PACKAGE='musicplayer'
-    VERSION='0.1.5'
+    VERSION='0.2'
     TIMESTAMP=''
     RM='rm -f'
     ofile='libtool'
@@ -891,7 +891,7 @@ S["AUTOHEADER"]="${SHELL} /home/kyle/c/music.git/musicplayer/missing --run autoh
 S["AUTOMAKE"]="${SHELL} /home/kyle/c/music.git/musicplayer/missing --run automake-1.11"
 S["AUTOCONF"]="${SHELL} /home/kyle/c/music.git/musicplayer/missing --run autoconf"
 S["ACLOCAL"]="${SHELL} /home/kyle/c/music.git/musicplayer/missing --run aclocal-1.11"
-S["VERSION"]="0.1.5"
+S["VERSION"]="0.2"
 S["PACKAGE"]="musicplayer"
 S["CYGPATH_W"]="echo"
 S["am__isrc"]=""
@@ -984,7 +984,7 @@ D["PACKAGE_STRING"]=" \"\""
 D["PACKAGE_BUGREPORT"]=" \"\""
 D["PACKAGE_URL"]=" \"\""
 D["PACKAGE"]=" \"musicplayer\""
-D["VERSION"]=" \"0.1.5\""
+D["VERSION"]=" \"0.2\""
 D["STDC_HEADERS"]=" 1"
 D["HAVE_SYS_TYPES_H"]=" 1"
 D["HAVE_SYS_STAT_H"]=" 1"

@@ -192,12 +192,16 @@ about_button_cb(GtkButton *button,
             dialog = gtk_about_dialog_new();
 
             gtk_about_dialog_set_program_name   (GTK_ABOUT_DIALOG(dialog),
-                                                         info->details->name);
+	     info->details->name);
 
-            gtk_about_dialog_set_comments   (GTK_ABOUT_DIALOG(dialog),
-                                                         info->details->desc);
-
-            gtk_dialog_run(dialog);
+	 gtk_about_dialog_set_comments   (GTK_ABOUT_DIALOG(dialog),
+	     info->details->desc);
+	 g_signal_connect_swapped (dialog,
+	     "response",
+	     G_CALLBACK (gtk_widget_destroy),
+	     dialog);
+	 
+            gtk_dialog_run(GTK_DIALOG(dialog));
             
              g_list_foreach (list, (GFunc)gtk_tree_path_free, NULL);
             g_list_free (list);
