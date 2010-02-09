@@ -9,7 +9,7 @@
 #include "player.h"
 G_BEGIN_DECLS
 
-#define VISUAL_TYPE_PLUGIN real_test_get_type()
+#define VISUAL_TYPE_PLUGIN visual_plugin_get_type()
 
 #define VISUAL_PLUGIN(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), VISUAL_TYPE_PLUGIN, ViualPlugin))

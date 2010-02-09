@@ -7,7 +7,7 @@ static void gs_SecondsToReal(float fseconds, char *str);
 static gint64 gs_PercentToTime(GsPlayer *me, gdouble percent);
 static gboolean my_bus_callback (GstBus     *bus, GstMessage *message,gpointer    data);
 
-static signals[5];
+static int signals[5];
 static void gst_new_tags                (const GstTagList *list,
 				    const gchar *tag,
 				    gpointer user_data);
@@ -15,7 +15,7 @@ static void gs_player_dispose (GObject *object);
 static void gs_player_finalize (GObject *object);
 
 gboolean gs_get_tags(GsPlayer *);
-static metadata * copyTrack(metadata *track);
+
 
 
 typedef enum {
@@ -43,7 +43,7 @@ gs_player_dispose (GObject *object)
 static void
 gs_player_finalize (GObject *object)
 {
-     GsPlayer *player =GS_PLAYER(object);
+//     GsPlayer *player =GS_PLAYER(object);
 
    
 	G_OBJECT_CLASS (gs_player_parent_class)->finalize (object);
@@ -152,58 +152,8 @@ void gs_playFile(GsPlayer *me , const char *location)
   
     
     
-       
+
 }
-void freeTrack(mtrack *track)
-{
-     if(track){
-	  if(track->uri)
-	       free(track->uri);
-	  if(track->title)
-	       free(track->title);
-	  if(track->artist)
-	       free(track->artist);
-	  if(track->genre)
-	       free(track->genre);
-	  if(track->codec)
-	       free(track->codec);
-
-
-     free(track);
-     }
-}
-
-
-static metadata * copyTrack(metadata *track)
-{
-     metadata * newTrack = NULL;
-
-   
-
-     if(track){
-	  newTrack = ts_metadata_new();
-	 
-	  if(track->uri)
-	       newTrack->uri = strdup(track->uri);
-	  if(track->title)
-	       newTrack->title = strdup(track->title);
-	  if(track->artist)
-	       newTrack->artist =strdup(track->artist);
-	  if(track->genre)
-	       newTrack->genre =strdup (track->genre);
-	  if(track->codec)
-	       newTrack->codec =strdup (track->codec);
-	  if(track->album)
-	       newTrack->album =strdup (track->album);
-	    
-	  
-        }
-
-     return newTrack;
-}
-
-
-
 
 
 void gs_loadFile(GsPlayer *me , char *location)
@@ -300,7 +250,6 @@ gboolean isPaused(GsPlayer *me)
 
 static gint64 gs_PercentToTime(GsPlayer *me, gdouble percent){
 
-     gint64 t=0;
      GstFormat fmt = GST_FORMAT_TIME;
      gint64  len;
      gchar test[200];
@@ -328,7 +277,7 @@ static gint64 gs_PercentToTime(GsPlayer *me, gdouble percent){
 
 gboolean gs_CurrTime(GsPlayer *me, gchar *curr)
 {
-    gint64 t=0;
+
     GstFormat fmt = GST_FORMAT_TIME;
      gint64 pos, len;
      gchar real[50];
@@ -360,7 +309,6 @@ gboolean gs_CurrTime(GsPlayer *me, gchar *curr)
 {
 
      int seconds = fseconds;
-     int hours = 0;
      int minutes = 0;
      int leftover =0;
 
@@ -417,11 +365,7 @@ my_bus_callback (GstBus     *bus,
 
      GsPlayer *player = (GsPlayer *)data;
      GstTagList *list;
-     gchar out[200];
-     gchar *tag;
-     GstState old, new,pend;
-     gchar *str;
-     mtrack * track;
+
         
      //g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
      switch (GST_MESSAGE_TYPE (message)) {
@@ -497,9 +441,7 @@ static void gst_new_tags                (const GstTagList *list,
 			     gpointer user_data)
 {
      gchar *str;
-     const GValue *date;
      GsPlayer *player = (GsPlayer *)user_data;
-     guint dur;
      metadata *track = player->track;
  
 	   

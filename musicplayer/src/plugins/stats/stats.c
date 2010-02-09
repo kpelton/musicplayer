@@ -11,7 +11,7 @@ static const char DESC[] = "Information about the playlist";
 //tatic const char AUTHORS[][] = {"Kyle Pelton","\0"};
 static const char COPYRIGHT[] = "Kyle Pelton";
 static const char WEBSITE[] = "www.squidman.net";
-static gboolean is_configurable = FALSE;
+//static gboolean is_configurable = FALSE;
 
 gboolean 
 stats_plugin_music_plugin_activate ( MusicPlugin  *self,MusicMainWindow *mw);
@@ -52,11 +52,13 @@ get_details()
 }
 
 
-
+/*
 static gboolean stats_plugin_eof(gpointer player,StatsPlugin * self)
 {
     g_signal_handler_unblock(player,self->id2);
+    return TRUE;
 }
+*/
 gboolean stats_plugin_music_plugin_activate (MusicPlugin *self,MusicMainWindow *mw)
 {
 StatsPlugin * stats = (StatsPlugin *)self;
@@ -107,7 +109,7 @@ StatsPlugin * stats = (StatsPlugin *)self;
 
     g_free(buffer);
     
-   
+   return TRUE;
 }
 
 static void stats_plugin_new_file(MusicQueue *queue,
@@ -175,7 +177,7 @@ gboolean stats_plugin_music_plugin_deactivate ( MusicPlugin *user_data)
      printf("destruction \n");
     g_object_unref(self->mw);
      gtk_widget_destroy(self->statusbar); 
-
+ return TRUE;
 }
 
 GType 

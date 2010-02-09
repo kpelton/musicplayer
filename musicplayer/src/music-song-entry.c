@@ -65,7 +65,7 @@ translate_text(gpointer data)
  GdkRegion *region;
  widget = GTK_WIDGET (data);
 
-         if (!widget->window) return;
+         if (!widget->window) return FALSE;
 
          region = gdk_drawable_get_clip_region (widget->window);
          /* redraw the cairo canvas completely by exposing it */
@@ -90,6 +90,7 @@ mouse_released(GtkWidget      *widget,
             self->trans2=0;
             self->type++;
         }
+    return TRUE;
 }
 static void
 music_song_entry_init (MusicSongEntry *self)
@@ -128,13 +129,11 @@ music_song_entry_draw(GtkWidget *self,cairo_t *cr)
 {
 	  gdouble radius,x,y;
 	  MusicSongEntry *  test = MUSIC_SONG_ENTRY(self);
-	  cairo_pattern_t *pattern;
 	  PangoLayout *layout;
 	  PangoFontDescription *desc;
-	  gint i;
 	  gint trans;
       gint delta =0; 
-      gint len;
+
       gchar *copy=NULL;
     
 

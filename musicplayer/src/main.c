@@ -27,15 +27,13 @@ message_received_cb (UniqueApp         *app,
                      gpointer           user_data);
 
 
-main (int argc, char *argv[])
+int main (int argc, char *argv[])
 {
     GtkWidget *mainwindow;
-    MusicMainWindow *m;
     UniqueApp* app;
  
     UniqueResponse response; /* the response to our command */
      UniqueMessageData *message; /* the payload for the command */
-     UniqueCommand command; 
 
     g_type_init(); 
      gtk_init (&argc, &argv);

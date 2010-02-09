@@ -91,8 +91,7 @@ music_plugin_init_widgets(MusicPluginManager *self)
 	GtkWidget *alignment;
 	GtkWidget *viewport;
 	GtkWidget *hbuttonbox;
-    GtkWidget *about;
-    GtkWidget *config;
+    //GtkWidget *config;
     GtkWidget *pm;
 	gchar *markup;
 
@@ -402,7 +401,7 @@ music_plugin_manager_populate_lists (MusicPluginManager *pm)
 	GtkTreeIter iter;
     GtkTreeSelection *selection;
     MusicPluginInfo *info;
-    MusicPluginDetails * details;
+    //MusicPluginDetails * details;
 	
 
 	plugins = music_plugins_get_list();

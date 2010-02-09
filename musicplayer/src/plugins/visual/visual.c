@@ -49,7 +49,7 @@ gboolean visual_plugin_activate (MusicPlugin *user_data,MusicMainWindow *mw)
 {
   VisualPlugin * self = (VisualPlugin *)user_data;
     self->mw = mw;
-    GstMessage *msg;
+    
     GstElement *vis_capsfilter;
     GstPad *pad;
     GstElement *vis_bin;
@@ -81,7 +81,7 @@ gboolean visual_plugin_activate (MusicPlugin *user_data,MusicMainWindow *mw)
     caps = gst_pad_get_allowed_caps (pad);
     
     gst_object_unref (pad);
-    int i;
+
 
      caps = gst_caps_make_writable (caps);
 
@@ -102,7 +102,7 @@ gboolean visual_plugin_activate (MusicPlugin *user_data,MusicMainWindow *mw)
    self->bin = vis_bin;
    g_object_set(G_OBJECT(self->mw->player->play),"vis-plugin",vis_bin,NULL);
 
-    
+    return TRUE;
 }
 
 
@@ -118,6 +118,7 @@ gboolean visual_plugin_deactivate ( MusicPlugin *user_data)
     g_object_set(G_OBJECT(self->mw->player->play),"vis-plugin",NULL,NULL);
 
     g_object_unref(self->bin);
+    return TRUE;
    
 }
 

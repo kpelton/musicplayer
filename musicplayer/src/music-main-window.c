@@ -56,7 +56,7 @@ music_main_window_set_property (GObject *object, guint property_id,
 static void
 music_main_window_dispose (GObject *object)
 {
-    MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);	
+    //MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);	
     
   G_OBJECT_CLASS (music_main_window_parent_class)->dispose (object);
    gtk_exit(0);
@@ -122,9 +122,6 @@ static void init_widgets(MusicMainWindow *self)
 {
 
    
-     gint dwidth;
-     gint dhight;
-     GtkWidget *test;
      GtkWidget *hbox;
 	  
      //init player window
@@ -349,11 +346,8 @@ static void mwindow_new_file(GsPlayer *player,
 			     metadata* p_track,gpointer user_data)
 {
 	MusicMainWindow *self = (MusicMainWindow *)user_data;
-	gchar title[200];
-	gchar buffer[50];
-	gint i;
+	gchar title[1024];
 	gchar output[1024];
-	gchar output2[1024];
 	gchar *escaped;
 	gchar *escaped_artist;
 	gchar *escaped_title;

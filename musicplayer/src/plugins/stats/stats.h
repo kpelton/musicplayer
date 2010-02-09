@@ -10,8 +10,7 @@
 
 G_BEGIN_DECLS
 
-#define STATS_TYPE_PLUGIN real_test_get_type()
-
+#define STATS_TYPE_PLUGIN stats_plugin_get_type()
 #define STATS_PLUGIN(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), STATS_TYPE_PLUGIN, StatsPlugin)
 

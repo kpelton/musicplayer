@@ -1,6 +1,7 @@
 /*a music-seek.c */
 
 #include "music-seek.h"
+#include "player.h"
 #include <gtk/gtk.h>
 G_DEFINE_TYPE (MusicSeek, music_seek, GTK_TYPE_HSCALE);
 static void 
@@ -29,7 +30,7 @@ button_released(GtkWidget      *widget,
 static void
 music_seek_finalize (GObject *gobject)
 {
-  MusicSeek *self = MUSIC_SEEK(gobject);
+  //MusicSeek *self = MUSIC_SEEK(gobject);
 
  
   /* Chain up to the parent class */
@@ -39,7 +40,7 @@ music_seek_finalize (GObject *gobject)
 static void
 music_seek_dispose (GObject *gobject)
 {
-    MusicSeek *self = MUSIC_SEEK(gobject);
+    //MusicSeek *self = MUSIC_SEEK(gobject);
     G_OBJECT_CLASS (music_seek_parent_class)->dispose (gobject);
 
 }
@@ -59,7 +60,7 @@ music_seek_class_init (MusicSeekClass *klass)
 static void
 music_seek_init (MusicSeek *self)
 {
-    MusicSeek *me = self;
+
 
     gtk_scale_set_value_pos(GTK_SCALE(self),GTK_POS_TOP);
 

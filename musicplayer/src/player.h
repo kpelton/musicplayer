@@ -77,9 +77,9 @@ metadata * gs_get_tag(GsPlayer *player);
 void gs_Set_Volume(GsPlayer *player, gdouble value);
 gdouble gs_Get_Volume(GsPlayer *player);
 void gs_loadFile(GsPlayer *me , char *location);
-void freeTrack(mtrack *track);
 gboolean isPlaying(GsPlayer *me);
 gboolean isPaused(GsPlayer *me);
+gboolean gs_CurrTime(GsPlayer *me, gchar *curr);
 G_END_DECLS
 
 
