@@ -22,7 +22,6 @@ music_volume_init (MusicVolume *self)
 GtkWidget*
 music_volume_new_with_player (GsPlayer *player)
 {
-    GtkWidget *ret;
     MusicVolume *me;
     GConfClient* client;
     gdouble vol;
@@ -52,10 +51,7 @@ music_volume_new_with_player (GsPlayer *player)
 GtkWidget*
 music_volume_new(void)
 {
-    GtkWidget *ret;
-    MusicVolume *me;
     return g_object_new (MUSIC_TYPE_VOLUME, NULL);
-
 
 }
 

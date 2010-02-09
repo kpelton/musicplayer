@@ -2245,7 +2245,7 @@ ac_config_headers="$ac_config_headers config.h"
 
 PACKAGE=musicplayer
 VERSION=0.2
-CFLAGS="$CFLAGS -Wall"
+CFLAGS="$CFLAGS -Wall -g -O2"
 
 am__api_version='1.11'
 

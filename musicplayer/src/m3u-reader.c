@@ -32,9 +32,8 @@ m3u_reader_read_list(PlaylistReader *plist,
     gchar *location,
     GList **list)
 {
-    M3uReader *self = M3U_READER(plist);
-    gssize count=0;
-    GError *er=NULL;
+    gsize count=0;
+    //GError *er=NULL;    
     gchar *buffer=NULL;
     gchar **lines =NULL;
     GFileInfo *info=NULL;
@@ -45,8 +44,7 @@ m3u_reader_read_list(PlaylistReader *plist,
     gchar *escaped=NULL;
     gchar *newuri=NULL;
     metadata *md=NULL;
-    gchar *uribeg=NULL; 
-    gchar* filetest=NULL;
+    gchar *uribeg=NULL; ;
     uri = g_strdup(location);
     uribeg= uri;
     gchar *lineptr=NULL;
@@ -74,7 +72,7 @@ m3u_reader_read_list(PlaylistReader *plist,
         &err);
     g_object_unref(file);
 
-    if(count >0)
+    if(count >0 && !err)
     {
         lines = g_strsplit(buffer,"\n",-1);
         if(lines){
@@ -162,10 +160,7 @@ m3u_reader_mime_type()
 static void
 m3u_reader_finalize (GObject *object)
 {
-    M3uReader *self = M3U_READER(object);
 
-
-    
   G_OBJECT_CLASS (m3u_reader_parent_class)->finalize (object);
 }
 

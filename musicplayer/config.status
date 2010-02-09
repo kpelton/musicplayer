@@ -589,7 +589,7 @@ old_postinstall_cmds='chmod 644 $oldlib~$RANLIB $oldlib'
 old_postuninstall_cmds=''
 old_archive_cmds='$AR $AR_FLAGS $oldlib$oldobjs~$RANLIB $oldlib'
 CC='gcc'
-CFLAGS=' -Wall'
+CFLAGS=' -Wall -g -O2'
 compiler='gcc'
 GCC='yes'
 lt_cv_sys_global_symbol_pipe='sed -n -e '\''s/^.*[	 ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p'\'''
@@ -673,7 +673,7 @@ old_striplib='strip --strip-debug'
 striplib='strip --strip-unneeded'
 
 LTCC='gcc'
-LTCFLAGS=' -Wall'
+LTCFLAGS=' -Wall -g -O2'
 compiler='gcc'
 
 # Quote evaled strings.
@@ -864,7 +864,7 @@ S["EXEEXT"]=""
 S["ac_ct_CC"]="gcc"
 S["CPPFLAGS"]=""
 S["LDFLAGS"]=""
-S["CFLAGS"]=" -Wall"
+S["CFLAGS"]=" -Wall -g -O2"
 S["CC"]="gcc"
 S["host_os"]="linux-gnu"
 S["host_vendor"]="pc"

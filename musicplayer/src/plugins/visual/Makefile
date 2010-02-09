@@ -100,7 +100,7 @@ AUTOMAKE = ${SHELL} /home/kyle/c/music.git/musicplayer/missing --run automake-1.
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS =  -Wall
+CFLAGS =  -Wall -g -O2
 CPP = gcc -E
 CPPFLAGS = 
 CYGPATH_W = echo
