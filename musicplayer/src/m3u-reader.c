@@ -29,32 +29,34 @@ G_DEFINE_TYPE_WITH_CODE (M3uReader, m3u_reader, G_TYPE_OBJECT,
 
 static gboolean
 m3u_reader_read_list(PlaylistReader *plist,
-                      gchar *location,
-                      GList **list)
+    gchar *location,
+    GList **list)
 {
     M3uReader *self = M3U_READER(plist);
     gssize count=0;
-    GError *err;
-    gchar *buffer;
+    GError *er=NULL;
+    gchar *buffer=NULL;
     gchar **lines =NULL;
-    GFileInfo *info;
-    GFile *file;
+    GFileInfo *info=NULL;
+    GFile *file=NULL;
     int i;
-    TagScanner *ts;
-    gchar *uri;
-    gchar *escaped;
-    gchar *newuri;
-    metadata *md;
-    gchar *uribeg; 
+    TagScanner *ts=NULL;
+    gchar *uri=NULL;
+    gchar *escaped=NULL;
+    gchar *newuri=NULL;
+    metadata *md=NULL;
+    gchar *uribeg=NULL; 
+    gchar* filetest=NULL;
     uri = g_strdup(location);
     uribeg= uri;
-    gchar *lineptr;
+    gchar *lineptr=NULL;
+    GError *err = NULL;
 
 
     //get the right directory for the uri
     for(uri=uri+strlen(uri); *uri != '/'; uri--);
 
-        *(uri)='\0';
+    *(uri)='\0';
 
     uri = uribeg;
     file =g_file_new_for_commandline_arg(location);
@@ -62,73 +64,78 @@ m3u_reader_read_list(PlaylistReader *plist,
     {
         printf("Error opening playlist\n");
         return 0;
-        
+
     }
     g_file_load_contents    (file,
-        				NULL,      				
-                                      &buffer,
-                                      &count,
-        				NULL,
-                                      &err);
+        NULL,      				
+        &buffer,
+        &count,
+        NULL,
+        &err);
     g_object_unref(file);
 
     if(count >0)
     {
         lines = g_strsplit(buffer,"\n",-1);
         if(lines){
-            ts = tag_scanner_new ();
-            for(i=0; lines[i] != NULL; i++)
-            {
-                if( *lines[i] != '\0' && *lines[i] != '#' && *lines[i] != '\r')
-                {
-                    if(lines[i][strlen(lines[i])-1] == '\r' || lines[i][strlen(lines[i])-1] == '\n')
-                        lines[i][strlen(lines[i])-1] = '\0';  
-                    
-                    //get rid of the \n at the start and  at the end
-                    lines[i][strlen(lines[i])] = '\0';   
-    
-                    
-                    lineptr = lines[i];
-                    
-                    if(*lineptr == '\n')
-                        lineptr++;
+	 ts = tag_scanner_new ();
+	 for(i=0; lines[i] != NULL; i++)
+	 {
+	     if( *lines[i] != '\0' && *lines[i] != '#' && *lines[i] != '\r')
+	     {
+	         if(lines[i][strlen(lines[i])-1] == '\r' || lines[i][strlen(lines[i])-1] == '\n')
+		  lines[i][strlen(lines[i])-1] = '\0';  
 
-                
-                    escaped = g_uri_escape_string(lineptr,NULL,TRUE);
-                    newuri = g_malloc(sizeof(gchar) *strlen(escaped)+strlen(uri)+10);
-                    g_snprintf(newuri,strlen(escaped)+strlen(uri)+20,"%s/%s",uri,escaped);
-	        	file =g_file_new_for_commandline_arg(newuri);
-	        
-	
-                    if( file)
-                    {
-                        md=ts_get_metadata (newuri,ts);
+	         //get rid of the \n at the start and  at the end
+	         lines[i][strlen(lines[i])] = '\0';   
 
-                        if(md) //has metadata
-                        {
-                            md->uri = strdup(newuri);
-                            *list = g_list_append(*list,md);
-                        }
-                        else //no metadata copy uri
-                        {
-                         md = ts_metadata_new ();
-                         md->uri = strdup(newuri);
-                         *list = g_list_append(*list,md);
-                        }	
-		g_object_unref(file);
-	        }
-                 g_free(escaped);
-                 g_free(newuri);   
-                }
-                
-            }
-            g_free(uri);
-            g_strfreev(lines); 
-            g_object_unref(ts);
-             return TRUE;
+
+	         lineptr = lines[i];
+
+	         if(*lineptr == '\n')
+		  lineptr++;
+
+
+	         escaped = g_uri_escape_string(lineptr,NULL,TRUE);
+	         newuri = g_malloc(sizeof(gchar) *strlen(escaped)+strlen(uri)+10);
+	         g_snprintf(newuri,strlen(escaped)+strlen(uri)+20,"%s/%s",uri,escaped);
+	         file =g_file_new_for_commandline_arg(newuri);
+	         info = g_file_query_info(file,G_FILE_ATTRIBUTE_STANDARD_TYPE,0,NULL,NULL);
+
+	         //needs more error checking
+	         if( file && info)
+	         {
+		  md=ts_get_metadata (newuri,ts);
+
+		  if(md) //has metadata
+		  {
+		      md->uri = strdup(newuri);
+		      *list = g_list_append(*list,md);
+		  }
+		  else //no metadata copy uri
+		  {
+		      md = ts_metadata_new ();
+		      md->uri = strdup(newuri);
+		      *list = g_list_append(*list,md);
+		  }	
+	         }
+
+	         g_object_unref(file);
+	         if(info)
+		  g_object_unref(info);
+
+	         g_free(escaped);
+	         g_free(newuri);   
+	     }
+
+	 }
+	 g_free(uri);
+	 g_strfreev(lines); 
+	 g_object_unref(ts);
+	 return TRUE;
         }
     }
-     
+    
     return FALSE;
 }
 

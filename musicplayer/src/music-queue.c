@@ -176,7 +176,7 @@ set_repeat   (GtkCheckMenuItem *widget,
 
 
 static void 
-gotJump(JumpWindow *jwindow,
+got_jump(JumpWindow *jwindow,
         GtkTreePath* path,gpointer user_data);
 
 static gint 
@@ -932,15 +932,15 @@ static void
 traverse_folders(gpointer data,
                  gpointer user_data)
 {
-	GFileEnumerator *enumer; 
-	GFileInfo *info;
-	GFile *file;
+	GFileEnumerator *enumer=NULL; 
+	GFileInfo *info=NULL;
+	GFile *file=NULL;
 	const gchar *target_uri;
 	const gchar *uri = (gchar *) data;
 	const gchar *name;
 	const gchar *filetype;
-	gchar *buffer;
-	gchar *escaped;
+	gchar *buffer=NULL;
+	gchar *escaped=NULL;
 	GError *err=NULL;
 
 	file = g_file_new_for_uri((gchar *)data);
@@ -958,6 +958,7 @@ traverse_folders(gpointer data,
 		/* Report error to user, and free error */
 		fprintf (stderr, "Unable to read file: %s\n", err->message);
 		g_error_free (err);
+	    	return;
 	}
 
     
@@ -968,6 +969,7 @@ traverse_folders(gpointer data,
 		/* Report error to user, and free error */
 		fprintf (stderr, "Unable to read file: %s\n", err->message);
 		g_error_free (err);
+	    	return;
 	}
     
 	while(info != NULL)
@@ -1034,8 +1036,8 @@ scan_file_action(gpointer data,
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GFile * file = g_file_new_for_uri((gchar *)data);
-	GError *err;
-	GFileInfo *info;
+	GError *err=NULL;
+	GFileInfo *info=NULL;
 	gchar* uri = (gchar *)data; 
     
 	const gchar *type;
@@ -1051,6 +1053,7 @@ scan_file_action(gpointer data,
 		/* Report error to user, and free error */
 		fprintf (stderr, "Unable to read file: %s\n", err->message);
 		g_error_free (err);
+	    	return;
 	}
 	else
 	{
@@ -1058,9 +1061,10 @@ scan_file_action(gpointer data,
 							G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
 		choose_file_action(uri,type,user_data);
 		g_object_unref(file);
+	    	g_object_unref(info);
 	}
 	
-	g_object_unref(info);
+	
 
     
     
@@ -1554,13 +1558,13 @@ make_jump_window(MusicQueue *self)
 	jumpwindow = jump_window_new_with_model(self->priv->musicstore);
 
 	g_signal_connect(jumpwindow, "jump",
-	                 G_CALLBACK(gotJump),
+	                 G_CALLBACK(got_jump),
 	                 self);
            
 	gtk_widget_show(jumpwindow);
 }
 static void 
-gotJump(JumpWindow *jwindow,
+got_jump(JumpWindow *jwindow,
         GtkTreePath* path,
         gpointer user_data)
 {

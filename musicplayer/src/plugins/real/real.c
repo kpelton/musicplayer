@@ -11,7 +11,7 @@ static const char DESC[] = "Inform user when the song changes";
 //tatic const char AUTHORS[][] = {"Kyle Pelton","\0"};
 static const char COPYRIGHT[] = "Kyle Pelton";
 static const char WEBSITE[] = "www.squidman.net";
-static gboolean is_configurable = FALSE;
+//static gboolean is_configurable = FALSE;
 
 gboolean 
 real_test_music_plugin_activate ( MusicPlugin  *self,MusicMainWindow *mw);
@@ -55,6 +55,7 @@ get_details()
 static gboolean real_test_eof(gpointer player,RealTest * self)
 {
     g_signal_handler_unblock(player,self->id2);
+     return TRUE;
 }
 gboolean real_test_music_plugin_activate (MusicPlugin *self,MusicMainWindow *mw)
 {
@@ -72,6 +73,7 @@ RealTest * real = (RealTest *)self;
                       (gpointer)real);
     
     g_signal_handler_block(mw->player,real->id2); 
+     return TRUE;
 }
 
 static void real_test_new_file(GsPlayer *player,
@@ -120,7 +122,7 @@ gboolean real_test_music_plugin_deactivate ( MusicPlugin *user_data)
 
      printf("destruction \n");
     g_object_unref(self->mw);
-
+     return TRUE;
 }
 
 GType 
