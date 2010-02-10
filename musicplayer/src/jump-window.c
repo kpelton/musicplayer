@@ -28,7 +28,7 @@ typedef enum {
 	JUMP
 }SIGNALS;
 
-static signals[5];
+static int signals[5];
 
 //prototypes
 static void init_widgets(JumpWindow *self, GtkTreeModel *model);
@@ -84,7 +84,7 @@ jump_window_finalize (GObject *object)
 static void
 jump_window_dispose (GObject *object)
 {
-	JumpWindow *self = JUMP_WINDOW(object);
+
     
   G_OBJECT_CLASS (jump_window_parent_class)->dispose (object);
  
@@ -94,7 +94,7 @@ static void
 jump_window_class_init (JumpWindowClass *klass)
 {
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
-	GtkWindowClass* parent_class = GTK_WINDOW_CLASS (klass);
+	
 
 	object_class->finalize = jump_window_finalize;
 	object_class->dispose = jump_window_dispose;
@@ -114,7 +114,7 @@ jump_window_class_init (JumpWindowClass *klass)
 GtkWidget*
 jump_window_new_with_model (GtkTreeModel *model)
 {
-	GtkWidget *retval;
+	
 	JumpWindow *self;
 	
     self = g_object_new (JUMP_TYPE_WINDOW, NULL);
@@ -169,6 +169,9 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 	
 	gtk_widget_show_all(GTK_WIDGET(self->mainvbox));
 	gtk_widget_show_all(GTK_WIDGET(self->scrolledwindow));
+
+	//setup
+	
 
 	//signals
 

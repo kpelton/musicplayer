@@ -355,7 +355,7 @@ static void mwindow_new_file(GsPlayer *player,
 
 
 
-	if(p_track->artist){
+	if(p_track->artist && p_track->title){
 		g_snprintf(title,1023,"%s - %s",p_track->artist, p_track->title);
 		gtk_window_set_title(GTK_WINDOW(self),title);
 		escaped_artist = g_markup_escape_text(p_track->artist,-1);

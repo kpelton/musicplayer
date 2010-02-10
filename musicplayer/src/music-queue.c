@@ -1532,6 +1532,7 @@ remove_files_via_press(GtkWidget *widget,
 
 	if(event->keyval == GDK_j)
 	{
+	    
 		make_jump_window(self);
 		return TRUE;
 	}
