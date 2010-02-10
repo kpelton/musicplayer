@@ -167,10 +167,10 @@ gboolean
 has_selected(gpointer user_data);
 
 /*
-static void 
-set_font   (gpointer    callback_data,
-            guint       callback_action,
-            GtkWidget  *widget);
+  static void 
+  set_font   (gpointer    callback_data,
+  guint       callback_action,
+  GtkWidget  *widget);
 */
 static void 
 set_repeat   (GtkCheckMenuItem *widget,
@@ -179,7 +179,7 @@ set_repeat   (GtkCheckMenuItem *widget,
 
 static void 
 got_jump(JumpWindow *jwindow,
-        GtkTreePath* path,gpointer user_data);
+	 GtkTreePath* path,gpointer user_data);
 
 static gint 
 compare_sort_nodes(sortnode *node1, 
@@ -249,11 +249,7 @@ struct _MusicQueuePrivate{
 
 //globals
 static int signals[5];
-
-
-
-
-
+//
 
 const static  GtkTargetEntry targetentries[] =
 {
@@ -449,17 +445,9 @@ music_queue_class_init (MusicQueueClass *klass)
 				       1,
 				       G_TYPE_POINTER);
 
-    
-
-    
-
 	g_object_class_install_property (object_class,
 	                                 PROP_MUSICQUEUE_REPEAT,
 	                                 pspec);
-
-
-
-
 
 }
 static void 
@@ -477,7 +465,6 @@ music_queue_read_start_playlist(gchar *location,
                                 MusicQueue *self)
 {
 	GList *list = g_list_alloc();
-    
     
 	playlist_reader_read_list(self->priv->read,location,&list);
 
@@ -545,15 +532,9 @@ init_widgets(MusicQueue *self)
 
 	gtk_box_pack_start (GTK_BOX (self),self->priv->scrolledwindow, TRUE, TRUE, 0);
      
-    
-     
 	gtk_widget_show (self->priv->scrolledwindow);
 
 	self->priv->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,-1);
-
-    
-
-       
 
 	//add model to widget we want the jump window to have the filter store and the queue
 	// to have the regular list store
@@ -614,12 +595,8 @@ init_widgets(MusicQueue *self)
 	g_signal_connect(self->priv->treeview, "drag_data_received",
 	                 G_CALLBACK(on_drag_data_received),
 	                 self);
-
-	
      
 //set policy
-     
-     
 
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(self->priv->scrolledwindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
      
@@ -633,15 +610,8 @@ init_widgets(MusicQueue *self)
 					      targetentries, G_N_ELEMENTS (targetentries),
 					      GDK_ACTION_COPY | GDK_ACTION_MOVE);
 
-     
-
-    
-
 	self->priv->currselection = gtk_tree_view_get_selection(GTK_TREE_VIEW (self->priv->treeview));
 	gtk_tree_selection_set_mode(self->priv->currselection,GTK_SELECTION_MULTIPLE);
-
-
-
 
 	self->priv->menu = get_context_menu(self);
 	gtk_widget_show_all(self->priv->menu);
@@ -661,7 +631,7 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 {
     
 	MusicQueue *self = (MusicQueue *) userdata;
-	char **list;
+	char **list=NULL;
 	int i;
 
 	//add to list;
@@ -697,10 +667,10 @@ static void playfile (GtkTreeView *treeview,
 	
 {
 	MusicQueue *self = (MusicQueue *) data;
-	gchar * uri;
+	gchar * uri=NULL;
 	GtkTreeIter iter;
-	GtkTreeModel *model;
-	gchar *id;
+	GtkTreeModel *model=NULL;
+	gchar *id=NULL;
 	model = gtk_tree_view_get_model(treeview);
     
 	if (gtk_tree_model_get_iter (model, &iter,path))
@@ -745,13 +715,11 @@ add(GtkWidget *widget,
 {
 
 	MusicQueue *self = (MusicQueue *) user_data;
-
-	GtkWidget *dialog;
-	GtkFileFilter *filter;
+	GtkWidget *dialog=NULL;
+	GtkFileFilter *filter=NULL;
 	gchar *lastdir = NULL;	
-    
 
-
+	
 	filter = gtk_file_filter_new ();
 
 	gtk_file_filter_set_name(filter,"Supported Types");  
@@ -809,7 +777,7 @@ gpointer add_threaded_folders(gpointer user_data)
 	g_slist_free(self->priv->list);
 	g_object_unref(self->priv->ts);
 	g_mutex_unlock(self->priv->mutex); 
-    return NULL;
+	return NULL;
 }
 gpointer add_threaded(gpointer user_data)
 {
@@ -829,7 +797,7 @@ gpointer add_threaded(gpointer user_data)
 	g_slist_free(self->priv->list);
 	g_object_unref(self->priv->ts);
 	g_mutex_unlock(self->priv->mutex); 
-    return NULL;
+	return NULL;
 }
 
 
@@ -841,9 +809,6 @@ file_chooser_cb(GtkWidget *data,
 
 {
 	MusicQueue *self = (MusicQueue *) data;
-
-
-
 	GtkWidget *dialog = GTK_WIDGET(user_data);
 
 	if(response == GTK_RESPONSE_CANCEL)
@@ -864,7 +829,7 @@ file_chooser_cb(GtkWidget *data,
 
 		gtk_widget_destroy (dialog);
 
-		self->priv->thread = g_thread_create                 (add_threaded,self,TRUE,NULL);  
+		self->priv->thread = g_thread_create(add_threaded,self,TRUE,NULL);  
 
 		g_mutex_unlock(self->priv->mutex); 
 
@@ -877,14 +842,11 @@ file_chooser_cb(GtkWidget *data,
 		{
 			gtk_widget_destroy (dialog);
 
-			self->priv->thread = g_thread_create                 (add_threaded_folders,self,TRUE,NULL);  
+			self->priv->thread = g_thread_create(add_threaded_folders,self,TRUE,NULL);  
 
 		}
 		g_mutex_unlock(self->priv->mutex); 
 	}
-
-
-
 }
 
 
@@ -954,7 +916,6 @@ traverse_folders(gpointer data,
 	    	return;
 	}
 
-    
 	info = g_file_enumerator_next_file(enumer,NULL,&err);
 
 	if (err != NULL)
@@ -989,20 +950,15 @@ traverse_folders(gpointer data,
 					add_file(buffer,user_data,NULL);
 				}
 			}
-                  
 			g_free(escaped);
 			g_free(buffer);
                  
                 }
-
-            
 		g_object_unref(info);
 		info = g_file_enumerator_next_file(enumer,NULL,NULL);
 	}
 	g_object_unref(file);
 	g_object_unref(enumer);
-    
-                                            
 }
 
 
@@ -1036,7 +992,6 @@ scan_file_action(gpointer data,
     
     
 	info =g_file_query_info (file,
-                                         
 				 G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE ,
 				 0,NULL,
 				 &err);
@@ -1055,11 +1010,6 @@ scan_file_action(gpointer data,
 		g_object_unref(file);
 	    	g_object_unref(info);
 	}
-	
-	
-
-    
-    
 }
 
 static void 
@@ -1070,9 +1020,7 @@ choose_file_action(gchar * uri,
 	PlaylistReader *read;
 	GList *list;
 	MusicQueue *self = (MusicQueue *) user_data;
-    
-
-    
+	    
 	if(strcmp(type,"audio/mpeg") == 0)
 	{
 		add_file(uri,user_data,NULL);
@@ -1131,9 +1079,7 @@ add_file(gpointer data,gpointer user_data,metadata *track)
 	metadata *md = NULL;
 
 	self->priv->i++;
-
- 
-
+	
 	file =g_file_new_for_commandline_arg((gchar *)data);
 	info= g_file_query_info(file,"time::modified,standard::display-name",
 				G_FILE_QUERY_INFO_NONE,  NULL,&err);    
@@ -1155,9 +1101,6 @@ add_file(gpointer data,gpointer user_data,metadata *track)
 
 	g_snprintf(buffer,10,"%i",self->priv->i);
 	gtk_list_store_set(self->priv->store,&iter,COLUMN_ID,buffer,-1);  
-
-
-                          
 
 
 	mod = g_file_info_get_attribute_uint64(info,
@@ -1189,9 +1132,6 @@ add_file(gpointer data,gpointer user_data,metadata *track)
 		else
 			ts_metadata_free(md);
 	}
-
-
-    
 	else
 	{
 		name = (gchar *)parse_file_name(file);//some kind of error here so have to cast
@@ -1199,19 +1139,13 @@ add_file(gpointer data,gpointer user_data,metadata *track)
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,name);   
 		g_free(name);
 	}
-
     
 	g_signal_emit (self, signals[NEWFILE],0,NULL);
    
 	g_free(valid);
 	g_object_unref(file);
 	g_object_unref(info);
-
-
 }
-
-
-
 
 GtkWidget*
 music_queue_new (void)
@@ -1229,10 +1163,7 @@ music_queue_new_with_player(GsPlayer *player)
 	g_signal_connect (player, "eof",
 			  G_CALLBACK(next_file),
 			  (gpointer)self);
-    
-    
-    
-    
+    	
 	return GTK_WIDGET(self);
 }
 static void 
@@ -1240,7 +1171,7 @@ next_file            (GsPlayer      *player,
 		      gpointer         user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
-	GtkTreeModel *model;
+	GtkTreeModel *model=NULL;
 	GtkTreeIter iter;
 
 	gboolean test;	
@@ -1265,11 +1196,7 @@ next_file            (GsPlayer      *player,
 				gtk_tree_selection_select_iter(self->priv->currselection,&iter); 
 				playfile(GTK_TREE_VIEW(self->priv->treeview),gtk_tree_model_get_path(model,&iter),NULL,user_data);
 			}
-
-
 		}
-
-
 	}
 }
 
@@ -1555,8 +1482,8 @@ make_jump_window(MusicQueue *self)
 }
 static void 
 got_jump(JumpWindow *jwindow,
-        GtkTreePath* path,
-        gpointer user_data)
+	 GtkTreePath* path,
+	 gpointer user_data)
 {
     
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1577,17 +1504,17 @@ plugins_item_selected  (gpointer    callback_data,
 	gtk_widget_show(dialog);
 }
 /*
-static void 
-set_font   (gpointer    callback_data,
-            guint       callback_action,
-            GtkWidget  *widget)
-{
+  static void 
+  set_font   (gpointer    callback_data,
+  guint       callback_action,
+  GtkWidget  *widget)
+  {
     
-	GtkWidget *   font_window = gtk_font_selection_dialog_new       ("Select playlist font"); 
+  GtkWidget *   font_window = gtk_font_selection_dialog_new       ("Select playlist font"); 
     
-	gtk_widget_show(font_window); 
+  gtk_widget_show(font_window); 
     
-}
+  }
 */
 static void 
 set_repeat (GtkCheckMenuItem *widget,
@@ -2013,23 +1940,23 @@ music_queue_get_list(gpointer user_data)
 			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
 					    &iter,COLUMN_TITLE, &title, -1); 
 		  
-		  track->title = title;
-		  gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
-						  &iter,COLUMN_ARTIST, &artist, -1); 
+			track->title = title;
+			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
+					    &iter,COLUMN_ARTIST, &artist, -1); 
 		  
-		  track->artist = artist;
+			track->artist = artist;
 		  
-		  gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
-						  &iter,COLUMN_URI, &uri, -1);
-		  track->uri = uri;
+			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
+					    &iter,COLUMN_URI, &uri, -1);
+			track->uri = uri;
 		  
-		  list =  g_list_append(list,(gpointer)track); 
-	   }while(gtk_tree_model_iter_next(
-								GTK_TREE_MODEL(self->priv->store),
-					 			&iter));
-    }
+			list =  g_list_append(list,(gpointer)track); 
+		}while(gtk_tree_model_iter_next(
+			       GTK_TREE_MODEL(self->priv->store),
+			       &iter));
+	}
     
     
-    return list;
+	return list;
     
 }
