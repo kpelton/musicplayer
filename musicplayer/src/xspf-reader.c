@@ -7,8 +7,7 @@
 #include <glib.h>
 #include <string.h>
 
-static void 
-do_action(PlaylistReader *plist);
+
 static void
 xspf_reader_playlist_interface_init(PlaylistReaderInterface *iface);
 static void 
@@ -42,11 +41,8 @@ xspf_reader_read_list(PlaylistReader *plist,
                       gchar *location,
                       GList **list)
 {
-    XspfReader *self = XSPF_READER(plist);
-     int ret;
-     metadata *track = NULL;
-     const xmlChar* name,*value;
-     xmlNode *nptr, *nptr2, *nptr3;
+
+     xmlNode *nptr, *nptr2;
      xmlDocPtr doc;
     
      doc = xmlRecoverFile(location);
@@ -135,11 +131,12 @@ xspf_reader_write_list(PlaylistReader *plist,
                        GList *list)
 {
     XspfReader *self = XSPF_READER(plist);
-
+     const xmlChar version[] = "1.0";
+     const xmlChar playlist[] = "playlist";
     if(list != NULL)
     {
-        self->priv->doc = xmlNewDoc("1.0");
-        self->priv->rootnode = xmlNewNode(NULL,"playlist");
+        self->priv->doc = xmlNewDoc(version);
+        self->priv->rootnode = xmlNewNode(NULL,playlist);
 
         xmlSetProp(self->priv->rootnode, (xmlChar *)"version", (xmlChar *)"1");
         xmlSetProp(self->priv->rootnode, (xmlChar *)"xmlns", (xmlChar *)XSPF_XMLNS);
@@ -170,7 +167,7 @@ foreach_xspf(gpointer data,
 {
     metadata *track = (metadata *) data;
     XspfReader *self = XSPF_READER(user_data);
-    xmlNodePtr tracknode ,node;
+    xmlNodePtr tracknode;
     xmlNodePtr location, title,artist;
 
     if(data != NULL)

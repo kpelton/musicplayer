@@ -98,7 +98,6 @@ music_store_drag_data_received (GtkTreeDragDest   *drag_dest_parent,
     GtkTreeDragDest  *drag_dest = GTK_TREE_DRAG_DEST(gtk_tree_model_filter_get_model(GTK_TREE_MODEL_FILTER(drag_dest_parent)));
     GtkTreeIter src_iter;
     GtkTreeIter dest_iter;
-    GtkTreePath *prev;
     GtkTreePath       *src;
     gboolean retval=FALSE;
     GtkTreeModel *src_model = GTK_TREE_MODEL(drag_dest);

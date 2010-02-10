@@ -60,7 +60,7 @@ tag_scanner_set_property (GObject *object, guint property_id,
 static void
 tag_scanner_dispose (GObject *object)
 {
-     TagScanner *self = TAG_SCANNER(object);
+    
  
      
      G_OBJECT_CLASS (tag_scanner_parent_class)->dispose (object);
@@ -133,7 +133,7 @@ static void ts_event_loop(TagScanner * self, GstBus *bus, metadata *data)
 
 metadata * ts_get_metadata(gchar * uri,TagScanner * self){
 
-     metadata *track;
+     metadata *track=NULL;
      
      self->track = NULL;
 
@@ -297,12 +297,6 @@ my_bus_callback (GstBus     *bus,
       */
      return FALSE;
 }
-static void 
-cb_gst_eos (GstElement *element, TagScanner *self)
-{
-
-     gst_element_set_state (self->pipeline, GST_STATE_NULL);
-}
 
 
 static void
@@ -311,8 +305,6 @@ cb_newpad (GstElement *decodebin,
 	   gboolean    last,
 	   gpointer    data)
 {
-     GstCaps *caps;
-     GstStructure *str;
      GstPad *audiopad;
      GstElement *fakesink = (GstElement *) data;
  
