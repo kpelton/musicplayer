@@ -20,19 +20,18 @@ static MusicMainWindow *mw = NULL;
 
 static 
 gboolean music_plugins_load_all (MusicMainWindow * mainwindows);
-static GList * 
-music_plugins_get_dirs ();
+
 static void  
 music_plugins_find_plugins (gchar * start,
                             GList **list);
 static gboolean
 load_file(gchar *location,MusicMainWindow * mainwindows);
 
-static void
-music_plugins_free_details(MusicPluginDetails *details);
+//static void
+//music_plugins_free_details(MusicPluginDetails *details);
 
-static void
-music_plugins_engine_unload_plugin(MusicPluginInfo *info);
+//static void
+//music_plugins_engine_unload_plugin(MusicPluginInfo *info);
 
 gboolean 
 music_plugins_engine_init (MusicMainWindow * mainwindow)
@@ -71,7 +70,7 @@ gboolean music_plugins_load_all (MusicMainWindow * mainwindow)
     }
     
     g_list_free(list);
-    
+    return TRUE;
 }
 
 static gboolean
@@ -81,8 +80,6 @@ load_file(gchar*            location,
     MusicPluginInfo *info;
 
     GType (*register_func)();
-    GType type;
-    gpointer plugin_obj;
     GConfClient* client;
     client = gconf_client_get_default ();
      gchar *gconf_path;
@@ -192,7 +189,7 @@ music_plugins_engine_deactivate_plugin(MusicPluginInfo *info)
 
      return TRUE;
 }
-
+/*
 static void
 music_plugins_engine_unload_plugin(MusicPluginInfo *info)
 {
@@ -218,7 +215,7 @@ music_plugins_free_details(MusicPluginDetails *details)
             g_free(details->website);
     }
 }
-
+*/
 GList *
 music_plugins_get_list()
 {
@@ -231,13 +228,11 @@ static void
 music_plugins_find_plugins (gchar * start,
                             GList **list)
 {
-    GFileEnumerator *enumer; 
-    GFileInfo *info;
+    GFileEnumerator *enumer=NULL; 
+    GFileInfo *info=NULL;
     GFile *file=NULL;
-    const gchar *name;
     const gchar *filetype;
-    gchar *buffer;
-    gchar *escaped;
+    gchar *buffer=NULL;
     GError *err=NULL;
     const gchar *target;
 

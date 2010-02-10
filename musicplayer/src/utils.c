@@ -1,11 +1,13 @@
 #include <glib.h>
 #include <string.h>
 #include <gio/gio.h>
+#include <glib/gstdio.h>
+#include "utils.h"
 
 
 void make_pref_folder()
 {
-       gchar *outputdir;
+       gchar *outputdir=NULL;
         const gchar *home;
         home = g_getenv ("HOME");
 
@@ -21,10 +23,10 @@ void make_pref_folder()
 
 gchar* parse_file_name(GFile *file)
 {
-    GFileInfo *info;
-    gchar *out;
-    gchar **tokens;
-    gchar *escaped;
+    GFileInfo *info=NULL;
+    gchar *out=NULL;
+    gchar **tokens=NULL;
+    gchar *escaped=NULL;
     gchar * filetypes = ".mp3";
 
     info= g_file_query_info(file,"standard::display-name",

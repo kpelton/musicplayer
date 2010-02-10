@@ -34,15 +34,18 @@ music_plugin_init (MusicPlugin *self)
 
 gboolean music_plugin_deactivate ( MusicPlugin *self)
 {
-       g_return_if_fail (MUSIC_IS_PLUGIN(self));
+	if(!MUSIC_IS_PLUGIN(self))
+		return FALSE;
     
      return MUSIC_PLUGIN_GET_CLASS (self)->music_plugin_deactivate(self);
 }
 
 gboolean music_plugin_activate ( MusicPlugin *self,MusicMainWindow *mw)
 {
-       g_return_if_fail (MUSIC_IS_PLUGIN(self));
-    
+
+    	if(!MUSIC_IS_PLUGIN(self))
+		return FALSE;
+
      return MUSIC_PLUGIN_GET_CLASS (self)->music_plugin_activate(self,mw);
    
 }
@@ -50,8 +53,8 @@ gboolean music_plugin_activate ( MusicPlugin *self,MusicMainWindow *mw)
 GtkWidget *
 music_plugin_get_config_window(MusicPlugin *self)
 {
-  g_return_if_fail (MUSIC_IS_PLUGIN(self));
-    
+     	if(!MUSIC_IS_PLUGIN(self))
+		return FALSE;
  return MUSIC_PLUGIN_GET_CLASS (self)->music_plugin_get_config_window(self);
     
 }

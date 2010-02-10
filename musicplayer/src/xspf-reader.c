@@ -138,12 +138,12 @@ xspf_reader_write_list(PlaylistReader *plist,
         self->priv->doc = xmlNewDoc(version);
         self->priv->rootnode = xmlNewNode(NULL,playlist);
 
-        xmlSetProp(self->priv->rootnode, (xmlChar *)"version", (xmlChar *)"1");
-        xmlSetProp(self->priv->rootnode, (xmlChar *)"xmlns", (xmlChar *)XSPF_XMLNS);
+        xmlSetProp(self->priv->rootnode, BAD_CAST "version", BAD_CAST "1");
+        xmlSetProp(self->priv->rootnode, BAD_CAST "xmlns",BAD_CAST XSPF_XMLNS);
 
         xmlDocSetRootElement(self->priv->doc, self->priv->rootnode);
-        xmlNewChild(self->priv->rootnode, NULL,"creator",CREATOR);
-        self->priv->tracklist = xmlNewNode(NULL, (xmlChar *)"trackList");
+        xmlNewChild(self->priv->rootnode, NULL,BAD_CAST "creator",BAD_CAST CREATOR);
+        self->priv->tracklist = xmlNewNode(NULL, BAD_CAST "trackList");
         xmlAddChild(self->priv->rootnode, self->priv->tracklist);
 
 
@@ -172,12 +172,12 @@ foreach_xspf(gpointer data,
 
     if(data != NULL)
     {
-        tracknode = xmlNewNode(NULL,"track");
+        tracknode = xmlNewNode(NULL,BAD_CAST "track");
         xmlAddChild(self->priv->tracklist, tracknode);
 
 
         
-        location = xmlNewNode(NULL,"location");
+        location = xmlNewNode(NULL,BAD_CAST "location");
 
 
         xmlAddChild(location, xmlNewText((xmlChar *)track->uri));
@@ -187,8 +187,8 @@ foreach_xspf(gpointer data,
         if(track->artist)
         {
 
-            title = xmlNewNode(NULL,"title");
-            artist =  xmlNewNode(NULL,"creator");     
+            title = xmlNewNode(NULL,BAD_CAST "title");
+            artist =  xmlNewNode(NULL,BAD_CAST "creator");     
 
             xmlAddChild(title, xmlNewText((xmlChar *)track->title));
             xmlAddChild(artist, xmlNewText((xmlChar *)track->artist));
