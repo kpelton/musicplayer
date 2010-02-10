@@ -2,6 +2,7 @@
 #include "music-store.h"
 #include "music-queue.h"
 #include "jump-window.h"
+#include "utils.h"
 #include "music-plugin-manager.h"
 #include <gdk/gdkkeysyms.h>
 #include <glib.h>
@@ -165,11 +166,12 @@ add_file(gpointer data,gpointer user_data,metadata *track);
 gboolean 
 has_selected(gpointer user_data);
 
+/*
 static void 
 set_font   (gpointer    callback_data,
             guint       callback_action,
             GtkWidget  *widget);
-
+*/
 static void 
 set_repeat   (GtkCheckMenuItem *widget,
               gpointer user_data);
@@ -184,7 +186,7 @@ compare_sort_nodes(sortnode *node1,
                    sortnode *node2,
                    gpointer userdata);
 
-static gint 
+static void
 sort_by_artist(gpointer    callback_data,
                gpointer user_data);
 
@@ -246,7 +248,7 @@ struct _MusicQueuePrivate{
 //end private varibles
 
 //globals
-static signals[5];
+static int signals[5];
 
 
 
@@ -380,7 +382,6 @@ static void
 music_queue_finalize (GObject *object)
 {
 
-	MusicQueue *self = MUSIC_QUEUE(object);
    
 	G_OBJECT_CLASS (music_queue_parent_class)->finalize (object);
 
@@ -494,7 +495,6 @@ static void
 music_queue_init (MusicQueue *self)
 {
 	gboolean repeat=FALSE;
-	gchar *font;
 	char *outputdir;
 	const char *home;
         
@@ -540,10 +540,6 @@ static void
 init_widgets(MusicQueue *self)
 {
 	GtkTreeSelection *select;
-	GtkTreeSortable *sortable;
-	 
-
-
 
 	self->priv->scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
 
@@ -753,7 +749,6 @@ add(GtkWidget *widget,
 	GtkWidget *dialog;
 	GtkFileFilter *filter;
 	gchar *lastdir = NULL;	
-	gint response;
     
 
 
@@ -814,6 +809,7 @@ gpointer add_threaded_folders(gpointer user_data)
 	g_slist_free(self->priv->list);
 	g_object_unref(self->priv->ts);
 	g_mutex_unlock(self->priv->mutex); 
+    return NULL;
 }
 gpointer add_threaded(gpointer user_data)
 {
@@ -833,6 +829,7 @@ gpointer add_threaded(gpointer user_data)
 	g_slist_free(self->priv->list);
 	g_object_unref(self->priv->ts);
 	g_mutex_unlock(self->priv->mutex); 
+    return NULL;
 }
 
 
@@ -844,12 +841,11 @@ file_chooser_cb(GtkWidget *data,
 
 {
 	MusicQueue *self = (MusicQueue *) data;
-	gboolean b = TRUE;
+
 
 
 	GtkWidget *dialog = GTK_WIDGET(user_data);
 
-	gchar *lastdir = NULL;
 	if(response == GTK_RESPONSE_CANCEL)
 	{
 		gtk_widget_destroy (dialog);
@@ -905,13 +901,11 @@ add_file_ext(gpointer data,
 static 
 gboolean check_for_folders(GSList *list)
 {
-	GSList *beg = list;
 	GFile *file;
-	gchar *uri;
 	GFileInfo *info;
 	gboolean ret = TRUE;
     
-	for(list; list!=NULL; list=list->next)
+	for(list=list; list!=NULL; list=list->next)
 	{
 		if(list->data){
 			file = g_file_new_for_uri((gchar *)list->data);
@@ -937,7 +931,6 @@ traverse_folders(gpointer data,
 	GFile *file=NULL;
 	const gchar *target_uri;
 	const gchar *uri = (gchar *) data;
-	const gchar *name;
 	const gchar *filetype;
 	gchar *buffer=NULL;
 	gchar *escaped=NULL;
@@ -1034,7 +1027,6 @@ static void
 scan_file_action(gpointer data,
                  gpointer user_data)
 {
-	MusicQueue *self = (MusicQueue *) user_data;
 	GFile * file = g_file_new_for_uri((gchar *)data);
 	GError *err=NULL;
 	GFileInfo *info=NULL;
@@ -1129,14 +1121,13 @@ add_file(gpointer data,gpointer user_data,metadata *track)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GtkTreeIter   iter;
-	gchar *name;
+	gchar *name=NULL;
 	GError *err =NULL;
 	gchar buffer[1024];
-	gchar *valid;
-	GFile *file;
+	gchar *valid=NULL;
+	GFile *file=NULL;
 	GFileInfo *info;
 	guint64 mod;
-	gint i;
 	metadata *md = NULL;
 
 	self->priv->i++;
@@ -1209,6 +1200,7 @@ add_file(gpointer data,gpointer user_data,metadata *track)
 		g_free(name);
 	}
 
+    
 	g_signal_emit (self, signals[NEWFILE],0,NULL);
    
 	g_free(valid);
@@ -1248,7 +1240,6 @@ next_file            (GsPlayer      *player,
 		      gpointer         user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
-	GtkTreePath *path;
 	GtkTreeModel *model;
 	GtkTreeIter iter;
 
@@ -1396,7 +1387,6 @@ gboolean grab_focus_cb (GtkWidget *widget,
 			gpointer user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
-	GtkWidget *menu;
 	GtkTreeModel *model;					      
     
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
@@ -1475,7 +1465,6 @@ static GtkWidget *
 get_context_menu(gpointer user_data)
 {
     
-	GtkItemFactory *item_factory;
 	GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins;
 	gboolean test;
 	
@@ -1586,19 +1575,19 @@ plugins_item_selected  (gpointer    callback_data,
 
 	gtk_widget_show(dialog);
 }
-
+/*
 static void 
 set_font   (gpointer    callback_data,
             guint       callback_action,
             GtkWidget  *widget)
 {
-	MusicQueue *self = (MusicQueue *) callback_data;
     
 	GtkWidget *   font_window = gtk_font_selection_dialog_new       ("Select playlist font"); 
     
 	gtk_widget_show(font_window); 
     
 }
+*/
 static void 
 set_repeat (GtkCheckMenuItem *widget,
             gpointer user_data)
@@ -1624,15 +1613,14 @@ remove_files(GtkMenuItem *item,
              gpointer  callback_data)
 {
 	MusicQueue *self = (MusicQueue *) callback_data;
-	GList * rows;
+	GList * rows=NULL;
 	GList * rowref_list = g_list_alloc();
 	gint i;
 	GtkTreeIter iter;
-	GtkTreeIter childiter;
-	GtkTreePath *path;
-	GtkTreeModel *model;
-	gchar *id;
-	GtkTreeRowReference  *rowref;
+	GtkTreePath *path=NULL;
+	GtkTreeModel *model=NULL;
+	gchar *id=NULL;
+	GtkTreeRowReference  *rowref=NULL;
     
 	g_mutex_lock(self->priv->mutex); 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
@@ -1708,7 +1696,7 @@ has_selected(gpointer user_data)
 	return FALSE;
 }
 
-static 
+static void
 sort_by_artist(gpointer    callback_data,
                gpointer user_data)
 {
@@ -1716,14 +1704,12 @@ sort_by_artist(gpointer    callback_data,
     
 	GtkTreeIter iter;
     
-	GHashTable *htable;
-	GList *list;
-	gchar *title;
-	gchar *cid;
-	gint *id;
-	gint *curri;
-	sortnode *node;
-	gint currid;
+	GHashTable *htable=NULL;
+	GList *list=NULL; 
+	gchar *cid=NULL;
+	gint *id=NULL;
+	gint *curri=NULL;
+	sortnode *node=NULL;
 	gint i=0;
 	traversestr str;
 	g_mutex_lock(self->priv->mutex); 
@@ -1796,14 +1782,12 @@ sort_by_date(gpointer    callback_data,
     
 	GtkTreeIter iter;
     
-	GHashTable *htable;
-	GList *list;
-	gchar *title;
-	gchar *cid;
-	gint *id;
-	gint *curri;
-	sortnodedate *node;
-	gint currid;
+	GHashTable *htable=NULL;
+	GList *list=NULL;
+	gchar *cid=NULL;
+	gint *id=NULL;
+	gint *curri=NULL;
+	sortnodedate *node=NULL;
 	gint i=0;
 	traversestr str;
     
@@ -1946,7 +1930,6 @@ compare_sort_nodes(sortnode *node1,
 	int ret=0;
 
 	gchar*artist1=NULL; 
-	gchar *artist2 = NULL;
 	gchar*title1=NULL; 
 	gchar *title2 = NULL;
     
