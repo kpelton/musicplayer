@@ -31,7 +31,11 @@ typedef struct {
     MusicMainWindow *mw;
     gint id1;
     gint id2;
+    gint id3;
     GtkWidget *statusbar;
+    GtkWidget *hbox;
+    GtkWidget *text;
+    gchar *buffer;
      gint count;
 } StatsPlugin;
 

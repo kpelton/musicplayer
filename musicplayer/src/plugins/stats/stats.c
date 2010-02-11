@@ -26,6 +26,8 @@ static void stats_plugin_new_file(MusicQueue *queue,
 				  metadata* p_track,gpointer user_data);
 static void stats_plugin_remove_file(MusicQueue *queue,
 				     metadata* p_track,gpointer user_data);
+static gboolean 
+draw_stats(gpointer data);
 
 
 G_DEFINE_TYPE (StatsPlugin, stats_plugin, MUSIC_TYPE_PLUGIN);
@@ -67,7 +69,6 @@ gboolean stats_plugin_music_plugin_activate (MusicPlugin *self,MusicMainWindow *
 	g_object_ref(stats->mw);
 	GList *list=NULL;
 	GList *node=NULL;
-	gchar* buffer=NULL;
     
 	stats->id1 = g_signal_connect (mw->queue, "new-file",
 				       G_CALLBACK(stats_plugin_new_file),
@@ -78,8 +79,12 @@ gboolean stats_plugin_music_plugin_activate (MusicPlugin *self,MusicMainWindow *
 				       (gpointer)stats);
     
 	stats->statusbar = gtk_statusbar_new();
-	gtk_box_pack_start (GTK_BOX (stats->mw->mainvbox), stats->statusbar, FALSE, FALSE,0);
-	gtk_widget_show(stats->statusbar);
+    	stats->hbox = gtk_hbox_new(FALSE,0);
+      	stats->text = gtk_label_new ("");
+    	gtk_box_pack_start (GTK_BOX (stats->hbox), stats->text, FALSE, FALSE,0);
+	gtk_box_pack_start (GTK_BOX (stats->mw->mainvbox), stats->hbox, FALSE, FALSE,0);
+    
+	gtk_widget_show_all(stats->hbox);
 
      
 	list = music_queue_get_list(mw->queue);
@@ -95,39 +100,33 @@ gboolean stats_plugin_music_plugin_activate (MusicPlugin *self,MusicMainWindow *
 	}
 	g_list_free(list);
     
-	buffer = g_strdup_printf("Files:%i",stats->count); 
+	stats->buffer = g_strdup_printf("Files:%i",stats->count); 
 
     
-	gtk_statusbar_push(GTK_STATUSBAR(stats->statusbar),
-			   gtk_statusbar_get_context_id(GTK_STATUSBAR(stats->statusbar),"General stats"),
-			   buffer);
+	
+	draw_stats(stats);
 
-	g_free(buffer);
-    
+
+   	stats->id3 = g_timeout_add_seconds(1,(GSourceFunc)draw_stats,self);   
 	return TRUE;
 }
 
+static gboolean 
+draw_stats(gpointer data)
+{
+	StatsPlugin * self = (StatsPlugin *)data;
+    	gtk_label_set_text(GTK_LABEL(self->text),self->buffer);
+    	return TRUE;
+}
 static void stats_plugin_new_file(MusicQueue *queue,
 				  metadata* p_track,gpointer user_data)
 {
 	StatsPlugin * self = (StatsPlugin *)user_data;
-	gchar * buffer;
 	self->count++;
-	guint id=0;
 
-	buffer = g_strdup_printf("Files:%i",self->count); 
+	g_free(self->buffer);
+	self->buffer = g_strdup_printf("Files:%i",self->count); 
 
-	id = gtk_statusbar_get_context_id(GTK_STATUSBAR(self->statusbar),"General stats");
-
-
-	if(self->count > 1)
-		gtk_statusbar_pop (GTK_STATUSBAR(self->statusbar),
-				   id); 
-	gtk_statusbar_push(GTK_STATUSBAR(self->statusbar),
-			   id,
-			   buffer);
-
-	g_free(buffer);
     
   
 }
@@ -136,23 +135,14 @@ static void stats_plugin_remove_file(MusicQueue *queue,
 				     metadata* p_track,gpointer user_data)
 {
 	StatsPlugin * self = (StatsPlugin *)user_data;
-	gchar * buffer;
 	self->count--;
-	guint id=0;
-	buffer = g_strdup_printf("Files:%i",self->count); 
+
+    	g_free(self->buffer);
+	self->buffer = g_strdup_printf("Files:%i",self->count); 
 
 
-	id = gtk_statusbar_get_context_id(GTK_STATUSBAR(self->statusbar),"General stats");
-
-	if(self->count > 1)
-		gtk_statusbar_pop (GTK_STATUSBAR(self->statusbar),
-				   id); 
-	gtk_statusbar_push(GTK_STATUSBAR(self->statusbar),
-			   id,
-			   buffer);
-
-
-	g_free(buffer);
+	draw_stats(self);
+	
     
   
 }
@@ -166,12 +156,12 @@ gboolean stats_plugin_music_plugin_deactivate ( MusicPlugin *user_data)
 				     self->id1);
         g_signal_handler_disconnect (G_OBJECT (self->mw->queue),
 				     self->id2);
-    
+    	g_source_remove (self->id3);
    
 
 	printf("destruction \n");
 	g_object_unref(self->mw);
-	gtk_widget_destroy(self->statusbar); 
+	gtk_widget_destroy(self->hbox); 
 	return TRUE;
 }
 
@@ -224,4 +214,3 @@ stats_plugin_new (void)
 {
 	return g_object_new (STATS_TYPE_PLUGIN, NULL);
 }
-
