@@ -810,6 +810,7 @@ file_chooser_cb(GtkWidget *data,
 {
 	MusicQueue *self = (MusicQueue *) data;
 	GtkWidget *dialog = GTK_WIDGET(user_data);
+    	gchar *current_folder = NULL;
 
 	if(response == GTK_RESPONSE_CANCEL)
 	{
@@ -822,10 +823,15 @@ file_chooser_cb(GtkWidget *data,
 		self->priv->list =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
 		//set our last dir to one they chose
 
-		g_object_set(G_OBJECT(self),"musicqueue-lastdir",
+	    
+	  current_folder = gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog));
+	      if(current_folder)
+	      {
+	       		g_object_set(G_OBJECT(self),"musicqueue-lastdir",
 			     gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog))
 			     ,NULL);	
-
+			g_free(current_folder);
+	      }
 
 		gtk_widget_destroy (dialog);
 
@@ -836,6 +842,15 @@ file_chooser_cb(GtkWidget *data,
 	}
 	else if(response == 1) //folder(s) selected
 	{
+	    current_folder = gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog));
+	      if(current_folder)
+	      {
+	       		g_object_set(G_OBJECT(self),"musicqueue-lastdir",
+			     gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog))
+			     ,NULL);	
+			g_free(current_folder);
+	      }
+    
 		g_mutex_lock(self->priv->mutex); 
 		self->priv->list = gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
 		if(check_for_folders(self->priv->list))
