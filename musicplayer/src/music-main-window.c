@@ -400,27 +400,28 @@ music_main_play_file(MusicMainWindow *self,gchar * location)
 {
 	gchar *valid=NULL;
     	GFile *file = NULL;
+	GFileInfo *info = NULL;
+	GError *err=NULL;
 
     	file =g_file_new_for_commandline_arg(location);
+	info = g_file_query_info(file,G_FILE_ATTRIBUTE_STANDARD_TYPE,0,NULL,&err);
 
-    	if(file)
+    	if(!err)
 	{
 		//need to check if the file exists before adding to queue and playing
 		valid =  g_file_get_uri(file);	
-        	if(valid)
-		{
-			add_file_ext(valid,self->queue);
-			gs_playFile(self->player,valid);
-			g_free(valid);
-			g_object_unref(file);
-		}
-
+		add_file_ext(valid,self->queue);
+		gs_playFile(self->player,valid);
+		g_free(valid);
+		
+		g_object_unref(info);
 	}
 	else
 	{
-		printf("Error adding file\n");
+		fprintf (stderr, "Unable to read file: %s\n", err->message);
+		g_error_free (err);
 	}
-    
+    	g_object_unref(file);
 }
 
 static void  
