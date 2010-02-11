@@ -78,7 +78,6 @@ gboolean stats_plugin_music_plugin_activate (MusicPlugin *self,MusicMainWindow *
 				       G_CALLBACK(stats_plugin_remove_file),
 				       (gpointer)stats);
     
-	stats->statusbar = gtk_statusbar_new();
     	stats->hbox = gtk_hbox_new(FALSE,0);
       	stats->text = gtk_label_new ("");
     	gtk_box_pack_start (GTK_BOX (stats->hbox), stats->text, FALSE, FALSE,0);
