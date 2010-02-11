@@ -34,7 +34,7 @@ playlist_reader_get_type (void)
 const gchar* 
 playlist_reader_mime_supported (PlaylistReader *self)
 {
-    if(!self || PLAYLIST_IS_READER(self))
+    if(!PLAYLIST_IS_READER(self))
         return NULL;
     
      return PLAYLIST_READER_GET_INTERFACE (self)->playlist_reader_mime_supported(self);
@@ -44,7 +44,7 @@ playlist_reader_mime_supported (PlaylistReader *self)
 gboolean 
 playlist_reader_write_list (PlaylistReader *self,gchar *location,GList * list)
 {
-      if(!self ||PLAYLIST_IS_READER(self))
+      if(!PLAYLIST_IS_READER(self))
         return FALSE;
 
   return PLAYLIST_READER_GET_INTERFACE (self)->playlist_reader_write_list (self,
@@ -54,7 +54,7 @@ playlist_reader_write_list (PlaylistReader *self,gchar *location,GList * list)
 gboolean 
 playlist_reader_read_list (PlaylistReader *self,gchar *location,GList **list)
 {
-     if(!self ||PLAYLIST_IS_READER(self))
+     if(!PLAYLIST_IS_READER(self))
         return FALSE;
 
   return PLAYLIST_READER_GET_INTERFACE (self)->playlist_reader_read_list (self,

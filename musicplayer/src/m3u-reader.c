@@ -122,6 +122,7 @@ m3u_reader_read_list(PlaylistReader *plist,
 					{
 						fprintf (stderr, "Unable to read file: %s\n", err->message);
 						g_error_free (err);
+					    	err = NULL;
 					}
 					g_object_unref(file);
 					
