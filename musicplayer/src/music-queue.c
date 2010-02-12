@@ -13,15 +13,13 @@ G_DEFINE_TYPE (MusicQueue, music_queue, GTK_TYPE_VBOX)
 struct
 {
 	gchar *title;
+    	guint type;
+    	gchar *datestr; 
+	guint  date;
 	gint id;    
 }typedef sortnode;
 
-struct
-{
-	gchar *datestr; 
-	guint  date;
-	gint id;    
-}typedef sortnodedate;
+
 struct
 {
 	GHashTable *htable;
@@ -29,6 +27,13 @@ struct
 	gint curr;
 }typedef traversestr;
 
+typedef enum
+{
+	SORT_DATE,
+    	SORT_TITLE
+        	
+
+}sorttype;
 
 enum
 {
@@ -93,7 +98,7 @@ static void
 destroy_hash_element(gpointer data);
 
 static void 
-add (GtkWidget *widget,
+add_from_dialog (GtkWidget *widget,
      gpointer user_data);
 
 static void 
@@ -115,7 +120,7 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 		      gpointer userdata);
 
 static void 
-playfile (GtkTreeView *treeview,
+play_file (GtkTreeView *treeview,
           GtkTreePath        *path,
           GtkTreeViewColumn  *col,
           gpointer data);
@@ -156,7 +161,7 @@ remove_files(GtkMenuItem *item,
              gpointer callback_data);
 
 static gboolean 
-remove_files_via_press(GtkWidget *widget,
+handle_key_input(GtkWidget *widget,
                        GdkEventKey *key,
                        gpointer user_data);
 
@@ -190,18 +195,14 @@ static void
 sort_by_artist(gpointer    callback_data,
                gpointer user_data);
 
-static gint
-compare_sort_nodes_by_date(sortnodedate *node1, 
-                           sortnodedate *node2,
-                           gpointer userdata);
 
 static void 
 sort_by_date(gpointer    callback_data,
              gpointer user_data);
 
-static gboolean            
-traverse_tree_by_date (gpointer data,
-                       gpointer userdata);
+static void
+sort_list(gpointer    callback_data,
+               gpointer user_data,int sorttype);
 
 static gboolean
 traverse_tree (gpointer data,
@@ -234,7 +235,7 @@ struct _MusicQueuePrivate{
 	TagScanner *ts;
 	PlaylistReader *read;
 	guint i;
-	gint currid;
+	guint currid;
 	gboolean changed;
 	gchar *font;
 	gchar *lastdir;
@@ -561,10 +562,10 @@ init_widgets(MusicQueue *self)
 //signals
 
 	g_signal_connect ((gpointer) self->priv->openbutton, "released",
-	                  G_CALLBACK (add),
+	                  G_CALLBACK (add_from_dialog),
 	                  (self));
 	g_signal_connect (G_OBJECT (self->priv->treeview), "row-activated",
-	                  G_CALLBACK (playfile),
+	                  G_CALLBACK (play_file),
 	                  self);
 
 	g_signal_connect (G_OBJECT (self->priv->store), "row-changed",
@@ -576,7 +577,7 @@ init_widgets(MusicQueue *self)
 	                  self);
 
 	g_signal_connect (G_OBJECT (self->priv->treeview), "key_press_event",
-	                  G_CALLBACK (remove_files_via_press),
+	                  G_CALLBACK (handle_key_input),
 	                  self);
 
 
@@ -595,6 +596,9 @@ init_widgets(MusicQueue *self)
 	g_signal_connect(self->priv->treeview, "drag_data_received",
 	                 G_CALLBACK(on_drag_data_received),
 	                 self);
+
+  
+    	
      
 //set policy
 
@@ -660,7 +664,7 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 }
 
 
-static void playfile (GtkTreeView *treeview,
+static void play_file (GtkTreeView *treeview,
                       GtkTreePath        *path,
                       GtkTreeViewColumn  *col,
                       gpointer data)
@@ -698,7 +702,7 @@ void music_queue_play_selected (MusicQueue *self)
  	
 	if(list){
       
-		playfile(GTK_TREE_VIEW(self->priv->treeview),list->data,
+		play_file(GTK_TREE_VIEW(self->priv->treeview),list->data,
 			 NULL,(gpointer)self);
 	}
 	g_list_foreach (list, (GFunc) gtk_tree_path_free, NULL);
@@ -710,7 +714,7 @@ void music_queue_play_selected (MusicQueue *self)
 
 
 static void 
-add(GtkWidget *widget,
+add_from_dialog(GtkWidget *widget,
     gpointer user_data)
 {
 
@@ -1093,6 +1097,7 @@ add_file(gpointer data,gpointer user_data,metadata *track)
 	guint64 mod;
 	metadata *md = NULL;
 
+    
 	self->priv->i++;
 	
 	file =g_file_new_for_commandline_arg((gchar *)data);
@@ -1175,10 +1180,11 @@ music_queue_new_with_player(GsPlayer *player)
 	self =g_object_new (MUSIC_TYPE_QUEUE, NULL);
 	self->priv->player =player;
     
-	g_signal_connect (player, "eof",
+     	g_signal_connect (self->priv->player, "eof",
 			  G_CALLBACK(next_file),
 			  (gpointer)self);
-    	
+    
+	
 	return GTK_WIDGET(self);
 }
 static void 
@@ -1193,23 +1199,23 @@ next_file            (GsPlayer      *player,
 
 	g_object_get(G_OBJECT(self),"musicqueue-repeat",&test,NULL);
 
-
+	gtk_tree_selection_unselect_all(self->priv->currselection);
 	if (self->priv->currid > 0)
 	{
 		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
 
-		gtk_tree_selection_unselect_iter(self->priv->currselection,&self->priv->curr);  
+		
 		if(gtk_tree_model_iter_next(model,&self->priv->curr))
 		{
 			//there is a next file 
 			gtk_tree_selection_select_iter(self->priv->currselection,&self->priv->curr); 
-			playfile(GTK_TREE_VIEW(self->priv->treeview),gtk_tree_model_get_path(model,&self->priv->curr),NULL,user_data);
+			play_file(GTK_TREE_VIEW(self->priv->treeview),gtk_tree_model_get_path(model,&self->priv->curr),NULL,user_data);
 		} else{
 			//repeat code check to make sure property is true
 			if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter) && test)
 			{
 				gtk_tree_selection_select_iter(self->priv->currselection,&iter); 
-				playfile(GTK_TREE_VIEW(self->priv->treeview),gtk_tree_model_get_path(model,&iter),NULL,user_data);
+				play_file(GTK_TREE_VIEW(self->priv->treeview),gtk_tree_model_get_path(model,&iter),NULL,user_data);
 			}
 		}
 	}
@@ -1463,7 +1469,7 @@ get_context_menu(gpointer user_data)
     
 }
 static gboolean 
-remove_files_via_press(GtkWidget *widget,
+handle_key_input(GtkWidget *widget,
                        GdkEventKey *event,
                        gpointer user_data)
 {
@@ -1506,7 +1512,7 @@ got_jump(JumpWindow *jwindow,
 	gtk_tree_selection_select_path(self->priv->currselection,path); 
 
 	gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->treeview),path,NULL,TRUE,0.5,0.5);   
-	playfile(GTK_TREE_VIEW(self->priv->treeview),path,NULL,user_data);
+	play_file(GTK_TREE_VIEW(self->priv->treeview),path,NULL,user_data);
 }
     
 static void 
@@ -1639,9 +1645,24 @@ has_selected(gpointer user_data)
 	return FALSE;
 }
 
+static void 
+sort_by_artist  (gpointer    callback_data,
+		     	gpointer user_data)
+{
+	sort_list(callback_data,user_data,SORT_TITLE);
+}
+
+static void 
+sort_by_date  (gpointer    callback_data,
+		     	gpointer user_data)
+{
+	sort_list(callback_data,user_data,SORT_DATE);
+}
+
+
 static void
-sort_by_artist(gpointer    callback_data,
-               gpointer user_data)
+sort_list(gpointer    callback_data,
+               gpointer user_data,int sorttype)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
     
@@ -1656,7 +1677,7 @@ sort_by_artist(gpointer    callback_data,
 	gint i=0;
 	traversestr str;
 	g_mutex_lock(self->priv->mutex); 
-        //need to compare titles if the artists are the same
+
 	if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter))
 	{
 		list = g_list_alloc();   
@@ -1666,11 +1687,27 @@ sort_by_artist(gpointer    callback_data,
         
 		do
 		{
-			//need a struture that holds artist name and ID of the element
-			node = g_malloc(sizeof(sortnode));
-			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
-					    &iter,COLUMN_SONG, &(node->title), -1);
-			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
+		    node = g_malloc(sizeof(sortnode));
+		    switch(sorttype)
+		    {
+		   	 case SORT_TITLE:		
+			
+		        		node->type = SORT_TITLE;
+				gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
+					    		&iter,COLUMN_SONG, &(node->title), -1);
+			
+		    	break;
+ 			case SORT_DATE:
+		    
+		    		node->type = SORT_DATE;		        
+				gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
+					    		&iter,COLUMN_MOD, &(node->datestr), -1); 
+		        		node->date = strtoul(node->datestr,NULL, 10);
+			 	
+		         break;
+		    }
+
+		    gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
 					    &iter,COLUMN_ID, &cid, -1); 
 
 			id = g_malloc(sizeof(gint));
@@ -1712,91 +1749,7 @@ sort_by_artist(gpointer    callback_data,
 		g_list_free(list);
 		g_hash_table_destroy(htable);
 
-    
-	}
-	g_mutex_unlock(self->priv->mutex); 
-}
-
-static void 
-sort_by_date(gpointer    callback_data,
-             gpointer user_data)
-{
-	MusicQueue *self = (MusicQueue *) user_data;
-    
-	GtkTreeIter iter;
-    
-	GHashTable *htable=NULL;
-	GList *list=NULL;
-	gchar *cid=NULL;
-	gint *id=NULL;
-	gint *curri=NULL;
-	sortnodedate *node=NULL;
-	gint i=0;
-	traversestr str;
-    
-	g_mutex_lock(self->priv->mutex); 
-	if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter) )
-	{
-		list = g_list_alloc();   
-		htable = g_hash_table_new_full(g_int_hash,g_int_equal,
-					       destroy_hash_element,
-					       destroy_hash_element);
-        
-		do
-		{
-			//need a struture that holds artist name and ID of the element
-			node = g_malloc(sizeof(sortnodedate));
-			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
-					    &iter,COLUMN_MOD, &(node->datestr), -1); 
-			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
-					    &iter,COLUMN_ID, &cid, -1); 
-
-           
-           
-			node->date = strtoul(node->datestr,NULL, 10);
-
-                       
-			id = g_malloc(sizeof(gint));
-			curri = g_malloc(sizeof(gint));
-			*id = atoi(cid);
-            
-			node->id = *id;
-          
-			*curri=i;
-			list = g_list_insert_sorted_with_data(list,(gpointer)node,
-							      (GCompareDataFunc)compare_sort_nodes_by_date,
-							      self);  
-			g_hash_table_insert(htable,id,curri);
-			++i;
-           
-		}while(gtk_tree_model_iter_next(
-			       GTK_TREE_MODEL(self->priv->store),
-			       &iter));
-     
-        
-                //need to write compare function that compares the two artist strings
-		str.htable=htable;
-		str.order = g_malloc(sizeof(gint)*i+1);        
-		str.curr=0; //reset our counter for our new order
-
-		g_list_foreach(list,(GFunc)traverse_tree_by_date,&str); 
-        
-
-		gtk_list_store_reorder(GTK_LIST_STORE(self->priv->store),str.order);
-
-        
-		//finally call the rearange function on the List store with our new order 
-     
-		//free list of nodes
-		//free our order
-		g_free(str.order);
-
-		//destroy data structures
-		g_list_free(list);
-		g_hash_table_destroy(htable);
-    
-
-    
+ 	    
 	}
 	g_mutex_unlock(self->priv->mutex); 
 }
@@ -1806,9 +1759,6 @@ destroy_hash_element(gpointer data)
 {
 	g_free((gint *)data);
 }
-
-
-
 
 static gboolean 
 traverse_tree  (gpointer data,
@@ -1830,41 +1780,22 @@ traverse_tree  (gpointer data,
 		str->order[str->curr]=*old;
 
 		str->curr++;
-        
-		if(node->title)
-			g_free(node->title);
-      
+
+	    	if(node->type == SORT_TITLE)
+	    	{
+	       		 if(node->title)
+		 		g_free(node->title);
+	    	}
+	   	 if(node->type == SORT_DATE)
+	    	{
+	        		if(node->datestr)
+				g_free(node->datestr);
+	    	}
 		g_free(node);
 	}
 	return FALSE;
 }
-static gboolean 
-traverse_tree_by_date (gpointer data,
-                       gpointer userdata)
-{
-	if(data)
-	{
 
-		traversestr *str =(traversestr *) userdata;
-		int currid=0;
-		gint *old;
-		sortnodedate * node = (sortnodedate *)data;
-		currid= node->id;
-
-         
-		old= (gint *)g_hash_table_lookup(str->htable,&currid); 
-        
-		str->order[str->curr]=*old;
-
-		str->curr++;
-		if(node->datestr)
-			g_free(node->datestr);
-      
-        
-		g_free(node);
-	}
-	return FALSE;
-}
 static gint 
 compare_sort_nodes(sortnode *node1, 
                    sortnode *node2,
@@ -1875,62 +1806,51 @@ compare_sort_nodes(sortnode *node1,
 	gchar*artist1=NULL; 
 	gchar*title1=NULL; 
 	gchar *title2 = NULL;
-    
-	if(node1){
-		title1=node1->title;   
-	}
-    
-	if(node2)
-	{
- 
-		title2 = node2->title;
-	}
-	//title is empty
-	if(title1 == NULL || title2 == NULL)
-	{
-		if (title1 == NULL && title2 == NULL)
-			return 0;
-
-		ret = (artist1== NULL) ? -1 : 1;
-
-	}else
-	{
-		//ret =g_utf8_collate(artist1,artist2);
-		ret =strcmp(title1,title2);
-
-		// if(ret == 0 && title1 && title2) //same artists so sort by title
-		// {
-		//      ret =strcmp(title1,title2);
-		// }
-	}
-	return ret;
-}
-
-static gint 
-compare_sort_nodes_by_date(sortnodedate *node1, 
-                           sortnodedate *node2,
-                           gpointer userdata)
-{
-	int ret=0;
-
-	guint date1 =0; 
-	if(node1)
-		date1= node1->date; 
+    	guint date1 =0; 
 	guint date2= 0;
-	if(node2)
-		date2 = node2->date;
 
-	//title is empty
-	if(date1 == 0 || date2 == 0)
+	if(node1->type == SORT_TITLE)
 	{
-		if (date1 == 0 && date2 == 0)
-			return 0;
+		if(node1)
+			title1=node1->title;   
+		if(node2)
+			title2 = node2->title;
 
-		ret = (date1== 0) ? -1 : 1;
+		//title is empty
+		if(title1 == NULL || title2 == NULL)
+		{
+			if (title1 == NULL && title2 == NULL)
+				return 0;
 
-	}else
+			ret = (artist1== NULL) ? -1 : 1;
+
+		}
+		else
+		{
+			ret =strcmp(title1,title2);
+		}
+	
+	}
+	if(node1->type  == SORT_DATE)
 	{
-		ret = (date1 > date2) ? 1 : -1;
+		if(node1)
+			date1= node1->date; 
+	
+		if(node2)
+			date2 = node2->date;
+
+		//title is empty
+		if(date1 == 0 || date2 == 0)
+		{
+			if (date1 == 0 && date2 == 0)
+				return 0;
+
+			ret = (date1== 0) ? -1 : 1;
+
+		}else
+		{
+			ret = (date1 > date2) ? 1 : -1;
+		}
 	}
 	return ret;
 }
