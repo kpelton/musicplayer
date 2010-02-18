@@ -133,6 +133,7 @@ m3u_reader_read_list(PlaylistReader *plist,
 			g_free(uri);
 			g_strfreev(lines); 
 			g_object_unref(ts);
+		    	g_free(buffer); 
 			return TRUE;
 		}
 	}

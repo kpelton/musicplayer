@@ -1162,11 +1162,14 @@ add_file(gpointer data,gpointer user_data,metadata *track)
 
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,name);   
 		g_free(name);
+	    if(track)
+	        	ts_metadata_free(track);	
 	}
     	
 	g_signal_emit (self, signals[NEWFILE],0,NULL);
 
 	g_free(valid);
+    	
 	g_object_unref(file);
 	g_object_unref(info);
 }
