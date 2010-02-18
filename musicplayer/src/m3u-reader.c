@@ -95,8 +95,8 @@ m3u_reader_read_list(PlaylistReader *plist,
 
 
 					escaped = g_uri_escape_string(lineptr,NULL,TRUE);
-					newuri = g_malloc(sizeof(gchar) *strlen(escaped)+strlen(uri)+10);
-					g_snprintf(newuri,strlen(escaped)+strlen(uri)+20,"%s/%s",uri,escaped);
+					newuri = g_malloc(sizeof(gchar) *strlen(escaped)+strlen(uri)+2);
+					g_snprintf(newuri,strlen(escaped)+strlen(uri)+2,"%s/%s",uri,escaped);
 					file =g_file_new_for_commandline_arg(newuri);
 					info = g_file_query_info(file,G_FILE_ATTRIBUTE_STANDARD_TYPE,0,NULL,&err);
 					

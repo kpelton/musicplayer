@@ -298,6 +298,7 @@ gs_SecondsToReal(float fseconds,
 
 	leftover = (seconds - (minutes *60));
 //     hours =  minutes / 60.;
+    //possible error right here
      
 	g_snprintf(str,50,"%i:%02i" ,minutes,leftover);
  

@@ -768,10 +768,11 @@ gpointer add_threaded_folders(gpointer user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GSList *node = self->priv->list;
+    	gdk_threads_enter();
 	g_mutex_lock(self->priv->mutex); 
 	self->priv->ts = tag_scanner_new();
 
-
+	
 	for(; node != NULL; node=node->next)
 	{
 		traverse_folders (node->data,self);
@@ -782,16 +783,17 @@ gpointer add_threaded_folders(gpointer user_data)
 	g_object_unref(self->priv->ts);
 	g_mutex_unlock(self->priv->mutex); 
 	return NULL;
+    gdk_threads_leave();
 }
 gpointer add_threaded(gpointer user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GSList *node = self->priv->list;
-
+	gdk_threads_enter();
 	g_mutex_lock(self->priv->mutex); 
 	self->priv->ts = tag_scanner_new();
 
-
+	
 	for(; node != NULL; node=node->next)
 	{
 		scan_file_action (node->data,self);
@@ -801,7 +803,9 @@ gpointer add_threaded(gpointer user_data)
 	g_slist_free(self->priv->list);
 	g_object_unref(self->priv->ts);
 	g_mutex_unlock(self->priv->mutex); 
+    
 	return NULL;
+    gdk_threads_leave();
 }
 
 
@@ -952,8 +956,8 @@ traverse_folders(gpointer data,
 		if (target_uri != NULL)
                 {
 			escaped = g_uri_escape_string(target_uri,NULL,TRUE);
-			buffer = g_malloc(sizeof(gchar) *strlen(escaped)+strlen(uri)+10);
-			g_snprintf(buffer,strlen(escaped)+strlen(uri)+10,"%s/%s",uri,escaped);
+			buffer = g_malloc(sizeof(gchar) *strlen(escaped)+strlen(uri)+2);
+			g_snprintf(buffer,strlen(escaped)+strlen(uri)+2,"%s/%s",uri,escaped);
 
 			if(g_file_info_get_file_type(info) ==  G_FILE_TYPE_DIRECTORY)
 			{

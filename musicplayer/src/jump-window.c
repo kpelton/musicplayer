@@ -292,7 +292,7 @@ gboolean	check_visible								(GtkTreeModel *model,
 	if(text){
 
 	gtk_tree_model_get (model, iter, COLUMN_SONG, &song, -1);
-		if(song && text){
+		if(song){
 		songlow =	g_utf8_strdown (song, g_utf8_strlen(song,500));
 
 	
