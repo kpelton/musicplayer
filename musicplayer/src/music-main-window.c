@@ -402,16 +402,25 @@ music_main_play_file(MusicMainWindow *self,gchar * location)
     	GFile *file = NULL;
 	GFileInfo *info = NULL;
 	GError *err=NULL;
+    	const gchar* filetype;
 
     	file =g_file_new_for_commandline_arg(location);
-	info = g_file_query_info(file,G_FILE_ATTRIBUTE_STANDARD_TYPE,0,NULL,&err);
+	info = g_file_query_info(file,   G_FILE_ATTRIBUTE_STANDARD_NAME ","
+					    G_FILE_ATTRIBUTE_STANDARD_TYPE ","
+					    G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE ","
+					    G_FILE_ATTRIBUTE_STANDARD_TARGET_URI 
+					    ,0,NULL,&err);
 
     	if(!err)
 	{
 		//need to check if the file exists before adding to queue and playing
 		valid =  g_file_get_uri(file);	
+	    //this is a hack
+	    	filetype = g_file_info_get_attribute_string (info, 
+									     G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
 		add_file_ext(valid,self->queue);
-		gs_playFile(self->player,valid);
+	    	if(check_type_supported(filetype)) //only play playable files
+			gs_playFile(self->player,valid);
 		g_free(valid);
 		
 		g_object_unref(info);

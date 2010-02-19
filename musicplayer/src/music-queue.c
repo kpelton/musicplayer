@@ -208,8 +208,7 @@ static gboolean
 traverse_tree (gpointer data,
                gpointer userdata);
 
-static gboolean 
-check_type_supported(const gchar *type);
+
 
 static void 
 plugins_item_selected  (gpointer    callback_data,
@@ -877,11 +876,7 @@ void
 add_file_ext(gpointer data,
              gpointer user_data)
 {
-	MusicQueue *self = user_data;
-	self->priv->ts = tag_scanner_new(); 
-	add_file(data,user_data,NULL);
-	g_object_unref(self->priv->ts);
-
+	scan_file_action(data,user_data);
 }
 static 
 gboolean check_for_folders(GSList *list)
@@ -985,7 +980,7 @@ traverse_folders(gpointer data,
 }
 
 
-static gboolean 
+gboolean 
 check_type_supported(const gchar *type)
 {
 	if(strcmp(type,"audio/mpeg") == 0)

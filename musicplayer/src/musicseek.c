@@ -190,7 +190,7 @@ value_changed (GtkRange     *range,
     GsPlayer *player = (GsPlayer *) user_data;
 
 
-    if(value > 100 || value <= 0 ||!gs_SeakFromPercent(player,value)) {
+    if(value > 100 ||value <0 ||!gs_SeakFromPercent(player,value)) {
         g_print ("Seek failed!\n");
         return FALSE;
     }
