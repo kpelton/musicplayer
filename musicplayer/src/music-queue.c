@@ -873,10 +873,13 @@ file_chooser_cb(GtkWidget *data,
 
 
 void 
-add_file_ext(gpointer data,
+add_file_ext(gchar * data,
              gpointer user_data)
 {
+    	MusicQueue *self = (MusicQueue *) user_data;
+    	self->priv->ts = tag_scanner_new();
 	scan_file_action(data,user_data);
+    	g_object_unref(self->priv->ts);
 }
 static 
 gboolean check_for_folders(GSList *list)
