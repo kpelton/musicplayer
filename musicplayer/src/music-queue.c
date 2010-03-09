@@ -169,7 +169,7 @@ static void
 add_file(gpointer data,gpointer user_data,metadata *track);
 
 gboolean 
-has_selected(gpointer user_data);
+has_selected(MusicQueue *self);
 
 /*
   static void 
@@ -1351,7 +1351,7 @@ gboolean grab_focus_cb (GtkWidget *widget,
 
 	if((event->button ==3) && (event->type == GDK_BUTTON_PRESS))
 	{
-		if(has_selected(user_data))
+		if(has_selected(self))
 			gtk_widget_set_sensitive(self->priv->delete,TRUE);
 		else
 			gtk_widget_set_sensitive(self->priv->delete,FALSE);
@@ -1500,7 +1500,7 @@ jump_to_current_song(gpointer    callback_data,
 		gtk_tree_selection_select_path(self->priv->currselection,path); 
 	
 		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->treeview),path,NULL,TRUE,0.5,0.5);   
-   		 gtk_tree_path_free (path);
+   		gtk_tree_path_free (path);
 	 }
 }
 static gboolean 
@@ -1510,7 +1510,7 @@ handle_key_input(GtkWidget *widget,
 {
     
 	MusicQueue *self = (MusicQueue *) user_data;
-	if(event->keyval == GDK_Delete && has_selected(user_data) == TRUE)
+	if(event->keyval == GDK_Delete && has_selected(self) == TRUE)
 		remove_files(NULL,user_data);
 
 	if(event->keyval == GDK_j || event->keyval == GDK_J)
@@ -1664,10 +1664,9 @@ remove_files(GtkMenuItem *item,
 
 
 gboolean //posible memory leak in this function needs more investigation
-has_selected(gpointer user_data)
+has_selected(MusicQueue *self)
 {
     
-	MusicQueue *self = (MusicQueue *) user_data;
     
 	GList *rows;
 	GtkTreeModel *model;
