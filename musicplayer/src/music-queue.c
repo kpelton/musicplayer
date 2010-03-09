@@ -1483,7 +1483,7 @@ handle_key_input(GtkWidget *widget,
 	if(event->keyval == GDK_Delete && has_selected(user_data) == TRUE)
 		remove_files(NULL,user_data);
 
-	if(event->keyval == GDK_j)
+	if(event->keyval == GDK_j || event->keyval == GDK_J)
 	{
 	    
 		make_jump_window(self);
