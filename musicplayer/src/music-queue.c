@@ -214,6 +214,9 @@ static void
 plugins_item_selected  (gpointer    callback_data,
                         guint       callback_action,
                         GtkWidget  *widget);
+static void 
+jump_to_current_song(gpointer    callback_data,
+		     	gpointer user_data);
 
 
 //end priv functions
@@ -1418,7 +1421,7 @@ static GtkWidget *
 get_context_menu(gpointer user_data)
 {
     
-	GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins;
+	GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins,*current;
 	gboolean test;
 	
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1431,6 +1434,7 @@ get_context_menu(gpointer user_data)
 	plugins   = gtk_menu_item_new_with_label("Plugins");
 	repeat =  gtk_check_menu_item_new_with_label("Repeat");
 	seperator = gtk_separator_menu_item_new ();
+    	current = gtk_menu_item_new_with_label("Jump to current song");
 	sort   = gtk_menu_item_new_with_label("Sort By Artist");
 	sort2   = gtk_menu_item_new_with_label("Sort By Date");
 	
@@ -1457,6 +1461,9 @@ get_context_menu(gpointer user_data)
 	g_signal_connect (G_OBJECT (plugins), "activate",
 			  G_CALLBACK (plugins_item_selected),
 			  user_data);
+        g_signal_connect (G_OBJECT (current), "activate",
+			  G_CALLBACK (jump_to_current_song),
+			  user_data);
 
     
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),self->priv->delete);
@@ -1465,6 +1472,7 @@ get_context_menu(gpointer user_data)
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),repeat);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),plugins);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator);
+    	gtk_menu_shell_append (GTK_MENU_SHELL(menu),current);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort2);
     
@@ -1472,6 +1480,28 @@ get_context_menu(gpointer user_data)
 	   
 	return menu;
     
+}
+
+static void 
+jump_to_current_song(gpointer    callback_data,
+		     	gpointer user_data)
+{
+
+    	MusicQueue *self = (MusicQueue *) user_data;
+    	GtkTreePath *path=NULL;
+    	GtkTreeModel  *model = NULL;
+
+    	if(has_selected(self) == TRUE && (isPlaying(self->priv->player) || isPaused(self->priv->player)))
+    	{
+   		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
+	
+    		path = gtk_tree_model_get_path (model,&self->priv->curr);
+		gtk_tree_selection_unselect_all(self->priv->currselection);
+		gtk_tree_selection_select_path(self->priv->currselection,path); 
+	
+		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->treeview),path,NULL,TRUE,0.5,0.5);   
+   		 gtk_tree_path_free (path);
+	 }
 }
 static gboolean 
 handle_key_input(GtkWidget *widget,
@@ -1488,6 +1518,11 @@ handle_key_input(GtkWidget *widget,
 	    
 		make_jump_window(self);
 		return TRUE;
+	}
+    	 if(event->keyval == GDK_c || event->keyval == GDK_C)
+    	{
+       		 jump_to_current_song(NULL, user_data);
+	        	 return TRUE;
 	}
     
 	return FALSE;
@@ -1628,7 +1663,7 @@ remove_files(GtkMenuItem *item,
 } 
 
 
-gboolean 
+gboolean //posible memory leak in this function needs more investigation
 has_selected(gpointer user_data)
 {
     
