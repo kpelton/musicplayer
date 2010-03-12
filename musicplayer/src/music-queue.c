@@ -218,6 +218,13 @@ static void
 jump_to_current_song(gpointer    callback_data,
 		     	gpointer user_data);
 
+static void remove_files_from_list(GList * rows,
+    					       MusicQueue *self);
+
+static void 
+remove_duplicates(GtkMenuItem *item, 
+             gpointer  callback_data);
+
 
 //end priv functions
 
@@ -1098,7 +1105,7 @@ add_file(gpointer data,gpointer user_data,metadata *track)
 	gchar buffer[1024];
 	gchar *valid=NULL;
 	GFile *file=NULL;
-	GFileInfo *info;
+	GFileInfo *info=NULL;
 	guint64 mod;
 	metadata *md = NULL;
 
@@ -1234,8 +1241,8 @@ next_file            (GsPlayer      *player,
 static void 
 add_columns(MusicQueue *self)
 {
-	GtkCellRenderer *renderer;
-	GtkTreeViewColumn *column;
+	GtkCellRenderer *renderer=NULL;
+	GtkTreeViewColumn *column=NULL;
 	gchar *font = NULL;
 	g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
     
@@ -1421,7 +1428,7 @@ static GtkWidget *
 get_context_menu(gpointer user_data)
 {
     
-	GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins,*current;
+	GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2;
 	gboolean test;
 	
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1434,7 +1441,9 @@ get_context_menu(gpointer user_data)
 	plugins   = gtk_menu_item_new_with_label("Plugins");
 	repeat =  gtk_check_menu_item_new_with_label("Repeat");
 	seperator = gtk_separator_menu_item_new ();
-    	current = gtk_menu_item_new_with_label("Jump to current song");
+    	duplicates = gtk_menu_item_new_with_label("Remove Duplicates");
+    	seperator2 = gtk_separator_menu_item_new ();
+    	current = gtk_menu_item_new_with_label("Jump To Current Song");
 	sort   = gtk_menu_item_new_with_label("Sort By Artist");
 	sort2   = gtk_menu_item_new_with_label("Sort By Date");
 	
@@ -1464,8 +1473,12 @@ get_context_menu(gpointer user_data)
         g_signal_connect (G_OBJECT (current), "activate",
 			  G_CALLBACK (jump_to_current_song),
 			  user_data);
+     g_signal_connect (G_OBJECT (duplicates), "activate",
+			  G_CALLBACK (remove_duplicates),
+			  user_data);
 
     
+
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),self->priv->delete);
 	
     
@@ -1473,6 +1486,8 @@ get_context_menu(gpointer user_data)
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),plugins);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator);
     	gtk_menu_shell_append (GTK_MENU_SHELL(menu),current);
+    	gtk_menu_shell_append (GTK_MENU_SHELL(menu),duplicates);
+    	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator2 );
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort2);
     
@@ -1597,37 +1612,37 @@ set_repeat (GtkCheckMenuItem *widget,
 }
 
 
-static void 
-remove_files(GtkMenuItem *item, 
-             gpointer  callback_data)
+//need help function that takes a list so we can remove files other than with a click or delete
+static void remove_files_from_list(GList * rows,
+    					       MusicQueue *self)
 {
-	MusicQueue *self = (MusicQueue *) callback_data;
-	GList * rows=NULL;
 	GList * rowref_list = g_list_alloc();
-	gint i;
 	GtkTreeIter iter;
 	GtkTreePath *path=NULL;
-	GtkTreeModel *model=NULL;
+	GtkTreeModel *model= gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
 	gchar *id=NULL;
 	GtkTreeRowReference  *rowref=NULL;
+    	GList *node = rows;
+  
     
-	g_mutex_lock(self->priv->mutex); 
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
-    
-    
-	rows = gtk_tree_selection_get_selected_rows(self->priv->currselection,&model);
-    
-	for(i = 0; i < g_list_length (rows); i++) 
+    	g_mutex_lock(self->priv->mutex); 
+
+    	for(; node != NULL; node=node->next)
 	{
-		path = (GtkTreePath *) g_list_nth_data(rows,i);
+	    if(node->data){
+		path = (GtkTreePath *) node->data;
 		rowref = gtk_tree_row_reference_new(model, path);
+	    	
 		rowref_list = g_list_append(rowref_list, rowref);
+	    }
 	}
-	for(i = 1; i < g_list_length (rowref_list); i++) 
+	node = rowref_list;
+        for(; node != NULL; node=node->next)
 	{
+	    if(node->data){
 		path = gtk_tree_row_reference_get_path(
 			(GtkTreeRowReference*) 
-			g_list_nth_data(rowref_list,i));
+			node->data);
 		gtk_tree_model_get_iter (model, &iter,path);
 		gtk_tree_model_get (model, &iter, COLUMN_ID, &id, -1);
 	   
@@ -1651,16 +1666,89 @@ remove_files(GtkMenuItem *item,
       
 		gtk_list_store_remove(GTK_LIST_STORE(self->priv->store),&iter);
 		g_signal_emit (self, signals[REMOVE],0,NULL);
-	   
+	    }
 	}
 	//free everything
 	g_list_foreach(rowref_list, (GFunc) gtk_tree_row_reference_free, NULL);
 	g_list_free(rowref_list);
+    	g_list_foreach (rows,(GFunc) gtk_tree_path_free, NULL);
 	g_list_free(rows);
 	g_free(id);
 	g_mutex_unlock(self->priv->mutex); 
-   
+    
+
+}
+
+static void 
+remove_files(GtkMenuItem *item, 
+             gpointer  callback_data)
+{
+	MusicQueue *self = (MusicQueue *) callback_data;
+	GtkTreeModel *model=NULL;
+    	GList *rows = NULL;
+
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
+    
+    	
+	rows = gtk_tree_selection_get_selected_rows(self->priv->currselection,&model);
+	if(rows != NULL)
+         	remove_files_from_list(rows,self);
 } 
+
+static void 
+remove_duplicates(GtkMenuItem *item, 
+             gpointer  callback_data)
+{
+    	MusicQueue *self = MUSIC_QUEUE(callback_data);
+	GList *list=NULL;
+    	GHashTable *htable=NULL;
+    	GtkTreeIter iter;
+    	gchar *old = NULL;
+    	gchar *song =NULL;
+    	GtkTreePath *path=NULL;
+    
+
+    if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter))
+	{
+		list = g_list_alloc();
+	    	htable = g_hash_table_new_full(g_str_hash,g_str_equal,
+			  			       	destroy_hash_element,
+		       				 	NULL);
+		do
+		{
+			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
+					    &iter,COLUMN_SONG, &song, -1);
+		    
+		    	old= g_hash_table_lookup(htable,song); 
+		    	if(!old)
+		    	{
+			        gtk_tree_model_get_path (GTK_TREE_MODEL(self->priv->store),&iter);
+				 
+				g_hash_table_insert(htable,song,song);
+			}
+			else
+		    	{
+			         path = gtk_tree_model_get_path (GTK_TREE_MODEL(self->priv->store),
+										&iter);	
+			             if(path){    					      
+			        
+			        	list = g_list_insert(list,path,1);
+			    }
+			        g_free(song);
+		    	}
+		    }while(gtk_tree_model_iter_next(
+			       GTK_TREE_MODEL(self->priv->store),
+			       &iter));
+	    
+	   	   remove_files_from_list(list,self);
+	    	   g_hash_table_destroy(htable);
+	    
+	}
+
+
+		
+    
+}
 
 
 gboolean //posible memory leak in this function needs more investigation
@@ -1671,7 +1759,7 @@ has_selected(MusicQueue *self)
 	GList *rows;
 	GtkTreeModel *model;
 	self->priv->currselection = gtk_tree_view_get_selection (GTK_TREE_VIEW (self->priv->treeview));
-
+	
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
 	rows = gtk_tree_selection_get_selected_rows(self->priv->currselection,&model);	
     
@@ -1796,7 +1884,7 @@ sort_list(gpointer    callback_data,
 static void 
 destroy_hash_element(gpointer data)
 {
-	g_free((gint *)data);
+	g_free(data);
 }
 
 static gboolean 
