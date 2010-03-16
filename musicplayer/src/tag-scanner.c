@@ -99,7 +99,7 @@ static void ts_event_loop(TagScanner * self, GstBus *bus, metadata *data)
 {
      GstMessage *message;
      gboolean val = FALSE;
-     message = gst_bus_timed_pop  (bus,GST_CLOCK_TIME_NONE); 
+     message = gst_bus_timed_pop  (bus,5000); 
      while( val != TRUE )
      {
 	  
@@ -111,7 +111,7 @@ static void ts_event_loop(TagScanner * self, GstBus *bus, metadata *data)
 
 	  }
 	  if(!val)
-	  message = gst_bus_timed_pop  (bus,GST_CLOCK_TIME_NONE); 
+	  message = gst_bus_timed_pop  (bus,5000); 
      }
 
     
@@ -162,7 +162,7 @@ metadata * ts_get_metadata(gchar * uri,TagScanner * self){
 
     g_object_set (G_OBJECT (self->filesrc), "location", uri, NULL);
      //gst_bus_add_watch (self->bus, my_bus_callback, self);
-     gst_element_set_state (self->pipeline, GST_STATE_PAUSED);
+     gst_element_set_state (self->pipeline, GST_STATE_PLAYING);
      
     
      ts_event_loop(self,self->bus,track);

@@ -777,7 +777,7 @@ gpointer add_threaded_folders(gpointer user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GSList *node = self->priv->list;
-    	gdk_threads_enter();
+    
 	g_mutex_lock(self->priv->mutex); 
 	self->priv->ts = tag_scanner_new();
 
@@ -792,13 +792,13 @@ gpointer add_threaded_folders(gpointer user_data)
 	g_object_unref(self->priv->ts);
 	g_mutex_unlock(self->priv->mutex); 
 	return NULL;
-    gdk_threads_leave();
+
 }
 gpointer add_threaded(gpointer user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GSList *node = self->priv->list;
-	gdk_threads_enter();
+	
 	g_mutex_lock(self->priv->mutex); 
 	self->priv->ts = tag_scanner_new();
 
@@ -814,7 +814,7 @@ gpointer add_threaded(gpointer user_data)
 	g_mutex_unlock(self->priv->mutex); 
     
 	return NULL;
-    gdk_threads_leave();
+    
 }
 
 
@@ -1030,7 +1030,7 @@ scan_file_action(gpointer data,
 	{
 		/* Report error to user, and free error */
 		fprintf (stderr, "Unable to read file: %s\n", err->message);
-		g_error_free (err);
+		g_error_free (err);   
 	    	return;
 	}
 	else
@@ -1202,6 +1202,8 @@ music_queue_new_with_player(GsPlayer *player)
 	
 	return GTK_WIDGET(self);
 }
+
+//need to free paths here
 static void 
 next_file            (GsPlayer      *player,
 		      gpointer         user_data)
@@ -1546,7 +1548,9 @@ handle_key_input(GtkWidget *widget,
 void
 make_jump_window(MusicQueue *self)
 {
+    	
 	GtkWidget *jumpwindow;
+   	g_mutex_lock(self->priv->mutex); 
 	self->priv->musicstore = music_store_new_with_model(GTK_TREE_MODEL(self->priv->store),NULL);
 	jumpwindow = jump_window_new_with_model(self->priv->musicstore);
 
@@ -1555,6 +1559,7 @@ make_jump_window(MusicQueue *self)
 	                 self);
            
 	gtk_widget_show(jumpwindow);
+    	g_mutex_unlock(self->priv->mutex); 
 }
 static void 
 got_jump(JumpWindow *jwindow,
@@ -1706,7 +1711,7 @@ remove_duplicates(GtkMenuItem *item,
     	gchar *old = NULL;
     	gchar *song =NULL;
     	GtkTreePath *path=NULL;
-    
+
 
     if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter))
 	{
@@ -1716,10 +1721,12 @@ remove_duplicates(GtkMenuItem *item,
 		       				 	NULL);
 		do
 		{
+		    	    g_mutex_lock(self->priv->mutex); 
 			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
 					    &iter,COLUMN_SONG, &song, -1);
 		    
 		    	old= g_hash_table_lookup(htable,song); 
+		    		 g_mutex_unlock(self->priv->mutex); 
 		    	if(!old)
 		    	{
 			        gtk_tree_model_get_path (GTK_TREE_MODEL(self->priv->store),&iter);
@@ -1744,7 +1751,6 @@ remove_duplicates(GtkMenuItem *item,
 	    	   g_hash_table_destroy(htable);
 	    
 	}
-
 
 		
     
