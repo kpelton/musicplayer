@@ -478,6 +478,7 @@ music_queue_read_start_playlist(gchar *location,
     
 	playlist_reader_read_list(self->priv->read,location,&list);
 
+    	
 	g_list_foreach(list,foreach_playlist_file,self);
 
 	//ts_metadata_list_free(list);
@@ -1073,7 +1074,7 @@ choose_file_action(gchar * uri,
 		list = g_list_alloc();
 		read = PLAYLIST_READER(xspf_reader_new());
 		playlist_reader_read_list(read,uri,&list);
-		g_list_foreach(list,foreach_playlist_file,self);
+	    g_list_foreach(list,foreach_playlist_file,self);
 		g_object_unref(read);
 
 		g_list_free(list);
@@ -1126,6 +1127,7 @@ add_file(gpointer data,gpointer user_data,metadata *track)
 	}
 	valid =  g_file_get_uri(file);
 
+    	gdk_threads_enter();
 	gtk_list_store_append(self->priv->store, &iter);
 
 	//gtk_list_store_set(self->priv->store,&iter,COLUMN_TITLE,out,-1);    
@@ -1143,12 +1145,14 @@ add_file(gpointer data,gpointer user_data,metadata *track)
   
         
 	gtk_list_store_set(self->priv->store,&iter,COLUMN_MOD,buffer,-1);
+       gdk_threads_leave();
        
        
 	if(!track)
 		md=ts_get_metadata(valid,self->priv->ts);
 	else
 		md = track;
+    	gdk_threads_enter();
     
 	if(md != NULL && md->title != NULL && md->artist !=NULL)
 	{	  
@@ -1173,7 +1177,7 @@ add_file(gpointer data,gpointer user_data,metadata *track)
 	    if(track)
 	        	ts_metadata_free(track);	
 	}
-    	
+    	gdk_threads_leave();
 	g_signal_emit (self, signals[NEWFILE],0,NULL);
 
 	g_free(valid);
@@ -1550,7 +1554,7 @@ make_jump_window(MusicQueue *self)
 {
     	
 	GtkWidget *jumpwindow;
-   	g_mutex_lock(self->priv->mutex); 
+
 	self->priv->musicstore = music_store_new_with_model(GTK_TREE_MODEL(self->priv->store),NULL);
 	jumpwindow = jump_window_new_with_model(self->priv->musicstore);
 
@@ -1559,7 +1563,7 @@ make_jump_window(MusicQueue *self)
 	                 self);
            
 	gtk_widget_show(jumpwindow);
-    	g_mutex_unlock(self->priv->mutex); 
+  
 }
 static void 
 got_jump(JumpWindow *jwindow,
