@@ -117,19 +117,6 @@ static void ts_event_loop(TagScanner * self, GstBus *bus, metadata *data)
     
 }
 
-//~ static gboolean isPlaying(TagScanner *self)
-//~ {
-     //~ GstState curr;
-    
-     //~ gst_element_get_state(self->pipeline,&curr,NULL,GST_SECOND/3);
-     
-	  //~ if (curr == GST_STATE_PLAYING)
-	       //~ return TRUE;
-	       
-	  
-	  
-     //~ return FALSE;
-//~ }
 
 metadata * ts_get_metadata(gchar * uri,TagScanner * self){
 

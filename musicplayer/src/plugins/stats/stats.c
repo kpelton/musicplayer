@@ -85,7 +85,8 @@ gboolean stats_plugin_music_plugin_activate (MusicPlugin *self,MusicMainWindow *
     
 	gtk_widget_show_all(stats->hbox);
 
-     
+
+    
 	list = music_queue_get_list(mw->queue);
      
      
@@ -97,8 +98,7 @@ gboolean stats_plugin_music_plugin_activate (MusicPlugin *self,MusicMainWindow *
 			g_free(node->data);
 		}
 	}
-	g_list_free(list);
-    
+	g_list_free(list);    
 	stats->buffer = g_strdup_printf("Files:%i",stats->count); 
 
     

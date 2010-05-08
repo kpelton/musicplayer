@@ -166,7 +166,7 @@ handle_key_input(GtkWidget *widget,
                        gpointer user_data);
 
 static void 
-add_file(gpointer data,gpointer user_data,metadata *track);
+add_file(const gchar *uri,MusicQueue *self,metadata *track);
 
 gboolean 
 has_selected(MusicQueue *self);
@@ -225,6 +225,9 @@ static void
 remove_duplicates(GtkMenuItem *item, 
              gpointer  callback_data);
 
+static gpointer 
+add_threaded_dlist(gpointer user_data);
+
 
 //end priv functions
 
@@ -249,8 +252,9 @@ struct _MusicQueuePrivate{
 	gchar *font;
 	gchar *lastdir;
 	gboolean drag_started;
-	gboolean repeat;
+    	gboolean repeat;
 	GSList *list;
+    	GList *dlist;
 	GMutex *mutex;
 	GThread *thread;
 };
@@ -474,18 +478,13 @@ static void
 music_queue_read_start_playlist(gchar *location,
                                 MusicQueue *self)
 {
-	GList *list = g_list_alloc();
-    
-	playlist_reader_read_list(self->priv->read,location,&list);
-
+	self->priv->dlist = g_list_alloc();
     	
-	g_list_foreach(list,foreach_playlist_file,self);
+	playlist_reader_read_list(self->priv->read,location,&self->priv->dlist);
 
-	//ts_metadata_list_free(list);
+    	g_thread_create(add_threaded_dlist,self,TRUE,NULL);  
 
 	g_object_unref(self->priv->read);
-    
-	g_list_free(list);
      
 }
 
@@ -650,10 +649,11 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 
 	//add to list;
     
-
+    
 	//check to see if it was internal
 	if(gtk_drag_get_source_widget (context)  == NULL){
-		list = g_uri_list_extract_uris ((char *)seldata->data);
+/*
+	    list = g_uri_list_extract_uris ((char *)seldata->data);
         	self->priv->ts = tag_scanner_new();
 		for(i=0; list[i] != NULL; i++)
 		{
@@ -661,16 +661,17 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 			scan_file_action (list[i],self);
 	     
 		}
-		// gtk_drag_finish (context, TRUE, FALSE, time);
-		g_object_unref(self->priv->ts);
+		 gtk_drag_finish (context, TRUE, FALSE, time);
+		//g_object_unref(self->priv->ts);
 		g_strfreev (list);  
-	}
+*/
+	    }
 	//internal drag 
 	else{
 		self->priv->changed = TRUE;
 	}
     
-    
+
 }
 
 
@@ -773,7 +774,7 @@ add_from_dialog(GtkWidget *widget,
 
 
 }
-
+static
 gpointer add_threaded_folders(gpointer user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -795,7 +796,8 @@ gpointer add_threaded_folders(gpointer user_data)
 	return NULL;
 
 }
-gpointer add_threaded(gpointer user_data)
+static
+gpointer add_threaded_slist(gpointer user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GSList *node = self->priv->list;
@@ -811,6 +813,36 @@ gpointer add_threaded(gpointer user_data)
 			g_free(node->data);
 	}
 	g_slist_free(self->priv->list);
+	g_object_unref(self->priv->ts);
+	g_mutex_unlock(self->priv->mutex); 
+    
+	return NULL;
+    
+}
+
+
+
+static
+gpointer add_threaded_dlist(gpointer user_data)
+{
+	MusicQueue *self = (MusicQueue *) user_data;
+	GList *node = self->priv->dlist;
+	metadata * md = NULL;
+	g_mutex_lock(self->priv->mutex); 
+	self->priv->ts = tag_scanner_new();
+
+	
+	for(; node != NULL; node=node->next)
+	{
+	    	if(node->data){
+	    	md = (metadata *) node->data;
+	    	add_file(md->uri,self,md);
+	
+		
+			//g_free(node->data);
+		    }
+	}
+	g_list_free(self->priv->dlist);
 	g_object_unref(self->priv->ts);
 	g_mutex_unlock(self->priv->mutex); 
     
@@ -853,7 +885,7 @@ file_chooser_cb(GtkWidget *data,
 
 		gtk_widget_destroy (dialog);
 
-		self->priv->thread = g_thread_create(add_threaded,self,TRUE,NULL);  
+		self->priv->thread = g_thread_create(add_threaded_slist,self,TRUE,NULL);  
 
 		g_mutex_unlock(self->priv->mutex); 
 
@@ -1074,7 +1106,7 @@ choose_file_action(gchar * uri,
 		list = g_list_alloc();
 		read = PLAYLIST_READER(xspf_reader_new());
 		playlist_reader_read_list(read,uri,&list);
-	    g_list_foreach(list,foreach_playlist_file,self);
+	       g_list_foreach(list,foreach_playlist_file,self);
 		g_object_unref(read);
 
 		g_list_free(list);
@@ -1097,9 +1129,8 @@ choose_file_action(gchar * uri,
     
 }
 static void 
-add_file(gpointer data,gpointer user_data,metadata *track)
+add_file(const gchar *uri,MusicQueue *self,metadata *track)
 {
-	MusicQueue *self = (MusicQueue *) user_data;
 	GtkTreeIter   iter;
 	gchar *name=NULL;
 	GError *err =NULL;
@@ -1113,7 +1144,7 @@ add_file(gpointer data,gpointer user_data,metadata *track)
     
 	self->priv->i++;
 	
-	file =g_file_new_for_commandline_arg((gchar *)data);
+	file =g_file_new_for_commandline_arg(uri);
 	info= g_file_query_info(file,"time::modified,standard::display-name",
 				G_FILE_QUERY_INFO_NONE,  NULL,&err);    
 
@@ -1177,9 +1208,10 @@ add_file(gpointer data,gpointer user_data,metadata *track)
 	    if(track)
 	        	ts_metadata_free(track);	
 	}
-    	gdk_threads_leave();
-	g_signal_emit (self, signals[NEWFILE],0,NULL);
-
+    	
+	
+    gdk_threads_leave();
+    g_signal_emit (self, signals[NEWFILE],0,NULL);
 	g_free(valid);
     	
 	g_object_unref(file);
@@ -1634,7 +1666,7 @@ static void remove_files_from_list(GList * rows,
     	GList *node = rows;
   
     
-    	g_mutex_lock(self->priv->mutex); 
+ 
 
     	for(; node != NULL; node=node->next)
 	{
@@ -1683,7 +1715,7 @@ static void remove_files_from_list(GList * rows,
     	g_list_foreach (rows,(GFunc) gtk_tree_path_free, NULL);
 	g_list_free(rows);
 	g_free(id);
-	g_mutex_unlock(self->priv->mutex); 
+	
     
 
 }
@@ -1701,6 +1733,7 @@ remove_files(GtkMenuItem *item,
     	
 	rows = gtk_tree_selection_get_selected_rows(self->priv->currselection,&model);
 	if(rows != NULL)
+        		
          	remove_files_from_list(rows,self);
 } 
 
