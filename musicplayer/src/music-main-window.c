@@ -418,7 +418,7 @@ music_main_play_file(MusicMainWindow *self,gchar * location)
 	    //this is a hack
 	    	filetype = g_file_info_get_attribute_string (info, 
 									     G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
-		add_file_ext(valid,self->queue);
+		//add_file_ext(valid,self->queue);
 	    	if(check_type_supported(filetype)) //only play playable files
 			gs_playFile(self->player,valid);
 		g_free(valid);
