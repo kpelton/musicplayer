@@ -36,6 +36,7 @@ typedef struct {
     GtkWidget *text;
     gchar *buffer;
      gint count;
+    MusicQueue *queue;
 } StatsPlugin;
 
 typedef struct {

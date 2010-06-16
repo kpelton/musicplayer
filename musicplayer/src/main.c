@@ -76,7 +76,7 @@ int main (int argc, char *argv[])
 
         gtk_widget_show (mainwindow);
 
-        music_plugins_engine_init(MUSIC_MAIN_WINDOW(mainwindow));
+       
         g_object_set(G_OBJECT (mainwindow), "title","squid player",NULL);
 
 

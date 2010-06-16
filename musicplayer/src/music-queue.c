@@ -248,6 +248,7 @@ struct _MusicQueuePrivate{
 	PlaylistReader *read;
 	guint i;
 	guint currid;
+    	guint size;
 	gboolean changed;
 	gchar *font;
 	gchar *lastdir;
@@ -501,7 +502,7 @@ music_queue_init (MusicQueue *self)
 	outputdir = g_strdup_printf("%s/.musicplayer/pl.xspf",home);
     
 
-    
+    	
 	//need to pull in gconf stuff here
 
 	self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, MUSIC_TYPE_QUEUE, 
@@ -518,6 +519,7 @@ music_queue_init (MusicQueue *self)
 	init_widgets(self);
 	self->priv->changed =FALSE;
 	self->priv->i=0;
+    	self->priv->size=0;
 	self->priv->drag_started=FALSE;
 	self->priv->ts = NULL;
 	self->priv->read = PLAYLIST_READER(xspf_reader_new());
@@ -1185,7 +1187,7 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 		md = track;
     	gdk_threads_enter();
     
-	if(md != NULL && md->title != NULL && md->artist !=NULL)
+	if(md != NULL && md->title != NULL && md->artist !=NULL) //we have tags
 	{	  
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_TITLE,md->title,-1);
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_ARTIST,md->artist,-1);
@@ -1194,12 +1196,13 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 			   "%s - %s",md->artist,md->title);
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,buffer,-1);
 
-		if (track)
+		if (track) //either free value obtained from tag scanner or free passed in value
 			ts_metadata_free(track);
 		else
 			ts_metadata_free(md);
+	     self->priv->size++;
 	}
-	else
+	else //no tags go by file name
 	{
 		name = (gchar *)parse_file_name(file);//some kind of error here so have to cast
 
@@ -1207,10 +1210,12 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 		g_free(name);
 	    if(track)
 	        	ts_metadata_free(track);	
+	     self->priv->size++;
 	}
     	
 	
     gdk_threads_leave();
+   
     g_signal_emit (self, signals[NEWFILE],0,NULL);
 	g_free(valid);
     	
@@ -1709,7 +1714,8 @@ static void remove_files_from_list(GList * rows,
 		g_signal_emit (self, signals[REMOVE],0,NULL);
 	    }
 	}
-	//free everything
+    	self->priv->size -=g_list_length(rows); //update size of queue  
+	//free everything   
 	g_list_foreach(rowref_list, (GFunc) gtk_tree_row_reference_free, NULL);
 	g_list_free(rowref_list);
     	g_list_foreach (rows,(GFunc) gtk_tree_path_free, NULL);
@@ -2027,9 +2033,9 @@ compare_sort_nodes(sortnode *node1,
 
                                   
 GList* 
-music_queue_get_list(gpointer user_data)
+music_queue_get_list(MusicQueue *self)
 {
-	MusicQueue *self = (MusicQueue *) user_data;
+
 	metadata *track = NULL;
 	GtkTreeIter iter;
 	GList *list = NULL;
@@ -2064,4 +2070,11 @@ music_queue_get_list(gpointer user_data)
     
 	return list;
     
+}
+
+guint
+music_queue_get_size(MusicQueue *self)
+{
+	return self->priv->size;
+
 }

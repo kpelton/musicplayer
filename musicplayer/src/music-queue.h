@@ -67,7 +67,10 @@ gboolean
 check_type_supported(const gchar *type);
 
 GList* 
-music_queue_get_list(gpointer user_data);
+music_queue_get_list(MusicQueue *self);
+
+guint
+music_queue_get_size(MusicQueue *self);
 
 //end public methods
 G_END_DECLS

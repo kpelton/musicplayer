@@ -113,6 +113,7 @@ music_main_window_init (MusicMainWindow *self)
 		gtk_expander_set_expanded(GTK_EXPANDER(self->expander),TRUE);
 		self->expanded=TRUE;
 	}
+     	music_plugins_engine_init(self);
 }
 
 GtkWidget*

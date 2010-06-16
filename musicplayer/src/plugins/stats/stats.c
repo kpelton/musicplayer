@@ -22,10 +22,7 @@ stats_plugin_music_plugin_deactivate ( MusicPlugin *self);
 MusicPluginDetails * 
 stats_plugin_get_info(MusicPlugin  *parent);
 
-static void stats_plugin_new_file(MusicQueue *queue,
-				  metadata* p_track,gpointer user_data);
-static void stats_plugin_remove_file(MusicQueue *queue,
-				     metadata* p_track,gpointer user_data);
+
 static gboolean 
 draw_stats(gpointer data);
 
@@ -54,29 +51,15 @@ get_details()
 }
 
 
-/*
-  static gboolean stats_plugin_eof(gpointer player,StatsPlugin * self)
-  {
-  g_signal_handler_unblock(player,self->id2);
-  return TRUE;
-  }
-*/
+
 gboolean stats_plugin_music_plugin_activate (MusicPlugin *self,MusicMainWindow *mw)
 {
 	StatsPlugin * stats = (StatsPlugin *)self;
-	stats->mw = mw;
+	stats->queue = MUSIC_QUEUE(mw->queue);
 	printf("it's working\n\n");
-	g_object_ref(stats->mw);
-	GList *list=NULL;
-	GList *node=NULL;
-    
-	stats->id1 = g_signal_connect (mw->queue, "new-file",
-				       G_CALLBACK(stats_plugin_new_file),
-				       (gpointer)stats);
-    
-	stats->id2 = g_signal_connect (mw->queue, "remove-file",
-				       G_CALLBACK(stats_plugin_remove_file),
-				       (gpointer)stats);
+	g_object_ref(stats->queue);
+
+
     
     	stats->hbox = gtk_hbox_new(FALSE,0);
       	stats->text = gtk_label_new ("");
@@ -86,80 +69,41 @@ gboolean stats_plugin_music_plugin_activate (MusicPlugin *self,MusicMainWindow *
 	gtk_widget_show_all(stats->hbox);
 
 
-    
-	list = music_queue_get_list(mw->queue);
+   
      
-     
-	for(node = list; node!=NULL; node=node->next){
-	     
-		if(node->data)
-		{
-			stats->count++;
-			g_free(node->data);
-		}
-	}
-	g_list_free(list);    
-	stats->buffer = g_strdup_printf("Files:%i",stats->count); 
+ 
 
     
-	
-	draw_stats(stats);
-
-
-   	stats->id3 = g_timeout_add_seconds(1,(GSourceFunc)draw_stats,self);   
+   	stats->id3 = g_timeout_add_seconds(2,(GSourceFunc)draw_stats,self);   
 	return TRUE;
 }
 
 static gboolean 
 draw_stats(gpointer data)
 {
+    	
 	StatsPlugin * self = (StatsPlugin *)data;
+	gchar *buffer = g_strdup_printf("Files:%u",music_queue_get_size(self->queue)); 
+    
     	gtk_label_set_text(GTK_LABEL(self->text),self->buffer);
+    	g_free(buffer);
     	return TRUE;
 }
-static void stats_plugin_new_file(MusicQueue *queue,
-				  metadata* p_track,gpointer user_data)
-{
-	StatsPlugin * self = (StatsPlugin *)user_data;
-	self->count++;
-
-	g_free(self->buffer);
-	self->buffer = g_strdup_printf("Files:%i",self->count); 
-
-    
-  
-}
-
-static void stats_plugin_remove_file(MusicQueue *queue,
-				     metadata* p_track,gpointer user_data)
-{
-	StatsPlugin * self = (StatsPlugin *)user_data;
-	self->count--;
-
-    	g_free(self->buffer);
-	self->buffer = g_strdup_printf("Files:%i",self->count); 
 
 
-	draw_stats(self);
-	
-    
-  
-}
+
 
 gboolean stats_plugin_music_plugin_deactivate ( MusicPlugin *user_data)
 {
 	StatsPlugin * self = (StatsPlugin *)user_data;
 
     
-	g_signal_handler_disconnect (G_OBJECT (self->mw->queue),
-				     self->id1);
-        g_signal_handler_disconnect (G_OBJECT (self->mw->queue),
-				     self->id2);
     	g_source_remove (self->id3);
    
 
 	printf("destruction \n");
-	g_object_unref(self->mw);
+	g_object_unref(self->queue);
+    	
 	gtk_widget_destroy(self->hbox); 
 	return TRUE;
 }
