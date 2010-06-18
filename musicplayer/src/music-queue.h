@@ -11,6 +11,7 @@
 #include "pl-reader.h"
 #include "xspf-reader.h"
 #include "m3u-reader.h"
+#include "music-side-queue.h"
 
 
 

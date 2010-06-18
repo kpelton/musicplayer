@@ -3,6 +3,7 @@
 #include "real.h"
 #include "music-plugin.h"
 #include "tag-scanner.h"
+#include "utils.h"
 
 #include<libnotify/notify.h>
 
@@ -81,14 +82,25 @@ static void real_test_new_file(GsPlayer *player,
 {
     NotifyNotification *example;
     RealTest * self = (RealTest *)user_data;
+    GFile *file=NULL;
+    
     if(p_track->artist && p_track->title)
     {
     // initiate notify
   
     notify_init("mplayer");
-    // create a new notification
-    
     example = notify_notification_new(p_track->artist,p_track->title,NULL,NULL);
+    // create a new notification
+    }
+     else
+    {
+	notify_init("mplayer");
+       file = g_file_new_for_uri(p_track->uri); 
+    	example = notify_notification_new(parse_file_name(file),NULL,NULL,NULL);
+       g_object_unref(file);
+	
+    }
+    
  
  
     // attach that icon to the notification
@@ -107,7 +119,7 @@ static void real_test_new_file(GsPlayer *player,
     GError *error = NULL;
     notify_notification_show(example,&error);
         
-    }
+    
     g_signal_handler_block(player,self->id2); 
   
 }

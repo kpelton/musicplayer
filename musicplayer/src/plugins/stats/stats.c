@@ -64,7 +64,7 @@ gboolean stats_plugin_music_plugin_activate (MusicPlugin *self,MusicMainWindow *
     	stats->hbox = gtk_hbox_new(FALSE,0);
       	stats->text = gtk_label_new ("");
     	gtk_box_pack_start (GTK_BOX (stats->hbox), stats->text, FALSE, FALSE,0);
-	gtk_box_pack_start (GTK_BOX (stats->mw->mainvbox), stats->hbox, FALSE, FALSE,0);
+	gtk_box_pack_start (GTK_BOX (mw->mainvbox), stats->hbox, FALSE, FALSE,0);
     
 	gtk_widget_show_all(stats->hbox);
 
@@ -74,7 +74,7 @@ gboolean stats_plugin_music_plugin_activate (MusicPlugin *self,MusicMainWindow *
  
 
     
-   	stats->id3 = g_timeout_add_seconds(2,(GSourceFunc)draw_stats,self);   
+   	stats->id3 = g_timeout_add_seconds(1,(GSourceFunc)draw_stats,self);   
 	return TRUE;
 }
 
@@ -85,7 +85,7 @@ draw_stats(gpointer data)
 	StatsPlugin * self = (StatsPlugin *)data;
 	gchar *buffer = g_strdup_printf("Files:%u",music_queue_get_size(self->queue)); 
     
-    	gtk_label_set_text(GTK_LABEL(self->text),self->buffer);
+    	gtk_label_set_text(GTK_LABEL(self->text),buffer);
     	g_free(buffer);
     	return TRUE;
 }

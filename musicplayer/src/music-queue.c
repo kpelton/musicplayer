@@ -258,6 +258,7 @@ struct _MusicQueuePrivate{
     	GList *dlist;
 	GMutex *mutex;
 	GThread *thread;
+    	MusicSideQueue *sidequeue;
 };
 
 //end private varibles
@@ -342,7 +343,7 @@ music_queue_dispose (GObject *object)
 
 
        
-        
+		        
 		home = g_getenv ("HOME");
 
 		outputdir = g_strdup_printf("%s/.musicplayer/pl.xspf",home);
@@ -380,6 +381,7 @@ music_queue_dispose (GObject *object)
 			g_free(font);
 			//g_object_unref(self->priv->store);
 			g_object_unref(self->priv->read);
+		    	g_object_unref(self->priv->sidequeue);
 
 			if(self->priv->thread == NULL)
 				g_mutex_free(self->priv->mutex);	
@@ -525,6 +527,7 @@ music_queue_init (MusicQueue *self)
 	self->priv->read = PLAYLIST_READER(xspf_reader_new());
 	self->priv->mutex = g_mutex_new ();
 	self->priv->thread = NULL;
+    	self->priv->sidequeue = music_side_queue_new ();
      
      
 	music_queue_read_start_playlist(outputdir,self);
