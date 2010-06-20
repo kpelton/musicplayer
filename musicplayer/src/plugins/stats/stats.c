@@ -72,7 +72,7 @@ gboolean stats_plugin_music_plugin_activate (MusicPlugin *self,MusicMainWindow *
    
      
  
-
+	draw_stats(self);
     
    	stats->id3 = g_timeout_add_seconds(1,(GSourceFunc)draw_stats,self);   
 	return TRUE;

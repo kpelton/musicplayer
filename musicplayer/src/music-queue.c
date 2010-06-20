@@ -164,6 +164,8 @@ static gboolean
 handle_key_input(GtkWidget *widget,
                        GdkEventKey *key,
                        gpointer user_data);
+static
+gpointer add_threaded_folders(gpointer user_data);
 
 static void 
 add_file(const gchar *uri,MusicQueue *self,metadata *track);
@@ -228,7 +230,8 @@ remove_duplicates(GtkMenuItem *item,
 static gpointer 
 add_threaded_dlist(gpointer user_data);
 
-
+static gpointer 
+add_threaded_slist(gpointer user_data);
 //end priv functions
 
 //private varibles
@@ -651,26 +654,26 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 	MusicQueue *self = (MusicQueue *) userdata;
 	char **list=NULL;
 	int i;
+    	GSList *slist = NULL;
 
 	//add to list;
     
     
 	//check to see if it was internal
 	if(gtk_drag_get_source_widget (context)  == NULL){
-/*
+
+	    
+
 	    list = g_uri_list_extract_uris ((char *)seldata->data);
-        	self->priv->ts = tag_scanner_new();
 		for(i=0; list[i] != NULL; i++)
 		{
-	      
-			scan_file_action (list[i],self);
-	     
+	     		slist = g_slist_append (slist,list[i]);
 		}
-		 gtk_drag_finish (context, TRUE, FALSE, time);
-		//g_object_unref(self->priv->ts);
-		g_strfreev (list);  
-*/
+
+	    	self->priv->list = slist;
+		self->priv->thread = g_thread_create(add_threaded_slist,self,TRUE,NULL);  
 	    }
+    	
 	//internal drag 
 	else{
 		self->priv->changed = TRUE;
@@ -801,6 +804,7 @@ gpointer add_threaded_folders(gpointer user_data)
 	return NULL;
 
 }
+//takes list with raw uri
 static
 gpointer add_threaded_slist(gpointer user_data)
 {
@@ -826,9 +830,10 @@ gpointer add_threaded_slist(gpointer user_data)
 }
 
 
-
+//this function takes a dlist that already has the md struct
 static
 gpointer add_threaded_dlist(gpointer user_data)
+
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GList *node = self->priv->dlist;
