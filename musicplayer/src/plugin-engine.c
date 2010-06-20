@@ -49,10 +49,9 @@ music_plugins_engine_init (MusicMainWindow * mainwindow)
 static 
 gboolean music_plugins_load_all (MusicMainWindow * mainwindow)
 {
-    GList *list;
+    GList *list=g_list_alloc();
     GList *list1;
     GList *listbeg;
-    list = g_list_alloc();
     listbeg = list;
 #ifdef TOTEM_RUN_IN_SOURCE_TREE
      music_plugins_find_plugins("plugins",&list);

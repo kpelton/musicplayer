@@ -481,7 +481,7 @@ static void
 music_queue_read_start_playlist(gchar *location,
                                 MusicQueue *self)
 {
-	self->priv->dlist = g_list_alloc();
+	self->priv->dlist =NULL;
     	
 	playlist_reader_read_list(self->priv->read,location,&self->priv->dlist);
 
@@ -1108,7 +1108,7 @@ choose_file_action(gchar * uri,
 	}
 	else if(strcmp(type,"application/xspf+xml")  == 0)
 	{
-		list = g_list_alloc();
+		list = NULL;
 		read = PLAYLIST_READER(xspf_reader_new());
 		playlist_reader_read_list(read,uri,&list);
 	       g_list_foreach(list,foreach_playlist_file,self);
@@ -1119,7 +1119,7 @@ choose_file_action(gchar * uri,
     
 	else if(strcmp(type,"audio/x-mpegurl")  == 0)
 	{
-		list = g_list_alloc();
+		list = NULL;
 		read = PLAYLIST_READER(m3u_reader_new());
 		playlist_reader_read_list(read,uri,&list);
 		g_list_foreach(list,foreach_playlist_file,self);
@@ -1665,7 +1665,7 @@ set_repeat (GtkCheckMenuItem *widget,
 static void remove_files_from_list(GList * rows,
     					       MusicQueue *self)
 {
-	GList * rowref_list = g_list_alloc();
+	GList * rowref_list = NULL;
 	GtkTreeIter iter;
 	GtkTreePath *path=NULL;
 	GtkTreeModel *model= gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
@@ -1757,11 +1757,11 @@ remove_duplicates(GtkMenuItem *item,
     	gchar *old = NULL;
     	gchar *song =NULL;
     	GtkTreePath *path=NULL;
+    	gboolean found = FALSE;
 
 
-    if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter))
+    if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter) && music_queue_get_size(self)>1)
 	{
-		list = g_list_alloc();
 	    	htable = g_hash_table_new_full(g_str_hash,g_str_equal,
 			  			       	destroy_hash_element,
 		       				 	NULL);
@@ -1778,22 +1778,26 @@ remove_duplicates(GtkMenuItem *item,
 			        gtk_tree_model_get_path (GTK_TREE_MODEL(self->priv->store),&iter);
 				 
 				g_hash_table_insert(htable,song,song);
+			      
 			}
 			else
 		    	{
 			         path = gtk_tree_model_get_path (GTK_TREE_MODEL(self->priv->store),
 										&iter);	
+			        found= TRUE;
 			             if(path){    					      
 			        
 			        	list = g_list_insert(list,path,1);
+				         printf("%s\n",song);
 			    }
 			        g_free(song);
 		    	}
 		    }while(gtk_tree_model_iter_next(
 			       GTK_TREE_MODEL(self->priv->store),
 			       &iter));
-	    
-	   	   remove_files_from_list(list,self);
+
+	    if(found)
+	   	 remove_files_from_list(list,self);
 	    	   g_hash_table_destroy(htable);
 	    
 	}
@@ -1859,7 +1863,6 @@ sort_list(gpointer    callback_data,
 
 	if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter))
 	{
-		list = g_list_alloc();   
 		htable = g_hash_table_new_full(g_int_hash,g_int_equal,
 					       destroy_hash_element,
 					       destroy_hash_element);
@@ -2046,7 +2049,7 @@ music_queue_get_list(MusicQueue *self)
     
 	if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter))
 	{
-		list = g_list_alloc();
+		list = NULL;
 		do
 		{
 			track = ts_metadata_new();
