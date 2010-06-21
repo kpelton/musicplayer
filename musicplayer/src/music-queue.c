@@ -94,8 +94,6 @@ scan_file_action(gpointer data,
 static void 
 traverse_folders(gpointer data,
                  gpointer user_data);
-static void 
-destroy_hash_element(gpointer data);
 
 static void 
 add_from_dialog (GtkWidget *widget,
@@ -1843,24 +1841,27 @@ remove_duplicates(GtkMenuItem *item,
     if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter) && music_queue_get_size(self)>1)
 	{
 	    	htable = g_hash_table_new_full(g_str_hash,g_str_equal,
-			  			       	destroy_hash_element,
+			  			       g_free,
 		       				 	NULL);
 		do
 		{
-		    	    g_mutex_lock(self->priv->mutex); 
+		    	old = NULL;
+		    	song = NULL;
 			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
 					    &iter,COLUMN_SONG, &song, -1);
-		    
-		    	old= g_hash_table_lookup(htable,song); 
-		    		 g_mutex_unlock(self->priv->mutex); 
-		    	if(!old)
+
+
+		    	if(song)
+		    		old= g_hash_table_lookup(htable,song); 
+		    		
+		    	if(!old && song )
 		    	{
 			        gtk_tree_model_get_path (GTK_TREE_MODEL(self->priv->store),&iter);
 				 
-				g_hash_table_insert(htable,song,song);
+				 g_hash_table_insert(htable,song,song);
 			      
 			}
-			else
+			else if (old && song)
 		    	{
 			         path = gtk_tree_model_get_path (GTK_TREE_MODEL(self->priv->store),
 										&iter);	
@@ -1872,6 +1873,9 @@ remove_duplicates(GtkMenuItem *item,
 			    }
 			        g_free(song);
 		    	}
+		    	else{
+				fprintf(stderr,"Error Removing All Duplicates... Probably adding\n");
+			    }
 		    }while(gtk_tree_model_iter_next(
 			       GTK_TREE_MODEL(self->priv->store),
 			       &iter));
@@ -1939,13 +1943,13 @@ sort_list(gpointer    callback_data,
 	sortnode *node=NULL;
 	gint i=0;
 	traversestr str;
-	g_mutex_lock(self->priv->mutex); 
+	
 
 	if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter))
 	{
 		htable = g_hash_table_new_full(g_int_hash,g_int_equal,
-					       destroy_hash_element,
-					       destroy_hash_element);
+					       g_free,
+					       g_free);
         
 		do
 		{
@@ -2013,14 +2017,9 @@ sort_list(gpointer    callback_data,
 
  	    
 	}
-	g_mutex_unlock(self->priv->mutex); 
+	
 }
 
-static void 
-destroy_hash_element(gpointer data)
-{
-	g_free(data);
-}
 
 static gboolean 
 traverse_tree  (gpointer data,
