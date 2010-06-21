@@ -1280,8 +1280,9 @@ next_file            (GsPlayer      *player,
 	    	
 	    
 		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
-
-	    	if((id = music_side_queue_dequeue (self->priv->sidequeue)) >0) //has a sidequeue entry 
+		id = music_side_queue_dequeue (self->priv->sidequeue);
+	    	path  = muisc_queue_path_from_id(self,id);
+	    	if(id > 0 && path != NULL) //has a sidequeue entry 
 	    {
 		      path  = muisc_queue_path_from_id(self,id);
 		       gtk_tree_model_get_iter(model,&self->priv->curr,path);
