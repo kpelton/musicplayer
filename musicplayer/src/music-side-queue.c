@@ -47,7 +47,7 @@ music_side_queue_finalize (GObject *object)
 {
    	if(object){
 		MusicSideQueue *self = MUSIC_SIDE_QUEUE(object) ;
-		g_list_foreach (self->priv->queue,(GFunc)gtk_tree_row_reference_free,NULL);
+		g_list_foreach (self->priv->queue,(GFunc)g_free,NULL);
 	       	g_list_free(self->priv->queue);
 	   }
   G_OBJECT_CLASS (music_side_queue_parent_class)->finalize (object);
@@ -76,33 +76,44 @@ music_side_queue_init (MusicSideQueue *self)
 }
 void
 music_side_queue_enqueue(MusicSideQueue *self,
-    					     GtkTreeRowReference *path)
+    					     guint id)
 {
-	self->priv->queue = g_list_prepend(self->priv->queue,path); 
+    	guint *newid = NULL;
+
+    	newid = g_malloc(sizeof(guint));
+    	*newid = id;
+	self->priv->queue = g_list_prepend(self->priv->queue,newid); 
 
 }
 
-GtkTreeRowReference *
+guint 
 music_side_queue_dequeue(MusicSideQueue *self)
 {
-	 GtkTreeRowReference *path = NULL;
+	guint *id = NULL;
     	GList *last = NULL;
+    	guint retid = 0;
 	if(self->priv->queue != NULL)
     	{
 		last =  g_list_last (self->priv->queue);
-	       path = (GtkTreeRowReference*) last->data;
+	       id = (guint*) last->data;
 
 	        if(last->prev && last->prev->next == last)
 	       		last->prev->next= NULL;
 	        else
 		   self->priv->queue = NULL;
+
+	        if(id)
+        		retid = *id;
 	        
-		g_list_free1(last);
+		g_free(last->data);
+	       g_list_free1(last);
+	        
 	        	
 	}
+    	
     
 
-	return path;
+	return retid;
 }
 
 

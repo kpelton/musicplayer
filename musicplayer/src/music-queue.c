@@ -170,6 +170,9 @@ gpointer add_threaded_folders(gpointer user_data);
 static void 
 add_file(const gchar *uri,MusicQueue *self,metadata *track);
 
+GtkTreePath *
+muisc_queue_path_from_id(MusicQueue *self,guint terms);
+
 gboolean 
 has_selected(MusicQueue *self);
 
@@ -527,7 +530,7 @@ music_queue_init (MusicQueue *self)
 	
 	init_widgets(self);
 	self->priv->changed =FALSE;
-	self->priv->i=0;
+	self->priv->i=1;
     	self->priv->size=0;
 	self->priv->drag_started=FALSE;
 	self->priv->ts = NULL;
@@ -1263,7 +1266,7 @@ next_file            (GsPlayer      *player,
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GtkTreeModel *model=NULL;
-    	GtkTreeRowReference *ref = NULL;
+	guint id=0;
 	GtkTreeIter iter;
     	GtkTreePath *path= NULL;
 
@@ -1274,16 +1277,17 @@ next_file            (GsPlayer      *player,
 	gtk_tree_selection_unselect_all(self->priv->currselection);
 	if (self->priv->currid > 0) //not sure what this means 
 	{
+	    	
 	    
 		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
 
-	    	if((ref = music_side_queue_dequeue (self->priv->sidequeue)) != NULL) //has a sidequeue entry 
-	    	{
-			path = gtk_tree_row_reference_get_path(ref);
+	    	if((id = music_side_queue_dequeue (self->priv->sidequeue)) >0) //has a sidequeue entry 
+	    {
+		      path  = muisc_queue_path_from_id(self,id);
 		       gtk_tree_model_get_iter(model,&self->priv->curr,path);
-		      gtk_tree_selection_select_iter(self->priv->currselection,&self->priv->curr);
+		       gtk_tree_selection_select_iter(self->priv->currselection,&self->priv->curr);
 		       play_file(GTK_TREE_VIEW(self->priv->treeview),path,NULL,user_data);
-		        //gtk_tree_row_reference_free(ref);
+	
 		       	 gtk_tree_path_free(path);
 		        
 	    	}
@@ -1412,6 +1416,8 @@ row_changed  (GtkTreeModel *tree_model,
 }
 
 
+
+
 static 
 gboolean grab_focus_cb (GtkWidget *widget,
 			GdkEventButton *event,
@@ -1496,7 +1502,7 @@ static GtkWidget *
 get_context_menu(gpointer user_data)
 {
     
-	GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2;
+	GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2, *queue, *seperator3;
 	gboolean test;
 	
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1509,11 +1515,13 @@ get_context_menu(gpointer user_data)
 	plugins   = gtk_menu_item_new_with_label("Plugins");
 	repeat =  gtk_check_menu_item_new_with_label("Repeat");
 	seperator = gtk_separator_menu_item_new ();
+    	seperator3 = gtk_separator_menu_item_new ();
     	duplicates = gtk_menu_item_new_with_label("Remove Duplicates");
     	seperator2 = gtk_separator_menu_item_new ();
     	current = gtk_menu_item_new_with_label("Jump To Current Song");
 	sort   = gtk_menu_item_new_with_label("Sort By Artist");
 	sort2   = gtk_menu_item_new_with_label("Sort By Date");
+    	queue = gtk_menu_item_new_with_label("Add To Side Queue");
 	
 
 
@@ -1538,23 +1546,27 @@ get_context_menu(gpointer user_data)
 	g_signal_connect (G_OBJECT (plugins), "activate",
 			  G_CALLBACK (plugins_item_selected),
 			  user_data);
-        g_signal_connect (G_OBJECT (current), "activate",
+       g_signal_connect (G_OBJECT (current), "activate",
 			  G_CALLBACK (jump_to_current_song),
 			  user_data);
-     g_signal_connect (G_OBJECT (duplicates), "activate",
+       	g_signal_connect (G_OBJECT (duplicates), "activate",
 			  G_CALLBACK (remove_duplicates),
 			  user_data);
-
+    	
+	g_signal_connect (G_OBJECT (queue), "activate",
+			  G_CALLBACK (add_to_side_queue),
+			  user_data);
     
 
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),self->priv->delete);
-	
-    
+	gtk_menu_shell_append (GTK_MENU_SHELL(menu),queue);	
+    	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator3 );
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),repeat);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),plugins);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator);
     	gtk_menu_shell_append (GTK_MENU_SHELL(menu),current);
     	gtk_menu_shell_append (GTK_MENU_SHELL(menu),duplicates);
+   	
     	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator2 );
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort2);
@@ -1595,7 +1607,11 @@ add_to_side_queue(gpointer    callback_data,
     	GtkTreeModel  *model = NULL;
     	GList *list = NULL;
     	GList *listptr  = NULL;
-       GtkTreeRowReference *ref = NULL;
+    	GtkTreeIter iter;
+    	guint id;
+    	gchar *cid;
+    
+    
     
  
    		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
@@ -1606,13 +1622,17 @@ add_to_side_queue(gpointer    callback_data,
 
 	        for(listptr = list; listptr != NULL; listptr=listptr->next)
 	        {  
-		   ref = gtk_tree_row_reference_new(model,listptr->data);
-		   music_side_queue_enqueue(self->priv->sidequeue,ref);
+
+		   	gtk_tree_model_get_iter (model, &iter,listptr->data);
+			gtk_tree_model_get (model, &iter, COLUMN_ID, &cid, -1);
+
+		   	id  = atoi(cid);
+		   	music_side_queue_enqueue (self->priv->sidequeue,id);
 	        }
 	      
 	   
  	      g_list_foreach (list, (GFunc) gtk_tree_path_free, NULL);      
-	        g_list_free (list);  
+	       g_list_free (list);  
 
 	        
 	 
@@ -2096,7 +2116,36 @@ compare_sort_nodes(sortnode *node1,
 	return ret;
 }
 
-                                  
+
+GtkTreePath *
+muisc_queue_path_from_id(MusicQueue *self,guint terms)
+{
+	GtkTreeIter iter;
+	gchar *cid;
+    	guint id;
+    	GtkTreePath* path  = NULL;
+    
+	if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter))
+	{
+
+		do
+		{
+	
+		    	gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), &iter, COLUMN_ID,& cid, -1);
+			id= atoi(cid);
+		    	if(id == terms)
+		        	path = gtk_tree_model_get_path (GTK_TREE_MODEL(self->priv->store),&iter); 
+
+		    	
+		}while(gtk_tree_model_iter_next(
+			       GTK_TREE_MODEL(self->priv->store),
+			       &iter) && id != terms);
+	}
+
+    return path;
+    
+
+}
 GList* 
 music_queue_get_list(MusicQueue *self)
 {

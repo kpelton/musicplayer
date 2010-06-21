@@ -38,9 +38,9 @@ typedef struct {
 } MusicSideQueueClass;
 
 void
-music_side_queue_enqueue(MusicSideQueue *self,GtkTreeRowReference *path);
+music_side_queue_enqueue(MusicSideQueue *self,guint id);
 
-GtkTreeRowReference *
+guint
 music_side_queue_dequeue(MusicSideQueue *self);
 
 GType music_side_queue_get_type (void);
