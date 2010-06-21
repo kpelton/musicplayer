@@ -5,6 +5,7 @@
 #define _MUSIC_SIDE_QUEUE
 
 #include <glib-object.h>
+#include <gtk/gtk.h>
 
 G_BEGIN_DECLS
 
@@ -35,6 +36,12 @@ typedef struct {
 typedef struct {
   GObjectClass parent_class;
 } MusicSideQueueClass;
+
+void
+music_side_queue_enqueue(MusicSideQueue *self,GtkTreeRowReference *path);
+
+GtkTreeRowReference *
+music_side_queue_dequeue(MusicSideQueue *self);
 
 GType music_side_queue_get_type (void);
 

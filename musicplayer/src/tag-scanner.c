@@ -150,7 +150,7 @@ ts_get_metadata(gchar * uri,TagScanner * self){
 
     g_object_set (G_OBJECT (self->filesrc), "location", uri, NULL);
     //gst_bus_add_watch (self->bus, my_bus_callback, self);
-    gst_element_set_state (self->pipeline, GST_STATE_PLAYING);
+    gst_element_set_state (self->pipeline, GST_STATE_PAUSED);
      
     
     ts_event_loop(self,self->bus);

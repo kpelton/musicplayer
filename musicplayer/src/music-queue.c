@@ -232,6 +232,10 @@ add_threaded_dlist(gpointer user_data);
 
 static gpointer 
 add_threaded_slist(gpointer user_data);
+
+static void 
+add_to_side_queue(gpointer    callback_data,
+		     		gpointer user_data);
 //end priv functions
 
 //private varibles
@@ -662,8 +666,8 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 	//check to see if it was internal
 	if(gtk_drag_get_source_widget (context)  == NULL){
 
-	    
 
+	    
 	    list = g_uri_list_extract_uris ((char *)seldata->data);
 		for(i=0; list[i] != NULL; i++)
 		{
@@ -1259,24 +1263,37 @@ next_file            (GsPlayer      *player,
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GtkTreeModel *model=NULL;
+    	GtkTreeRowReference *ref = NULL;
 	GtkTreeIter iter;
+    	GtkTreePath *path= NULL;
 
 	gboolean test;	
 
 	g_object_get(G_OBJECT(self),"musicqueue-repeat",&test,NULL);
 
 	gtk_tree_selection_unselect_all(self->priv->currselection);
-	if (self->priv->currid > 0)
+	if (self->priv->currid > 0) //not sure what this means 
 	{
+	    
 		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
 
-		
-		if(gtk_tree_model_iter_next(model,&self->priv->curr))
+	    	if((ref = music_side_queue_dequeue (self->priv->sidequeue)) != NULL) //has a sidequeue entry 
+	    	{
+			path = gtk_tree_row_reference_get_path(ref);
+		       gtk_tree_model_get_iter(model,&self->priv->curr,path);
+		      gtk_tree_selection_select_iter(self->priv->currselection,&self->priv->curr);
+		       play_file(GTK_TREE_VIEW(self->priv->treeview),path,NULL,user_data);
+		        //gtk_tree_row_reference_free(ref);
+		       	 gtk_tree_path_free(path);
+		        
+	    	}
+			
+		else if(gtk_tree_model_iter_next(model,&self->priv->curr)) //next file in list
 		{
 			//there is a next file 
 			gtk_tree_selection_select_iter(self->priv->currselection,&self->priv->curr); 
 			play_file(GTK_TREE_VIEW(self->priv->treeview),gtk_tree_model_get_path(model,&self->priv->curr),NULL,user_data);
-		} else{
+		} else{ // go to top of the list 
 			//repeat code check to make sure property is true
 			if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter) && test)
 			{
@@ -1550,7 +1567,7 @@ get_context_menu(gpointer user_data)
 
 static void 
 jump_to_current_song(gpointer    callback_data,
-		     	gpointer user_data)
+		     		    gpointer user_data)
 {
 
     	MusicQueue *self = (MusicQueue *) user_data;
@@ -1569,6 +1586,38 @@ jump_to_current_song(gpointer    callback_data,
    		gtk_tree_path_free (path);
 	 }
 }
+static void 
+add_to_side_queue(gpointer    callback_data,
+		     		gpointer user_data)
+{
+
+    	MusicQueue *self = (MusicQueue *) user_data;
+    	GtkTreeModel  *model = NULL;
+    	GList *list = NULL;
+    	GList *listptr  = NULL;
+       GtkTreeRowReference *ref = NULL;
+    
+ 
+   		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
+
+		list = gtk_tree_selection_get_selected_rows(self->priv->currselection,&model);
+
+	    
+
+	        for(listptr = list; listptr != NULL; listptr=listptr->next)
+	        {  
+		   ref = gtk_tree_row_reference_new(model,listptr->data);
+		   music_side_queue_enqueue(self->priv->sidequeue,ref);
+	        }
+	      
+	   
+ 	      g_list_foreach (list, (GFunc) gtk_tree_path_free, NULL);      
+	        g_list_free (list);  
+
+	        
+	 
+}
+
 static gboolean 
 handle_key_input(GtkWidget *widget,
                        GdkEventKey *event,
@@ -1588,6 +1637,11 @@ handle_key_input(GtkWidget *widget,
     	 if(event->keyval == GDK_c || event->keyval == GDK_C)
     	{
        		 jump_to_current_song(NULL, user_data);
+	        	 return TRUE;
+	}
+    	if(event->keyval == GDK_q || event->keyval == GDK_Q)
+    	{
+       		 add_to_side_queue(NULL, user_data);
 	        	 return TRUE;
 	}
     
