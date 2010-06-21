@@ -390,6 +390,7 @@ music_queue_dispose (GObject *object)
 			//g_object_unref(self->priv->store);
 			g_object_unref(self->priv->read);
 		    	g_object_unref(self->priv->sidequeue);
+		    	g_object_unref(self->priv->ts);
 
 			if(self->priv->thread == NULL)
 				g_mutex_free(self->priv->mutex);	
@@ -536,7 +537,8 @@ music_queue_init (MusicQueue *self)
 	self->priv->mutex = g_mutex_new ();
 	self->priv->thread = NULL;
     	self->priv->sidequeue = music_side_queue_new ();
-     
+    
+     	self->priv->ts = tag_scanner_new ();
      
 	music_queue_read_start_playlist(outputdir,self);
      
@@ -792,9 +794,7 @@ gpointer add_threaded_folders(gpointer user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GSList *node = self->priv->list;
-    
-	g_mutex_lock(self->priv->mutex); 
-	self->priv->ts = tag_scanner_new();
+
 
 	
 	for(; node != NULL; node=node->next)
@@ -804,8 +804,6 @@ gpointer add_threaded_folders(gpointer user_data)
 			g_free(node->data);
 	}
 	g_slist_free(self->priv->list);
-	g_object_unref(self->priv->ts);
-	g_mutex_unlock(self->priv->mutex); 
 	return NULL;
 
 }
@@ -816,9 +814,6 @@ gpointer add_threaded_slist(gpointer user_data)
 	MusicQueue *self = (MusicQueue *) user_data;
 	GSList *node = self->priv->list;
 	
-	g_mutex_lock(self->priv->mutex); 
-	self->priv->ts = tag_scanner_new();
-
 	
 	for(; node != NULL; node=node->next)
 	{
@@ -827,8 +822,7 @@ gpointer add_threaded_slist(gpointer user_data)
 			g_free(node->data);
 	}
 	g_slist_free(self->priv->list);
-	g_object_unref(self->priv->ts);
-	g_mutex_unlock(self->priv->mutex); 
+
     
 	return NULL;
     
@@ -843,9 +837,6 @@ gpointer add_threaded_dlist(gpointer user_data)
 	MusicQueue *self = (MusicQueue *) user_data;
 	GList *node = self->priv->dlist;
 	metadata * md = NULL;
-	g_mutex_lock(self->priv->mutex); 
-	self->priv->ts = tag_scanner_new();
-
 	
 	for(; node != NULL; node=node->next)
 	{
@@ -858,8 +849,7 @@ gpointer add_threaded_dlist(gpointer user_data)
 		    }
 	}
 	g_list_free(self->priv->dlist);
-	g_object_unref(self->priv->ts);
-	g_mutex_unlock(self->priv->mutex); 
+	
     
 	return NULL;
     
@@ -934,10 +924,9 @@ void
 add_file_ext(gchar * data,
              gpointer user_data)
 {
-    	MusicQueue *self = (MusicQueue *) user_data;
-    	self->priv->ts = tag_scanner_new();
+
 	scan_file_action(data,user_data);
-    	g_object_unref(self->priv->ts);
+    
 }
 static 
 gboolean check_for_folders(GSList *list)
@@ -1193,11 +1182,12 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 	gtk_list_store_set(self->priv->store,&iter,COLUMN_MOD,buffer,-1);
        gdk_threads_leave();
        
-       
+       g_mutex_lock(self->priv->mutex);  //lock the tag scanner so we dont screw up the pipeline in ts
 	if(!track)
 		md=ts_get_metadata(valid,self->priv->ts);
 	else
 		md = track;
+   	g_mutex_unlock(self->priv->mutex); 
     	gdk_threads_enter();
     
 	if(md != NULL && md->title != NULL && md->artist !=NULL) //we have tags
@@ -1851,7 +1841,7 @@ remove_duplicates(GtkMenuItem *item,
 					    &iter,COLUMN_SONG, &song, -1);
 
 
-		    	if(song)
+		    	if(song) //if the song is being added by a thread this will be NULL
 		    		old= g_hash_table_lookup(htable,song); 
 		    		
 		    	if(!old && song )
@@ -1873,7 +1863,7 @@ remove_duplicates(GtkMenuItem *item,
 			    }
 			        g_free(song);
 		    	}
-		    	else{
+		    	else{ //in the proccess of adding
 				fprintf(stderr,"Error Removing All Duplicates... Probably adding\n");
 			    }
 		    }while(gtk_tree_model_iter_next(
