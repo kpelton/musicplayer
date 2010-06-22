@@ -1277,8 +1277,8 @@ next_file            (GsPlayer      *player,
 	
 	if (self->priv->currid > 0) //only when there are files in the playlist
 	{
-	    	gtk_tree_selection_unselect_all(self->priv->currselection);
-	    	gtk_list_store_set(self->priv->store,&self->priv->curr,COLUMN_PLAYING,FALSE,-1);
+	    	gtk_tree_selection_unselect_all(self->priv->currselection); 
+	    	gtk_list_store_set(self->priv->store,&self->priv->curr,COLUMN_PLAYING,FALSE,-1); 
 	    
 		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
 		id = music_side_queue_dequeue (self->priv->sidequeue);

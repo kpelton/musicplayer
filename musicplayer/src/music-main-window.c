@@ -126,6 +126,7 @@ static void
 init_widgets(MusicMainWindow *self)
 {
 	GtkWidget *hbox;
+
 	  
 	//init player window
 	self->player = gs_player_new();
@@ -175,8 +176,10 @@ init_widgets(MusicMainWindow *self)
 
 	self->mainhbox = gtk_hbox_new (FALSE, 0);
 
-	self->pausebutton = gtk_button_new_from_stock ("gtk-media-pause");
-	self->playbutton  = gtk_button_new_from_stock ("gtk-media-play");
+	self->pausebutton = gtk_button_new_from_stock (GTK_STOCK_MEDIA_PAUSE);
+	self->playbutton  = gtk_button_new_from_stock (GTK_STOCK_MEDIA_PLAY);
+    	self->prevbutton = gtk_button_new_from_stock (GTK_STOCK_MEDIA_PREVIOUS);
+	self->nextbutton  = gtk_button_new_from_stock (GTK_STOCK_MEDIA_NEXT);
 	self->volumebutton = music_volume_new_with_player(self->player);
 	self->albumlabel = gtk_label_new ("");
     
@@ -188,9 +191,11 @@ init_widgets(MusicMainWindow *self)
 	gtk_box_pack_start (GTK_BOX (self->mainvbox), self->expander, TRUE, TRUE,0);
 
 	//pack into hbox
-	gtk_box_pack_start (GTK_BOX (self->mainhbox), self->pausebutton, FALSE,FALSE,0);
-	gtk_box_pack_start (GTK_BOX (self->mainhbox), self->playbutton, FALSE, FALSE,0);
-	gtk_box_pack_start (GTK_BOX (self->mainhbox), self->volumebutton,FALSE, FALSE,0);
+    	gtk_box_pack_start (GTK_BOX (self->mainhbox), self->playbutton, FALSE, FALSE,2);
+	gtk_box_pack_start (GTK_BOX (self->mainhbox), self->pausebutton, FALSE,FALSE,2);
+	gtk_box_pack_start (GTK_BOX (self->mainhbox), self->prevbutton, FALSE, FALSE,2);
+	gtk_box_pack_start (GTK_BOX (self->mainhbox), self->nextbutton, FALSE,FALSE,2);   
+	gtk_box_pack_start (GTK_BOX (self->mainhbox), self->volumebutton,FALSE, FALSE,5);
 	gtk_box_pack_start (GTK_BOX (self->mainhbox), self->albumlabel, TRUE, TRUE,10);
 
 	//properties
@@ -210,7 +215,9 @@ init_widgets(MusicMainWindow *self)
 	//buttons
 	gtk_button_set_relief(GTK_BUTTON(self->pausebutton),GTK_RELIEF_NONE);
 	gtk_button_set_relief(GTK_BUTTON(self->playbutton),GTK_RELIEF_NONE);
-    
+	gtk_button_set_relief(GTK_BUTTON(self->prevbutton),GTK_RELIEF_NONE);
+	gtk_button_set_relief(GTK_BUTTON(self->nextbutton),GTK_RELIEF_NONE);
+    	
 	//show all 
 
 	gtk_widget_show(self->mainvbox);
@@ -220,6 +227,8 @@ init_widgets(MusicMainWindow *self)
 	gtk_widget_show(self->playbutton);
 	gtk_widget_show(self->pausebutton);
 	gtk_widget_show(self->volumebutton);
+    	gtk_widget_show(self->prevbutton);
+	gtk_widget_show(self->nextbutton);
 	gtk_widget_show(self->queue);
 	gtk_widget_show(self->expander);
 	gtk_widget_show_all(hbox);

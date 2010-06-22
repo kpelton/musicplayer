@@ -41,6 +41,8 @@ typedef struct {
     GtkWidget *queue;
     GtkWidget *pausebutton;
     GtkWidget *playbutton;
+    GtkWidget *prevbutton;
+    GtkWidget *nextbutton;	
     GtkWidget *volumebutton;
     GtkWidget *expander;
     GConfClient* client;
