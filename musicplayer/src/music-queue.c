@@ -1311,35 +1311,24 @@ add_columns(MusicQueue *self)
     
 	renderer = gtk_cell_renderer_text_new ();
 	g_object_set(G_OBJECT(renderer),"font",self->priv->font,NULL);
-	column = gtk_tree_view_column_new_with_attributes ("Artist",
+	column = gtk_tree_view_column_new_with_attributes ("Big",
 							   renderer,
 							   "text",
 							   COLUMN_ARTIST,
-							   NULL);
-    
-	gtk_tree_view_column_set_resizable(GTK_TREE_VIEW_COLUMN (column),TRUE);
-    
-    
-	renderer = gtk_cell_renderer_text_new ();
-	g_object_set(G_OBJECT(renderer),"ellipsize",PANGO_ELLIPSIZE_END,NULL);
-    
-	g_object_set(G_OBJECT(renderer),"font",font,NULL);
-    
-    
-	column = gtk_tree_view_column_new_with_attributes ("Title",
-							   renderer,
 							   "text",
 							   COLUMN_TITLE,
+							   "text",
+							   COLUMN_URI,
+							   "text",
+							   COLUMN_ID,
+							   "text",
+							   COLUMN_MOD,
 							   NULL);
-
-	
+    
+	    
+		
  	renderer = gtk_cell_renderer_text_new ();
-	g_object_set(G_OBJECT(renderer),"ellipsize",PANGO_ELLIPSIZE_END,NULL);
-    
-	g_object_set(G_OBJECT(renderer),"font",font,NULL);
-    
-
-
+	
 	
 	column = gtk_tree_view_column_new_with_attributes ("Songs",
 							   renderer,
@@ -1347,34 +1336,7 @@ add_columns(MusicQueue *self)
 							   COLUMN_SONG,
 							   NULL);
 
-	
-
 	gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->treeview), column);
-
-
-	renderer = gtk_cell_renderer_text_new ();
-    
-    
-	column = gtk_tree_view_column_new_with_attributes ("URI",
-							   renderer,
-							   "text",
-							   COLUMN_URI,
-							   NULL);
-	renderer = gtk_cell_renderer_text_new ();
-    
-    
-	column = gtk_tree_view_column_new_with_attributes ("ID",
-							   renderer,
-							   "text",
-							   COLUMN_ID,
-							   NULL);
-	renderer = gtk_cell_renderer_text_new ();
-
-	column = gtk_tree_view_column_new_with_attributes ("MODIFCATION",
-							   renderer,
-							   "text",
-							   COLUMN_MOD,
-							   NULL);
 
     
 }
