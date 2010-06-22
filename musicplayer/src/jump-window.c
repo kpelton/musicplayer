@@ -322,30 +322,7 @@ static void add_columns(JumpWindow *self)
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
 
-    renderer = gtk_cell_renderer_text_new ();
-    
-    column = gtk_tree_view_column_new_with_attributes ("Artist",
-											renderer,
-											"text",
-											COLUMN_ARTIST,
-											NULL);
-    
-    gtk_tree_view_column_set_resizable(GTK_TREE_VIEW_COLUMN (column),TRUE);
-       
-    renderer = gtk_cell_renderer_text_new ();
-    g_object_set(G_OBJECT(renderer),"ellipsize",PANGO_ELLIPSIZE_END,NULL);
-    
-  
-    
-    column = gtk_tree_view_column_new_with_attributes ("Title",
-											renderer,
-											"text",
-											COLUMN_TITLE,
-											NULL);
-
-	
- 	renderer = gtk_cell_renderer_text_new ();
-    g_object_set(G_OBJECT(renderer),"ellipsize",PANGO_ELLIPSIZE_END,NULL);
+	renderer = gtk_cell_renderer_text_new ();
 
     column = gtk_tree_view_column_new_with_attributes ("Songs",
 											renderer,
@@ -356,22 +333,5 @@ static void add_columns(JumpWindow *self)
 	
 
 	gtk_tree_view_append_column (GTK_TREE_VIEW(self->treeview), column);
-
-    renderer = gtk_cell_renderer_text_new ();
-    
-    
-    column = gtk_tree_view_column_new_with_attributes ("URI",
-											renderer,
-											"text",
-											COLUMN_URI,
-											NULL);
-    renderer = gtk_cell_renderer_text_new ();
-    
-    
-    column = gtk_tree_view_column_new_with_attributes ("ID",
-											renderer,
-											"text",
-											COLUMN_ID,
-											NULL);
 
 }

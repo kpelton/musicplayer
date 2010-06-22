@@ -40,6 +40,8 @@ enum
 	COLUMN_ARTIST,
 	COLUMN_TITLE,
 	COLUMN_SONG,
+	COLUMN_WEIGHT,
+	COLUMN_PLAYING,
 	COLUMN_URI,
 	COLUMN_ID,
 	COLUMN_MOD,
@@ -559,7 +561,7 @@ init_widgets(MusicQueue *self)
      
 	gtk_widget_show (self->priv->scrolledwindow);
 
-	self->priv->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,-1);
+	self->priv->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_INT,G_TYPE_BOOLEAN,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,-1);
 
 	//add model to widget we want the jump window to have the filter store and the queue
 	// to have the regular list store
@@ -708,7 +710,7 @@ static void play_file (GtkTreeView *treeview,
 		self->priv->curr = iter;
 		gtk_tree_model_get (model, &iter, COLUMN_ID, &id, -1);
 		self->priv->currid = atoi(id);
-
+		gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,TRUE);
                 gtk_tree_model_get (model, &iter, COLUMN_URI, &uri, -1);
 		gs_playFile(self->priv->player,uri);
                 
@@ -1210,6 +1212,9 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 		name = (gchar *)parse_file_name(file);//some kind of error here so have to cast
 
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,name);   
+		
+		gtk_list_store_set(self->priv->store,&iter,COLUMN_WEIGHT,PANGO_WEIGHT_BOLD);
+		gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,FALSE);
 		g_free(name);
 	    if(track)
 	        	ts_metadata_free(track);	
@@ -1257,10 +1262,16 @@ next_file            (GsPlayer      *player,
 	guint id=0;
 	GtkTreeIter iter;
     	GtkTreePath *path= NULL;
-
+	GList *list = NULL;
+	GList *listptr = NULL;
 	gboolean test;	
 
 	g_object_get(G_OBJECT(self),"musicqueue-repeat",&test,NULL);
+
+	
+	
+	gtk_list_store_set(self->priv->store,&self->priv->curr,COLUMN_PLAYING,FALSE,-1);
+	gtk_list_store_set(self->priv->store,&self->priv->curr,COLUMN_WEIGHT,0,-1);
 
 	gtk_tree_selection_unselect_all(self->priv->currselection);
 	if (self->priv->currid > 0) //not sure what this means 
@@ -1308,7 +1319,7 @@ add_columns(MusicQueue *self)
 	g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
     
 	printf("font:%s\n",font);
-    
+	/*    
 	renderer = gtk_cell_renderer_text_new ();
 	g_object_set(G_OBJECT(renderer),"font",self->priv->font,NULL);
 	column = gtk_tree_view_column_new_with_attributes ("Big",
@@ -1325,16 +1336,26 @@ add_columns(MusicQueue *self)
 							   COLUMN_MOD,
 							   NULL);
     
-	    
+	*/  
 		
  	renderer = gtk_cell_renderer_text_new ();
-	
 	
 	column = gtk_tree_view_column_new_with_attributes ("Songs",
 							   renderer,
 							   "text",
 							   COLUMN_SONG,
+							   "weight-set",
+							   COLUMN_PLAYING,
+							   "weight",
+							   COLUMN_WEIGHT,
+							   
 							   NULL);
+	
+	
+
+			
+
+
 
 	gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->treeview), column);
 
