@@ -323,8 +323,12 @@ static void add_columns(JumpWindow *self)
     GtkTreeViewColumn *column;
 
 	renderer = gtk_cell_renderer_text_new ();
-
-    column = gtk_tree_view_column_new_with_attributes ("Songs",
+	
+	renderer = gtk_cell_renderer_text_new ();
+	g_object_set(G_OBJECT(renderer),"ellipsize",PANGO_ELLIPSIZE_END,NULL);
+    
+    
+   column = gtk_tree_view_column_new_with_attributes ("Songs",
 											renderer,
 											"text",
 											COLUMN_SONG,

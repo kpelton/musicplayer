@@ -704,17 +704,20 @@ static void play_file (GtkTreeView *treeview,
 	GtkTreeModel *model=NULL;
 	gchar *id=NULL;
 	model = gtk_tree_view_get_model(treeview);
-    
+
+	if(self->priv->currid > 0)
+		gtk_list_store_set(self->priv->store,&self->priv->curr,COLUMN_PLAYING,FALSE,-1);
 	if (gtk_tree_model_get_iter (model, &iter,path))
         {
 		self->priv->curr = iter;
 		gtk_tree_model_get (model, &iter, COLUMN_ID, &id, -1);
 		self->priv->currid = atoi(id);
-		gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,TRUE);
-                gtk_tree_model_get (model, &iter, COLUMN_URI, &uri, -1);
+	   	gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,TRUE);
+	   	gtk_list_store_set(self->priv->store,&iter,COLUMN_WEIGHT,PANGO_WEIGHT_BOLD);
+               gtk_tree_model_get (model, &iter, COLUMN_URI, &uri, -1);
 		gs_playFile(self->priv->player,uri);
                 
-                g_free (uri);
+              g_free (uri);
 		g_free(id);
                   
         }
@@ -1212,9 +1215,9 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 		name = (gchar *)parse_file_name(file);//some kind of error here so have to cast
 
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,name);   
+	    	gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,FALSE);
 		
-		gtk_list_store_set(self->priv->store,&iter,COLUMN_WEIGHT,PANGO_WEIGHT_BOLD);
-		gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,FALSE);
+		
 		g_free(name);
 	    if(track)
 	        	ts_metadata_free(track);	
@@ -1262,21 +1265,20 @@ next_file            (GsPlayer      *player,
 	guint id=0;
 	GtkTreeIter iter;
     	GtkTreePath *path= NULL;
-	GList *list = NULL;
-	GList *listptr = NULL;
+
 	gboolean test;	
 
 	g_object_get(G_OBJECT(self),"musicqueue-repeat",&test,NULL);
 
 	
 	
-	gtk_list_store_set(self->priv->store,&self->priv->curr,COLUMN_PLAYING,FALSE,-1);
-	gtk_list_store_set(self->priv->store,&self->priv->curr,COLUMN_WEIGHT,0,-1);
+	
 
-	gtk_tree_selection_unselect_all(self->priv->currselection);
-	if (self->priv->currid > 0) //not sure what this means 
+	
+	if (self->priv->currid > 0) //only when there are files in the playlist
 	{
-	    	
+	    	gtk_tree_selection_unselect_all(self->priv->currselection);
+	    	gtk_list_store_set(self->priv->store,&self->priv->curr,COLUMN_PLAYING,FALSE,-1);
 	    
 		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
 		id = music_side_queue_dequeue (self->priv->sidequeue);
@@ -1319,26 +1321,12 @@ add_columns(MusicQueue *self)
 	g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
     
 	printf("font:%s\n",font);
-	/*    
-	renderer = gtk_cell_renderer_text_new ();
-	g_object_set(G_OBJECT(renderer),"font",self->priv->font,NULL);
-	column = gtk_tree_view_column_new_with_attributes ("Big",
-							   renderer,
-							   "text",
-							   COLUMN_ARTIST,
-							   "text",
-							   COLUMN_TITLE,
-							   "text",
-							   COLUMN_URI,
-							   "text",
-							   COLUMN_ID,
-							   "text",
-							   COLUMN_MOD,
-							   NULL);
-    
-	*/  
 		
  	renderer = gtk_cell_renderer_text_new ();
+	g_object_set(G_OBJECT(renderer),"ellipsize",PANGO_ELLIPSIZE_END,NULL);
+    
+	g_object_set(G_OBJECT(renderer),"font",font,NULL);
+    
 	
 	column = gtk_tree_view_column_new_with_attributes ("Songs",
 							   renderer,
@@ -1752,7 +1740,7 @@ static void remove_files_from_list(GList * rows,
 			if(!gtk_tree_model_iter_next(model,&self->priv->curr))
 			{
 				//last one in tree view
-				self->priv->currid = -1;
+				self->priv->currid = 0;
 			}
 			else
 			{ //update the ID to the next one 
