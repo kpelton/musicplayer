@@ -27,6 +27,12 @@ struct
 	gint curr;
 }typedef traversestr;
 
+struct
+{
+       MusicQueue *self;
+       gpointer user_data;
+}typedef threadstr;
+
 typedef enum
 {
 	SORT_DATE,
@@ -493,10 +499,14 @@ music_queue_read_start_playlist(gchar *location,
                                 MusicQueue *self)
 {
 	self->priv->dlist =NULL;
-    	
-	playlist_reader_read_list(self->priv->read,location,&self->priv->dlist);
-
-    	g_thread_create(add_threaded_dlist,self,TRUE,NULL);  
+	threadstr *str = g_malloc(sizeof(threadstr));	
+	GList *list = NULL;
+	str->self = self;
+	
+	
+	playlist_reader_read_list(self->priv->read,location,&list);
+	str->user_data = list;
+    	g_thread_create(add_threaded_dlist,str,TRUE,NULL);  
 
 	g_object_unref(self->priv->read);
      
@@ -664,7 +674,9 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 	char **list=NULL;
 	int i;
     	GSList *slist = NULL;
-
+	threadstr *str = g_malloc(sizeof(threadstr));	
+	
+	str->self = self;
 	//add to list;
     
     
@@ -679,8 +691,8 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 	     		slist = g_slist_append (slist,list[i]);
 		}
 
-	    	self->priv->list = slist;
-		self->priv->thread = g_thread_create(add_threaded_slist,self,TRUE,NULL);  
+	    	str->user_data = slist;
+		g_thread_create(add_threaded_slist,str,TRUE,NULL);  
 	    }
     	
 	//internal drag 
@@ -797,8 +809,9 @@ add_from_dialog(GtkWidget *widget,
 static
 gpointer add_threaded_folders(gpointer user_data)
 {
-	MusicQueue *self = (MusicQueue *) user_data;
-	GSList *node = self->priv->list;
+        threadstr *str = user_data;
+	MusicQueue *self = (MusicQueue *) str->self;
+	GSList *node = str->user_data;
 
 
 	
@@ -809,6 +822,7 @@ gpointer add_threaded_folders(gpointer user_data)
 			g_free(node->data);
 	}
 	g_slist_free(self->priv->list);
+	g_free(str);
 	return NULL;
 
 }
@@ -816,9 +830,9 @@ gpointer add_threaded_folders(gpointer user_data)
 static
 gpointer add_threaded_slist(gpointer user_data)
 {
-	MusicQueue *self = (MusicQueue *) user_data;
-	GSList *node = self->priv->list;
-	
+	threadstr *str = user_data;
+	MusicQueue *self = (MusicQueue *) str->self;
+	GSList *node = str->user_data;	
 	
 	for(; node != NULL; node=node->next)
 	{
@@ -827,7 +841,7 @@ gpointer add_threaded_slist(gpointer user_data)
 			g_free(node->data);
 	}
 	g_slist_free(self->priv->list);
-
+	g_free(str);
     
 	return NULL;
     
@@ -839,22 +853,21 @@ static
 gpointer add_threaded_dlist(gpointer user_data)
 
 {
-	MusicQueue *self = (MusicQueue *) user_data;
-	GList *node = self->priv->dlist;
-	metadata * md = NULL;
-	
+	threadstr *str = user_data;
+	MusicQueue *self = (MusicQueue *) str->self;
+	GSList *node = str->user_data;	
+	metadata *md = NULL;
+		
 	for(; node != NULL; node=node->next)
 	{
-	    	if(node->data){
-	    	md = (metadata *) node->data;
-	    	add_file(md->uri,self,md);
-	
-		
-			//g_free(node->data);
-		    }
+	    	if(node->data)
+		{
+			md = (metadata *) node->data;
+			add_file(md->uri,self,md); //add_file will free md
+		}
 	}
 	g_list_free(self->priv->dlist);
-	
+	g_free(str);
     
 	return NULL;
     
@@ -871,6 +884,9 @@ file_chooser_cb(GtkWidget *data,
 	MusicQueue *self = (MusicQueue *) data;
 	GtkWidget *dialog = GTK_WIDGET(user_data);
     	gchar *current_folder = NULL;
+	GSList *slist = NULL;
+	threadstr *str = g_malloc(sizeof(threadstr));	
+	str->self = self;
 
 	if(response == GTK_RESPONSE_CANCEL)
 	{
@@ -880,7 +896,7 @@ file_chooser_cb(GtkWidget *data,
 	else if (response  == GTK_RESPONSE_ACCEPT)
 	{
 		g_mutex_lock(self->priv->mutex); 
-		self->priv->list =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
+		slist =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
 		//set our last dir to one they chose
 
 	    
@@ -895,7 +911,8 @@ file_chooser_cb(GtkWidget *data,
 
 		gtk_widget_destroy (dialog);
 
-		self->priv->thread = g_thread_create(add_threaded_slist,self,TRUE,NULL);  
+		str->user_data = slist;
+		g_thread_create(add_threaded_slist,str,TRUE,NULL);  
 
 		g_mutex_unlock(self->priv->mutex); 
 
@@ -912,12 +929,13 @@ file_chooser_cb(GtkWidget *data,
 	      }
     
 		g_mutex_lock(self->priv->mutex); 
-		self->priv->list = gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
+		slist= gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
+		
 		if(check_for_folders(self->priv->list))
 		{
 			gtk_widget_destroy (dialog);
-
-			self->priv->thread = g_thread_create(add_threaded_folders,self,TRUE,NULL);  
+			str->user_data = slist;
+			self->priv->thread = g_thread_create(add_threaded_folders,str,TRUE,NULL);  
 
 		}
 		g_mutex_unlock(self->priv->mutex); 
