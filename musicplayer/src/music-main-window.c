@@ -109,9 +109,9 @@ music_main_window_init (MusicMainWindow *self)
 	if(gconf_client_get_bool (self->client,"/apps/musicplayer/expanded",NULL))
 	{
             
-		mwindow_expander_activate(GTK_EXPANDER(self->expander),self);	
-		gtk_expander_set_expanded(GTK_EXPANDER(self->expander),TRUE);
-		self->expanded=TRUE;
+		//mwindow_expander_activate(GTK_EXPANDER(self->expander),self);	
+		//gtk_expander_set_expanded(GTK_EXPANDER(self->expander),FALSE);
+		//self->expanded=TRUE;
 	}
      	music_plugins_engine_init(self);
 }
