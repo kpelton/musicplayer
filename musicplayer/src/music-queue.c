@@ -13,8 +13,8 @@ G_DEFINE_TYPE (MusicQueue, music_queue, GTK_TYPE_VBOX)
 struct
 {
 	gchar *title;
-    	guint type;
-    	gchar *datestr; 
+    guint type;
+    gchar *datestr; 
 	guint  date;
 	gint id;    
 }typedef sortnode;
@@ -721,16 +721,16 @@ static void play_file (GtkTreeView *treeview,
 		gtk_list_store_set(self->priv->store,&self->priv->curr,COLUMN_PLAYING,FALSE,-1);
 	if (gtk_tree_model_get_iter (model, &iter,path))
         {
-		self->priv->curr = iter;
-		gtk_tree_model_get (model, &iter, COLUMN_ID, &id, -1);
-		self->priv->currid = atoi(id);
-	   	gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,TRUE);
-	   	gtk_list_store_set(self->priv->store,&iter,COLUMN_WEIGHT,PANGO_WEIGHT_BOLD);
-               gtk_tree_model_get (model, &iter, COLUMN_URI, &uri, -1);
-		gs_playFile(self->priv->player,uri);
+			self->priv->curr = iter;
+			gtk_tree_model_get (model, &iter, COLUMN_ID, &id, -1);
+			self->priv->currid = atoi(id);
+	   		gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,TRUE,-1);
+	   		gtk_list_store_set(self->priv->store,&iter,COLUMN_WEIGHT,PANGO_WEIGHT_BOLD,-1);
+            gtk_tree_model_get (model, &iter, COLUMN_URI, &uri, -1);
+			gs_playFile(self->priv->player,uri);
                 
-              g_free (uri);
-		g_free(id);
+        	g_free (uri);
+			g_free(id);
                   
         }
 }
@@ -1232,8 +1232,8 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 	{
 		name = (gchar *)parse_file_name(file);//some kind of error here so have to cast
 
-		gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,name);   
-	    	gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,FALSE);
+		gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,name,-1);   
+	    gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,FALSE,-1);
 		
 		
 		g_free(name);
