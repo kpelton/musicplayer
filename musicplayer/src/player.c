@@ -349,6 +349,7 @@ my_bus_callback (GstBus     *bus,
 
 	GsPlayer *player = (GsPlayer *)data;
 	GstTagList *list;
+	gint percent;
 
         
 	//g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
@@ -398,13 +399,19 @@ my_bus_callback (GstBus     *bus,
 	  
 		break;
 
+       case GST_MESSAGE_BUFFERING: {
+	 gst_message_parse_buffering (message, &percent);
+	 g_print ("Buffering (%u percent done)\n", percent);
+	 break;
+       }
+
 
 	default:
 
-		return TRUE;
-       
-		/* unhandled message */
-		break;
+	      return TRUE;
+	  
+	      /* unhandled message */
+	      break;
 	}
      	return TRUE;
 }

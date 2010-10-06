@@ -233,7 +233,7 @@ static gboolean
     TagScanner * self = (TagScanner *)data;
     GstTagList *list;
     metadata* track=NULL;
-
+    gint percent = 0;
 
  
 
@@ -256,9 +256,14 @@ static gboolean
     case GST_MESSAGE_EOS:  
 	return TRUE;
 	break;
-
+    case GST_MESSAGE_BUFFERING: 
+      
+      gst_message_parse_buffering (message, &percent);
+      g_print ("Buffering (%u percent done)", percent);
+      break;
+  
     case GST_MESSAGE_TAG:
-       
+   
 
 	
 #ifdef DEBUG
