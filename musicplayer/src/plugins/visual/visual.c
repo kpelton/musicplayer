@@ -29,103 +29,103 @@ MusicPluginDetails *
 get_details()
 {   
 
-    MusicPluginDetails *info;
+	MusicPluginDetails *info;
 
-    info = g_malloc(sizeof(MusicPluginDetails));
+	info = g_malloc(sizeof(MusicPluginDetails));
 
-    info->name = g_strdup(PLUGIN_NAME);
-    info->desc = g_strdup(DESC);
-    info->copyright = g_strdup(COPYRIGHT);
-    info->website = g_strdup(WEBSITE);
-    info->is_configurable = is_configurable;
+	info->name = g_strdup(PLUGIN_NAME);
+	info->desc = g_strdup(DESC);
+	info->copyright = g_strdup(COPYRIGHT);
+	info->website = g_strdup(WEBSITE);
+	info->is_configurable = is_configurable;
 
-    
-    return info;
-  
-    
+
+	return info;
+
+
 }
 
 gboolean visual_plugin_activate (MusicPlugin *user_data,MusicMainWindow *mw)
 {
-  VisualPlugin * self = (VisualPlugin *)user_data;
-    self->mw = mw;
-    
-    GstElement *vis_capsfilter;
-    GstPad *pad;
-    GstElement *vis_bin;
-     GstCaps *caps = NULL;
+	VisualPlugin * self = (VisualPlugin *)user_data;
+	self->mw = mw;
 
-    
-      
-  vis_capsfilter = gst_element_factory_make ("capsfilter",
-        "vis_capsfilter");
-    
-   
-   vis_bin = gst_bin_new("vis_bin");
-   self->goom = gst_element_factory_make("goom","sink");
-   
-    
-   
-    gst_bin_add_many (GST_BIN (vis_bin), self->goom,vis_capsfilter,NULL);
- /* Sink ghostpad */
-    pad = gst_element_get_static_pad (self->goom, "sink");
-    gst_element_add_pad (vis_bin, gst_ghost_pad_new ("sink", pad));
-    gst_object_unref (pad);
-    
-    
-    pad = gst_element_get_static_pad (vis_capsfilter, "src");
-    gst_element_add_pad (vis_bin, gst_ghost_pad_new ("src", pad));
-    gst_element_link_pads (self->goom, "src", vis_capsfilter, "sink");
-
-    pad = gst_element_get_static_pad (self->goom, "src");
-    caps = gst_pad_get_allowed_caps (pad);
-    
-    gst_object_unref (pad);
+	GstElement *vis_capsfilter;
+	GstPad *pad;
+	GstElement *vis_bin;
+	GstCaps *caps = NULL;
 
 
-     caps = gst_caps_make_writable (caps);
 
-  
-       /* Get visualization size */
-        GstStructure *s = gst_caps_get_structure (caps, 0);
-      
-        /* Fixate */
-        gst_structure_fixate_field_nearest_int (s, "width", 800);
-        gst_structure_fixate_field_nearest_int (s, "height", 600);
-      
+	vis_capsfilter = gst_element_factory_make ("capsfilter",
+	                                           "vis_capsfilter");
 
-        /* set this */
-         g_object_set (vis_capsfilter, "caps", caps, NULL);
 
-    
+	vis_bin = gst_bin_new("vis_bin");
+	self->goom = gst_element_factory_make("goom","sink");
 
-   self->bin = vis_bin;
-   g_object_set(G_OBJECT(self->mw->player->play),"vis-plugin",vis_bin,NULL);
 
-    return TRUE;
+
+	gst_bin_add_many (GST_BIN (vis_bin), self->goom,vis_capsfilter,NULL);
+	/* Sink ghostpad */
+	pad = gst_element_get_static_pad (self->goom, "sink");
+	gst_element_add_pad (vis_bin, gst_ghost_pad_new ("sink", pad));
+	gst_object_unref (pad);
+
+
+	pad = gst_element_get_static_pad (vis_capsfilter, "src");
+	gst_element_add_pad (vis_bin, gst_ghost_pad_new ("src", pad));
+	gst_element_link_pads (self->goom, "src", vis_capsfilter, "sink");
+
+	pad = gst_element_get_static_pad (self->goom, "src");
+	caps = gst_pad_get_allowed_caps (pad);
+
+	gst_object_unref (pad);
+
+
+	caps = gst_caps_make_writable (caps);
+
+
+	/* Get visualization size */
+	GstStructure *s = gst_caps_get_structure (caps, 0);
+
+	/* Fixate */
+	gst_structure_fixate_field_nearest_int (s, "width", 800);
+	gst_structure_fixate_field_nearest_int (s, "height", 600);
+
+
+	/* set this */
+	g_object_set (vis_capsfilter, "caps", caps, NULL);
+
+
+
+	self->bin = vis_bin;
+	g_object_set(G_OBJECT(self->mw->player->play),"vis-plugin",vis_bin,NULL);
+
+	return TRUE;
 }
 
 
 
 gboolean visual_plugin_deactivate ( MusicPlugin *user_data)
 {
-    VisualPlugin * self = (VisualPlugin *)user_data;
+	VisualPlugin * self = (VisualPlugin *)user_data;
 
 
-    gst_element_set_state (self->bin, GST_STATE_NULL);
-    gst_element_set_state (self->mw->player->play, GST_STATE_NULL);
-    
-    g_object_set(G_OBJECT(self->mw->player->play),"vis-plugin",NULL,NULL);
+	gst_element_set_state (self->bin, GST_STATE_NULL);
+	gst_element_set_state (self->mw->player->play, GST_STATE_NULL);
 
-    g_object_unref(self->bin);
-    return TRUE;
-   
+	g_object_set(G_OBJECT(self->mw->player->play),"vis-plugin",NULL,NULL);
+
+	g_object_unref(self->bin);
+	return TRUE;
+
 }
 
 GType 
 register_music_plugin()
 {
-    return visual_plugin_get_type();
+	return visual_plugin_get_type();
 }
 
 
@@ -133,36 +133,36 @@ static void
 visual_plugin_dispose (GObject *object)
 {
 
-     G_OBJECT_CLASS (visual_plugin_parent_class)->dispose (object);
-  
+	G_OBJECT_CLASS (visual_plugin_parent_class)->dispose (object);
+
 }
 
 
 static void
 visual_plugin_init (VisualPlugin *self)
 {
- 
-    
-    
+
+
+
 }
 static void
 visual_plugin_class_init (VisualPluginClass *klass)
 {
-   MusicPluginClass  *class = MUSIC_PLUGIN_CLASS (klass);
-    GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  /* implement pure virtual class function. */
-  class->music_plugin_activate=visual_plugin_activate;
-  class->music_plugin_deactivate=visual_plugin_deactivate;
-    
+	MusicPluginClass  *class = MUSIC_PLUGIN_CLASS (klass);
+	GObjectClass *object_class = G_OBJECT_CLASS (klass);
+	/* implement pure virtual class function. */
+	class->music_plugin_activate=visual_plugin_activate;
+	class->music_plugin_deactivate=visual_plugin_deactivate;
 
-    
-   object_class->dispose = visual_plugin_dispose;
+
+
+	object_class->dispose = visual_plugin_dispose;
 
 
 
 }
 VisualPlugin* visual_plugin_new ()
 {
-    return g_object_new (VISUAL_TYPE_PLUGIN, NULL);
+	return g_object_new (VISUAL_TYPE_PLUGIN, NULL);
 }
 

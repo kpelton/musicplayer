@@ -6,23 +6,23 @@ static void
 music_plugin_dispose (GObject *object)
 {
 
-     G_OBJECT_CLASS (music_plugin_parent_class)->dispose (object);
-  
+	G_OBJECT_CLASS (music_plugin_parent_class)->dispose (object);
+
 }
 
 static void
 music_plugin_finalize (GObject *object)
 {
-    
-   
-     G_OBJECT_CLASS (music_plugin_parent_class)->finalize (object);
+
+
+	G_OBJECT_CLASS (music_plugin_parent_class)->finalize (object);
 }
 static void
 music_plugin_class_init (MusicPluginClass *klass)
 {
-     GObjectClass *object_class = G_OBJECT_CLASS (klass);
-    object_class->dispose = music_plugin_dispose;
-    object_class->finalize = music_plugin_finalize;
+	GObjectClass *object_class = G_OBJECT_CLASS (klass);
+	object_class->dispose = music_plugin_dispose;
+	object_class->finalize = music_plugin_finalize;
 }
 
 static void
@@ -36,29 +36,29 @@ gboolean music_plugin_deactivate ( MusicPlugin *self)
 {
 	if(!MUSIC_IS_PLUGIN(self))
 		return FALSE;
-    
-     return MUSIC_PLUGIN_GET_CLASS (self)->music_plugin_deactivate(self);
+
+	return MUSIC_PLUGIN_GET_CLASS (self)->music_plugin_deactivate(self);
 }
 
 gboolean music_plugin_activate ( MusicPlugin *self,MusicMainWindow *mw)
 {
 
-    	if(!MUSIC_IS_PLUGIN(self))
+	if(!MUSIC_IS_PLUGIN(self))
 		return FALSE;
 
-     return MUSIC_PLUGIN_GET_CLASS (self)->music_plugin_activate(self,mw);
-   
+	return MUSIC_PLUGIN_GET_CLASS (self)->music_plugin_activate(self,mw);
+
 }
 
 GtkWidget *
 music_plugin_get_config_window(MusicPlugin *self)
 {
-     	if(!MUSIC_IS_PLUGIN(self))
+	if(!MUSIC_IS_PLUGIN(self))
 		return FALSE;
- return MUSIC_PLUGIN_GET_CLASS (self)->music_plugin_get_config_window(self);
-    
+	return MUSIC_PLUGIN_GET_CLASS (self)->music_plugin_get_config_window(self);
+
 }
 
 
 
-                                       
+

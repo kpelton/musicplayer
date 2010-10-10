@@ -11,28 +11,28 @@ G_BEGIN_DECLS
 #define MUSIC_TYPE_SEEK music_seek_get_type()
 
 #define MUSIC_SEEK(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MUSIC_TYPE_SEEK, MusicSeek))
+(G_TYPE_CHECK_INSTANCE_CAST ((obj), MUSIC_TYPE_SEEK, MusicSeek))
 
 #define MUSIC_SEEK_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST ((klass), MUSIC_TYPE_SEEK, MusicSeekClass))
+(G_TYPE_CHECK_CLASS_CAST ((klass), MUSIC_TYPE_SEEK, MusicSeekClass))
 
 #define MUSIC_IS_SEEK(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MUSIC_TYPE_SEEK))
+(G_TYPE_CHECK_INSTANCE_TYPE ((obj), MUSIC_TYPE_SEEK))
 
 #define MUSIC_IS_SEEK_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE ((klass), MUSIC_TYPE_SEEK))
+(G_TYPE_CHECK_CLASS_TYPE ((klass), MUSIC_TYPE_SEEK))
 
 #define MUSIC_SEEK_GET_CLASS(obj) \
-  (G_TYPE_INSTANCE_GET_CLASS ((obj), MUSIC_TYPE_SEEK, MusicSeekClass))
+(G_TYPE_INSTANCE_GET_CLASS ((obj), MUSIC_TYPE_SEEK, MusicSeekClass))
 
 typedef struct {
-     GtkHScale parent;
-     GtkAdjustment *adj;
-     GsPlayer *player;
+	GtkHScale parent;
+	GtkAdjustment *adj;
+	GsPlayer *player;
 } MusicSeek;
 
 typedef struct {
-  GtkHScaleClass parent_class;
+	GtkHScaleClass parent_class;
 } MusicSeekClass;
 
 GType music_seek_get_type (void);

@@ -20,18 +20,18 @@ static const char *
 xspf_mime_type(PlaylistReader *plist);
 
 G_DEFINE_TYPE_WITH_CODE (XspfReader, xspf_reader, G_TYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (PLAYLIST_TYPE_READER,xspf_reader_playlist_interface_init));
+                         G_IMPLEMENT_INTERFACE (PLAYLIST_TYPE_READER,xspf_reader_playlist_interface_init));
 
 #define XSPF_XMLNS "http://xspf.org/ns/0/"
 #define CREATOR "musicplayer"
 #define MIME_TYPE "application/xspf+xml"
 
 struct _XspfReaderPrivate{
-    
+
 	xmlDocPtr doc;
 	xmlNodePtr rootnode;
 	xmlNodePtr tracklist;
-    
+
 };
 
 
@@ -44,12 +44,12 @@ xspf_reader_read_list(PlaylistReader *plist,
 
 	xmlNode *nptr, *nptr2;
 	xmlDocPtr doc;
-    
+
 	doc = xmlRecoverFile(location);
 	if (doc == NULL)
 		return FALSE;
 
-    
+
 	//playlist
 	for (nptr = doc->children; nptr != NULL; nptr = nptr->next) 
 	{
@@ -60,9 +60,9 @@ xspf_reader_read_list(PlaylistReader *plist,
 			{
 				if (nptr2->type == XML_ELEMENT_NODE &&
 				    !xmlStrcmp(nptr2->name, (xmlChar *)"trackList")){
-					process_xspf_tracks(nptr2,list);
+						process_xspf_tracks(nptr2,list);
 
-				}
+					}
 			}
 		}
 	}
@@ -82,15 +82,15 @@ process_xspf_tracks(xmlNode *nptr,
 		//each track
 		if (nptr->type == XML_ELEMENT_NODE &&
 		    !xmlStrcmp(nptr->name, (xmlChar *)"track")) {
-                
-			track = ts_metadata_new();
-			plist_xspf_add_file(nptr,track);
-                
-			if(track->uri)
-				*list = g_list_append(*list,track);
-			else
-				ts_metadata_free(track);
-		}
+
+				track = ts_metadata_new();
+				plist_xspf_add_file(nptr,track);
+
+				if(track->uri)
+					*list = g_list_append(*list,track);
+				else
+					ts_metadata_free(track);
+			}
 
 	}
 
@@ -107,20 +107,20 @@ plist_xspf_add_file(xmlNode *nptr ,
 		name = (const gchar *)xmlNodeGetContent(nptr);
 		if (nptr->type == XML_ELEMENT_NODE &&
 		    !xmlStrcmp(nptr->name,(xmlChar *)"location")) {
-			track->uri = g_malloc(strlen(name)+1);
-			strcpy(track->uri,name);
-		}
+				track->uri = g_malloc(strlen(name)+1);
+				strcpy(track->uri,name);
+			}
 		if (nptr->type == XML_ELEMENT_NODE &&
 		    !xmlStrcmp(nptr->name, (xmlChar *)"title")) {
-			track->title = g_malloc(strlen(name)+1);
-			strcpy(track->title,name);
-		}
+				track->title = g_malloc(strlen(name)+1);
+				strcpy(track->title,name);
+			}
 		if (nptr->type == XML_ELEMENT_NODE &&
 		    !xmlStrcmp(nptr->name,(xmlChar *)"creator")) {
 
-			track->artist = g_malloc(strlen(name)+1);
-			strcpy(track->artist,name);
-		}
+				track->artist = g_malloc(strlen(name)+1);
+				strcpy(track->artist,name);
+			}
 	}
 }
 
@@ -159,7 +159,7 @@ xspf_reader_write_list(PlaylistReader *plist,
 	}
 	return TRUE;
 
-    
+
 }
 static void 
 foreach_xspf(gpointer data,

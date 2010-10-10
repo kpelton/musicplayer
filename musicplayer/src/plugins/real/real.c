@@ -24,7 +24,7 @@ MusicPluginDetails *
 real_test_get_info(MusicPlugin  *parent);
 
 static void real_test_new_file(GsPlayer *player,
-			     metadata* p_track,gpointer user_data);
+                               metadata* p_track,gpointer user_data);
 
 
 
@@ -36,111 +36,111 @@ MusicPluginDetails *
 get_details()
 {   
 
-    MusicPluginDetails *info;
+	MusicPluginDetails *info;
 
-    info = g_malloc(sizeof(MusicPluginDetails));
+	info = g_malloc(sizeof(MusicPluginDetails));
 
-    info->name = g_strdup(PLUGIN_NAME);
-    info->desc = g_strdup(DESC);
-    info->copyright = g_strdup(COPYRIGHT);
-    info->website = g_strdup(WEBSITE);
-    info->is_configurable = FALSE;
+	info->name = g_strdup(PLUGIN_NAME);
+	info->desc = g_strdup(DESC);
+	info->copyright = g_strdup(COPYRIGHT);
+	info->website = g_strdup(WEBSITE);
+	info->is_configurable = FALSE;
 
-    return info;
-  
-    
+	return info;
+
+
 }
 
 
 
 static gboolean real_test_eof(gpointer player,RealTest * self)
 {
-    g_signal_handler_unblock(player,self->id2);
-     return TRUE;
+	g_signal_handler_unblock(player,self->id2);
+	return TRUE;
 }
 gboolean real_test_music_plugin_activate (MusicPlugin *self,MusicMainWindow *mw)
 {
-RealTest * real = (RealTest *)self;
-     real->mw = mw;
-     printf("it's working\n\n");
-     g_object_ref(real->mw);
+	RealTest * real = (RealTest *)self;
+	real->mw = mw;
+	printf("it's working\n\n");
+	g_object_ref(real->mw);
 
-    real->id1 =g_signal_connect(mw->player, "eof",
-				 G_CALLBACK(real_test_eof),
-				 self);
-    
-   real->id2 = g_signal_connect (mw->player, "new-file",
-                      G_CALLBACK(real_test_new_file),
-                      (gpointer)real);
-    
-    g_signal_handler_block(mw->player,real->id2); 
-     return TRUE;
+	real->id1 =g_signal_connect(mw->player, "eof",
+	                            G_CALLBACK(real_test_eof),
+	                            self);
+
+	real->id2 = g_signal_connect (mw->player, "new-file",
+	                              G_CALLBACK(real_test_new_file),
+	                              (gpointer)real);
+
+	g_signal_handler_block(mw->player,real->id2); 
+	return TRUE;
 }
 
 static void real_test_new_file(GsPlayer *player,
-			     metadata* p_track,gpointer user_data)
+                               metadata* p_track,gpointer user_data)
 {
-    NotifyNotification *example;
-    RealTest * self = (RealTest *)user_data;
-    GFile *file=NULL;
-    
-    if(p_track->artist && p_track->title)
-    {
-    // initiate notify
-  
-    notify_init("mplayer");
-    example = notify_notification_new(p_track->artist,p_track->title,NULL,NULL);
-    // create a new notification
-    }
-     else
-    {
-	notify_init("mplayer");
-       file = g_file_new_for_uri(p_track->uri); 
-    	example = notify_notification_new(parse_file_name(file),NULL,NULL,NULL);
-       g_object_unref(file);
-	
-    }
-    
- 
- 
-    // attach that icon to the notification
- 
+	NotifyNotification *example;
+	RealTest * self = (RealTest *)user_data;
+	GFile *file=NULL;
 
-    // set the timeout of the notification to 3 secs
-    notify_notification_set_timeout(example,1500);
+	if(p_track->artist && p_track->title)
+	{
+		// initiate notify
 
-    // set the category so as to tell what kind it is
-    char category[] = "test";
-    notify_notification_set_category(example,category);
+		notify_init("mplayer");
+		example = notify_notification_new(p_track->artist,p_track->title,NULL,NULL);
+		// create a new notification
+	}
+	else
+	{
+		notify_init("mplayer");
+		file = g_file_new_for_uri(p_track->uri); 
+		example = notify_notification_new(parse_file_name(file),NULL,NULL,NULL);
+		g_object_unref(file);
 
-    // set the urgency level of the notification
-    notify_notification_set_urgency (example,NOTIFY_URGENCY_NORMAL);
+	}
 
-    GError *error = NULL;
-    notify_notification_show(example,&error);
-        
-    
-    g_signal_handler_block(player,self->id2); 
-  
+
+
+	// attach that icon to the notification
+
+
+	// set the timeout of the notification to 3 secs
+	notify_notification_set_timeout(example,1500);
+
+	// set the category so as to tell what kind it is
+	char category[] = "test";
+	notify_notification_set_category(example,category);
+
+	// set the urgency level of the notification
+	notify_notification_set_urgency (example,NOTIFY_URGENCY_NORMAL);
+
+	GError *error = NULL;
+	notify_notification_show(example,&error);
+
+
+	g_signal_handler_block(player,self->id2); 
+
 }
 gboolean real_test_music_plugin_deactivate ( MusicPlugin *user_data)
 {
-    RealTest * self = (RealTest *)user_data;
-    notify_uninit();  
-    g_signal_handler_disconnect (G_OBJECT (self->mw->player),
-				    self->id1);
-    g_signal_handler_disconnect (G_OBJECT (self->mw->player),
-				    self->id2);
+	RealTest * self = (RealTest *)user_data;
+	notify_uninit();  
+	g_signal_handler_disconnect (G_OBJECT (self->mw->player),
+	                             self->id1);
+	g_signal_handler_disconnect (G_OBJECT (self->mw->player),
+	                             self->id2);
 
-     printf("destruction \n");
-    g_object_unref(self->mw);
-     return TRUE;
+	printf("destruction \n");
+	g_object_unref(self->mw);
+	return TRUE;
 }
 
 GType 
 register_music_plugin()
 {
-    return real_test_get_type();
+	return real_test_get_type();
 }
 
 
@@ -148,34 +148,34 @@ static void
 real_test_dispose (GObject *object)
 {
 
-     G_OBJECT_CLASS (real_test_parent_class)->dispose (object);
-  
+	G_OBJECT_CLASS (real_test_parent_class)->dispose (object);
+
 }
 
 static void
 real_test_finalize (GObject *object)
 {
-    
-   
-     G_OBJECT_CLASS (real_test_parent_class)->finalize (object);
+
+
+	G_OBJECT_CLASS (real_test_parent_class)->finalize (object);
 }
 static void
 real_test_init (RealTest *self)
 {
-   
+
 }
 static void
 real_test_class_init (RealTestClass *klass)
 {
-   MusicPluginClass  *class = MUSIC_PLUGIN_CLASS (klass);
-    GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  /* implement pure virtual class function. */
-  class->music_plugin_activate=real_test_music_plugin_activate;
-  class->music_plugin_deactivate=real_test_music_plugin_deactivate;
+	MusicPluginClass  *class = MUSIC_PLUGIN_CLASS (klass);
+	GObjectClass *object_class = G_OBJECT_CLASS (klass);
+	/* implement pure virtual class function. */
+	class->music_plugin_activate=real_test_music_plugin_activate;
+	class->music_plugin_deactivate=real_test_music_plugin_deactivate;
 
-    
-   object_class->dispose = real_test_dispose;
-    object_class->finalize = real_test_finalize;
+
+	object_class->dispose = real_test_dispose;
+	object_class->finalize = real_test_finalize;
 
 
 }
@@ -183,6 +183,6 @@ real_test_class_init (RealTestClass *klass)
 RealTest*
 real_test_new (void)
 {
-  return g_object_new (REAL_TYPE_TEST, NULL);
+	return g_object_new (REAL_TYPE_TEST, NULL);
 }
 

@@ -14,51 +14,51 @@ G_BEGIN_DECLS
 #define GS_TYPE_PLAYER gs_player_get_type()
 
 #define GS_PLAYER(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST ((obj), GS_TYPE_PLAYER, GsPlayer))
+(G_TYPE_CHECK_INSTANCE_CAST ((obj), GS_TYPE_PLAYER, GsPlayer))
 
 #define GS_PLAYER_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST ((klass), GS_TYPE_PLAYER, GsPlayerClass))
+(G_TYPE_CHECK_CLASS_CAST ((klass), GS_TYPE_PLAYER, GsPlayerClass))
 
 #define GS_IS_PLAYER(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GS_TYPE_PLAYER))
+(G_TYPE_CHECK_INSTANCE_TYPE ((obj), GS_TYPE_PLAYER))
 
 #define GS_IS_PLAYER_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE ((klass), GS_TYPE_PLAYER))
+(G_TYPE_CHECK_CLASS_TYPE ((klass), GS_TYPE_PLAYER))
 
 #define GS_PLAYER_GET_CLASS(obj) \
-  (G_TYPE_INSTANCE_GET_CLASS ((obj), GS_TYPE_PLAYER, GsPlayerClass))
+(G_TYPE_INSTANCE_GET_CLASS ((obj), GS_TYPE_PLAYER, GsPlayerClass))
 
 typedef struct  {
-     gchar *title;
-     gchar *artist;
-     gchar *genre;
-     gchar *uri;
-     gchar *codec;
-     guint64 duration;
+	gchar *title;
+	gchar *artist;
+	gchar *genre;
+	gchar *uri;
+	gchar *codec;
+	guint64 duration;
 
-     
+
 }mtrack;
 
 typedef struct {
-     GObject parent;
+	GObject parent;
 
-     GstElement *play;
-     GstBus *bus;
-     gboolean isPlaying;
-     GtkWidget *scroll;
-     GstTagList *taglist;
-     metadata *track;
-	 GstElement *gconf;
-    	 GstElement *gio;
-     gchar  *uri;
-     gboolean lock;
-     int idle;
-     
+	GstElement *play;
+	GstBus *bus;
+	gboolean isPlaying;
+	GtkWidget *scroll;
+	GstTagList *taglist;
+	metadata *track;
+	GstElement *gconf;
+	GstElement *gio;
+	gchar  *uri;
+	gboolean lock;
+	int idle;
+
 } GsPlayer;
 
 typedef struct {
-  GObjectClass parent_class;
-     guint signals[5];
+	GObjectClass parent_class;
+	guint signals[5];
 } GsPlayerClass;
 
 

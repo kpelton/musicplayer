@@ -14,44 +14,44 @@ G_BEGIN_DECLS
 #define TAG_TYPE_SCANNER tag_scanner_get_type()
 
 #define TAG_SCANNER(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST ((obj), TAG_TYPE_SCANNER, TagScanner))
+(G_TYPE_CHECK_INSTANCE_CAST ((obj), TAG_TYPE_SCANNER, TagScanner))
 
 #define TAG_SCANNER_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST ((klass), TAG_TYPE_SCANNER, TagScannerClass))
+(G_TYPE_CHECK_CLASS_CAST ((klass), TAG_TYPE_SCANNER, TagScannerClass))
 
 #define TAG_IS_SCANNER(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TAG_TYPE_SCANNER))
+(G_TYPE_CHECK_INSTANCE_TYPE ((obj), TAG_TYPE_SCANNER))
 
 #define TAG_IS_SCANNER_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE ((klass), TAG_TYPE_SCANNER))
+(G_TYPE_CHECK_CLASS_TYPE ((klass), TAG_TYPE_SCANNER))
 
 #define TAG_SCANNER_GET_CLASS(obj) \
-  (G_TYPE_INSTANCE_GET_CLASS ((obj), TAG_TYPE_SCANNER, TagScannerClass))
+(G_TYPE_INSTANCE_GET_CLASS ((obj), TAG_TYPE_SCANNER, TagScannerClass))
 typedef struct
 {
-     gchar *uri;
-     gchar *title;
-     gchar *artist;
-     gchar *genre;
-     gchar *album;
-     gchar *codec;
-     guint64 duration;
-  
+	gchar *uri;
+	gchar *title;
+	gchar *artist;
+	gchar *genre;
+	gchar *album;
+	gchar *codec;
+	guint64 duration;
+
 }metadata;
 
 typedef struct {
-     GObject parent;
-     GstElement *pipeline;
-     GstElement *filesrc;
-     GstElement *dec;
-     GstElement *fakesink;
-     GstBus *bus;
-     metadata *track;
-     gboolean already_found;
+	GObject parent;
+	GstElement *pipeline;
+	GstElement *filesrc;
+	GstElement *dec;
+	GstElement *fakesink;
+	GstBus *bus;
+	metadata *track;
+	gboolean already_found;
 } TagScanner;
 
 typedef struct {
-  GObjectClass parent_class;
+	GObjectClass parent_class;
 } TagScannerClass;
 
 GType tag_scanner_get_type (void);

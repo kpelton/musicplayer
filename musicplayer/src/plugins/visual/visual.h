@@ -12,31 +12,31 @@ G_BEGIN_DECLS
 #define VISUAL_TYPE_PLUGIN visual_plugin_get_type()
 
 #define VISUAL_PLUGIN(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST ((obj), VISUAL_TYPE_PLUGIN, ViualPlugin))
+(G_TYPE_CHECK_INSTANCE_CAST ((obj), VISUAL_TYPE_PLUGIN, ViualPlugin))
 
 #define VISUAL_PLUGIN_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST ((klass), VISUAL_TYPE_PLUGIN, VisualPluginClass))
+(G_TYPE_CHECK_CLASS_CAST ((klass), VISUAL_TYPE_PLUGIN, VisualPluginClass))
 
 #define VISUAL_IS_PLUGIN(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), VISUAL_TYPE_PLUGIN))
+(G_TYPE_CHECK_INSTANCE_TYPE ((obj), VISUAL_TYPE_PLUGIN))
 
 #define VISUAL_IS_PLUGIN_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE ((klass), VISUAL_TYPE_PLUGIN))
+(G_TYPE_CHECK_CLASS_TYPE ((klass), VISUAL_TYPE_PLUGIN))
 
 #define VISUAL_PLUGIN_GET_CLASS(obj) \
-  (G_TYPE_INSTANCE_GET_CLASS ((obj), VISUAL_TYPE_PLUGIN, VisualPluginClass))
+(G_TYPE_INSTANCE_GET_CLASS ((obj), VISUAL_TYPE_PLUGIN, VisualPluginClass))
 
 typedef struct {
-  MusicPlugin parent;
-    MusicMainWindow *mw;
-    GstElement *goom;
-    GstElement *video;
-    GstElement *bin;
-  
+	MusicPlugin parent;
+	MusicMainWindow *mw;
+	GstElement *goom;
+	GstElement *video;
+	GstElement *bin;
+
 } VisualPlugin;
 
 typedef struct {
-  MusicPluginClass parent_class;
+	MusicPluginClass parent_class;
 } VisualPluginClass;
 
 GType visual_plugin_get_type (void);

@@ -96,7 +96,7 @@ static void real_test_new_file(GsPlayer *player,
     {
 	notify_init("mplayer");
        file = g_file_new_for_uri(p_track->uri); 
-    	example = notify_notification_new(NULL,parse_file_name(file),NULL,NULL);
+    	example = notify_notification_new(parse_file_name(file),NULL,NULL,NULL);
        g_object_unref(file);
 	
     }

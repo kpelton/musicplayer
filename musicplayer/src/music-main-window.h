@@ -16,47 +16,47 @@ G_BEGIN_DECLS
 #define MUSIC_TYPE_MAIN_WINDOW music_main_window_get_type()
 
 #define MUSIC_MAIN_WINDOW(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MUSIC_TYPE_MAIN_WINDOW, MusicMainWindow))
+(G_TYPE_CHECK_INSTANCE_CAST ((obj), MUSIC_TYPE_MAIN_WINDOW, MusicMainWindow))
 
 #define MUSIC_MAIN_WINDOW_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST ((klass), MUSIC_TYPE_MAIN_WINDOW, MusicMainWindowClass))
+(G_TYPE_CHECK_CLASS_CAST ((klass), MUSIC_TYPE_MAIN_WINDOW, MusicMainWindowClass))
 
 #define MUSIC_IS_MAIN_WINDOW(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MUSIC_TYPE_MAIN_WINDOW))
+(G_TYPE_CHECK_INSTANCE_TYPE ((obj), MUSIC_TYPE_MAIN_WINDOW))
 
 #define MUSIC_IS_MAIN_WINDOW_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE ((klass), MUSIC_TYPE_MAIN_WINDOW))
+(G_TYPE_CHECK_CLASS_TYPE ((klass), MUSIC_TYPE_MAIN_WINDOW))
 
 #define MUSIC_MAIN_WINDOW_GET_CLASS(obj) \
-  (G_TYPE_INSTANCE_GET_CLASS ((obj), MUSIC_TYPE_MAIN_WINDOW, MusicMainWindowClass))
+(G_TYPE_INSTANCE_GET_CLASS ((obj), MUSIC_TYPE_MAIN_WINDOW, MusicMainWindowClass))
 
 typedef struct {
-    GtkWindow parent;
-    GsPlayer *player;
-    GtkWidget *mainvbox;
-    GtkWidget *mainhbox;
-    GtkWidget *songlabel;
-    GtkWidget *albumlabel;
-    GtkWidget *musicseek;
-    GtkWidget *queue;
-    GtkWidget *pausebutton;
-    GtkWidget *playbutton;
-    GtkWidget *prevbutton;
-    GtkWidget *nextbutton;	
-    GtkWidget *volumebutton;
-    GtkWidget *expander;
-    GConfClient* client;
-    gint dhight;
-    gint dwidth;
-    gint signum;
-    gboolean expanded;
-    
+	GtkWindow parent;
+	GsPlayer *player;
+	GtkWidget *mainvbox;
+	GtkWidget *mainhbox;
+	GtkWidget *songlabel;
+	GtkWidget *albumlabel;
+	GtkWidget *musicseek;
+	GtkWidget *queue;
+	GtkWidget *pausebutton;
+	GtkWidget *playbutton;
+	GtkWidget *prevbutton;
+	GtkWidget *nextbutton;	
+	GtkWidget *volumebutton;
+	GtkWidget *expander;
+	GConfClient* client;
+	gint dhight;
+	gint dwidth;
+	gint signum;
+	gboolean expanded;
+
 } MusicMainWindow;
 
 
 
 typedef struct {
-  GtkWindowClass parent_class;
+	GtkWindowClass parent_class;
 } MusicMainWindowClass;
 
 GType music_main_window_get_type (void);

@@ -8,8 +8,8 @@
 typedef struct MusicPluginInfo{
 	gchar        *location;
 	GModule  *module;
-    GType   type;
-    MusicPluginDetails *details;
+	GType   type;
+	MusicPluginDetails *details;
 	MusicPlugin   *plugin;
 
 	gboolean     builtin;

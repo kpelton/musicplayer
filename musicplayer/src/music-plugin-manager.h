@@ -11,32 +11,32 @@ G_BEGIN_DECLS
 #define MUSIC_TYPE_PLUGIN_MANAGER music_plugin_manager_get_type()
 
 #define MUSIC_PLUGIN_MANAGER(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MUSIC_TYPE_PLUGIN_MANAGER, MusicPluginManager))
+(G_TYPE_CHECK_INSTANCE_CAST ((obj), MUSIC_TYPE_PLUGIN_MANAGER, MusicPluginManager))
 
 #define MUSIC_PLUGIN_MANAGER_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST ((klass), MUSIC_TYPE_PLUGIN_MANAGER, MusicPluginManagerClass))
+(G_TYPE_CHECK_CLASS_CAST ((klass), MUSIC_TYPE_PLUGIN_MANAGER, MusicPluginManagerClass))
 
 #define MUSIC_IS_PLUGIN_MANAGER(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MUSIC_TYPE_PLUGIN_MANAGER))
+(G_TYPE_CHECK_INSTANCE_TYPE ((obj), MUSIC_TYPE_PLUGIN_MANAGER))
 
 #define MUSIC_IS_PLUGIN_MANAGER_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE ((klass), MUSIC_TYPE_PLUGIN_MANAGER))
+(G_TYPE_CHECK_CLASS_TYPE ((klass), MUSIC_TYPE_PLUGIN_MANAGER))
 
 #define MUSIC_PLUGIN_MANAGER_GET_CLASS(obj) \
-  (G_TYPE_INSTANCE_GET_CLASS ((obj), MUSIC_TYPE_PLUGIN_MANAGER, MusicPluginManagerClass))
+(G_TYPE_INSTANCE_GET_CLASS ((obj), MUSIC_TYPE_PLUGIN_MANAGER, MusicPluginManagerClass))
 
 typedef struct _MusicPluginManagerPrivate MusicPluginManagerPrivate;
 
 
 typedef struct {
-    
-  GtkWindow parent;
-  MusicPluginManagerPrivate *priv;
-    
+
+	GtkWindow parent;
+	MusicPluginManagerPrivate *priv;
+
 } MusicPluginManager;
 
 typedef struct {
-  GtkWindowClass parent_class;
+	GtkWindowClass parent_class;
 } MusicPluginManagerClass;
 
 GType music_plugin_manager_get_type (void);

@@ -29,7 +29,8 @@ G_BEGIN_DECLS
 typedef struct {
   MusicPlugin parent;
     MusicMainWindow *mw;
-    gint id;
+    gint id1;
+    gint id2;
 } RealTest;
 
 typedef struct {
