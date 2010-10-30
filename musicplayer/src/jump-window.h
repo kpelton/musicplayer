@@ -10,6 +10,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include "music-side-queue.h"
 
 G_BEGIN_DECLS
 
@@ -38,14 +39,16 @@ struct _JumpWindow
 	GtkWidget *openbutton;
 	GtkWidget *scrolledwindow;
 	GtkWidget *jumpbutton;
+	GtkWidget *queuebutton;
 	GtkTreeModelFilter *filter;
+	MusicSideQueue *squeue;
 	
 };
 
 GType jump_window_get_type (void) G_GNUC_CONST;
 
 GtkWidget*
-jump_window_new_with_model (GtkTreeModel *model);
+jump_window_new_with_model_squeue (GtkTreeModel *model,MusicSideQueue *squeue);
 G_END_DECLS
 
 #endif /* _JUMP_WINDOW_H_ */

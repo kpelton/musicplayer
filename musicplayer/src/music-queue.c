@@ -1653,7 +1653,7 @@ make_jump_window(MusicQueue *self)
 	GtkWidget *jumpwindow;
 
 	self->priv->musicstore = music_store_new_with_model(GTK_TREE_MODEL(self->priv->store),NULL);
-	jumpwindow = jump_window_new_with_model(self->priv->musicstore);
+	jumpwindow = jump_window_new_with_model_squeue(self->priv->musicstore,self->priv->sidequeue);
 
 	g_signal_connect(jumpwindow, "jump",
 	                 G_CALLBACK(got_jump),

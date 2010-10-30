@@ -10,18 +10,21 @@
 #include <string.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdk.h>
+#include <stdlib.h>
 
-
-typedef enum
+enum
 {
 	COLUMN_ARTIST,
 	COLUMN_TITLE,
 	COLUMN_SONG,
+	COLUMN_WEIGHT,
+	COLUMN_PLAYING,
 	COLUMN_URI,
 	COLUMN_ID,
+	COLUMN_MOD,
 	N_COLUMNS,
 
-}COLUMNS;
+};
 
 
 typedef enum {
@@ -34,6 +37,8 @@ static int signals[5];
 static void init_widgets(JumpWindow *self, GtkTreeModel *model);
 static void add_columns(JumpWindow *self);
 static void jump_button_pressed(GtkButton *button, gpointer user_data);
+static void queue_button_pressed(GtkButton *button, gpointer user_data);
+
 static void row_activated(GtkTreeView *treeview,
                           GtkTreePath        *path,
                           GtkTreeViewColumn  *col,
@@ -112,12 +117,13 @@ jump_window_class_init (JumpWindowClass *klass)
 
 }
 GtkWidget*
-jump_window_new_with_model (GtkTreeModel *model)
+jump_window_new_with_model_squeue (GtkTreeModel *model,MusicSideQueue *squeue)
 {
 
 	JumpWindow *self;
 
 	self = g_object_new (JUMP_TYPE_WINDOW, NULL);
+	self->squeue = squeue;
 
 	init_widgets(self,model);
 
@@ -136,6 +142,7 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 
 	self->scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
 	self->jumpbutton = gtk_button_new_with_label("Jump");
+	self->queuebutton = gtk_button_new_with_label("Queue");
 
 
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(self->scrolledwindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -150,8 +157,9 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 	//pack all
 	gtk_box_pack_start (GTK_BOX (self->mainvbox),self->entry, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (self->mainvbox),self->scrolledwindow, TRUE, TRUE, 0);
-	gtk_box_pack_start (GTK_BOX (self->mainvbox),self->jumpbutton, FALSE, FALSE, 0);
-
+	gtk_box_pack_start (GTK_BOX (self->mainvbox),self->mainhbox, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (self->mainhbox),self->jumpbutton, TRUE,TRUE, 0);
+	gtk_box_pack_start (GTK_BOX (self->mainhbox),self->queuebutton, TRUE, TRUE, 0);
 	//properties
 	gtk_window_set_default_size         (GTK_WINDOW(self),
 	                                     250,
@@ -177,6 +185,10 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 
 	g_signal_connect (G_OBJECT(self->jumpbutton), "released",
 	                  G_CALLBACK (jump_button_pressed),
+	                  (self));
+
+	g_signal_connect (G_OBJECT(self->queuebutton), "released",
+	                  G_CALLBACK (queue_button_pressed),
 	                  (self));
 
 	g_signal_connect (G_OBJECT (self), "key_press_event",
@@ -249,6 +261,40 @@ static void jump_button_pressed(GtkButton *button,  gpointer data)
 	gtk_widget_destroy(GTK_WIDGET(self));
 
 }
+
+static void queue_button_pressed(GtkButton *button,  gpointer data)
+{
+	JumpWindow *self = JUMP_WINDOW(data);
+	GtkTreeModel *model =NULL;
+	GtkTreeSelection *selection=NULL;
+	GtkTreeIter iter;
+	GList *list = NULL;
+	gchar *id = NULL;
+	guint uid;
+	GtkTreePath *path=NULL;
+	
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->treeview));
+	model = gtk_tree_model_filter_get_model(self->filter);                                     
+	list = gtk_tree_selection_get_selected_rows (selection,NULL);
+	
+	if(g_list_length(list) >0)
+	{   
+		path = gtk_tree_model_filter_convert_path_to_child_path (self->filter,(GtkTreePath *)list->data);
+		if(path && gtk_tree_model_get_iter(model,&iter,path))
+		{         
+			gtk_tree_model_get (model, &iter, COLUMN_ID, &id, -1);
+			uid = atoi(id);
+			music_side_queue_enqueue (self->squeue,uid);
+			g_free(id);
+			gtk_tree_path_free(path);
+		}
+	}
+	
+	g_list_foreach (list, (GFunc) gtk_tree_path_free, NULL);
+	g_list_free (list);
+
+}
+
 static void row_activated(GtkTreeView *treeview,
                           GtkTreePath        *path,
                           GtkTreeViewColumn  *col,
