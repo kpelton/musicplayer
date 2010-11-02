@@ -73,6 +73,8 @@ music_queue_get_list(MusicQueue *self);
 guint
 music_queue_get_size(MusicQueue *self);
 
+gint64
+music_queue_get_length(MusicQueue *self);
 //end public methods
 G_END_DECLS
 

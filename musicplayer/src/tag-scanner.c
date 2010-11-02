@@ -120,8 +120,11 @@ ts_event_loop  (TagScanner * self, GstBus *bus)
 
 
 metadata * 
-ts_get_metadata(gchar * uri,TagScanner * self){
-
+ts_get_metadata(gchar * uri,TagScanner * self)
+{
+	GstQuery *query;
+	gboolean res;
+	query = gst_query_new_duration (GST_FORMAT_TIME);
 
 	self->track = ts_metadata_new ();
 
@@ -155,22 +158,29 @@ ts_get_metadata(gchar * uri,TagScanner * self){
 
 	ts_event_loop(self,self->bus);
 
-	gst_element_set_state (self->pipeline, GST_STATE_NULL);
 
+	
+	
+	res = gst_element_query (self->pipeline, query);
+	if (res) 
+	{
+  		gst_query_parse_duration (query, NULL,&(self->track->duration));
+	}
+#ifdef DEBUG   
+	else 
+	{
+  		g_print ("duration query failed...\n");
+	}
+#endif
+	//unref
+	gst_query_unref (query);
 	gst_object_unref (self->bus);
+	gst_element_set_state (self->pipeline, GST_STATE_NULL);
 	gst_object_unref(self->pipeline);
 
 	self->pipeline = NULL;
+	return self->track;
 
-	if(self->track->title != NULL && self->track->artist !=NULL ) //we have usefull info pass back
-	{
-		return self->track;
-	}
-	else
-	{
-		ts_metadata_free(self->track);
-	}
-	return NULL;
 
 }
 
@@ -232,7 +242,6 @@ my_bus_callback (GstBus     *bus,
 
 		TagScanner * self = (TagScanner *)data;
 	GstTagList *list;
-	metadata* track=NULL;
 	gint percent = 0;
 
 

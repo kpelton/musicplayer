@@ -121,6 +121,11 @@ plist_xspf_add_file(xmlNode *nptr ,
 				track->artist = g_malloc(strlen(name)+1);
 				strcpy(track->artist,name);
 			}
+		if (nptr->type == XML_ELEMENT_NODE &&
+		    !xmlStrcmp(nptr->name,(xmlChar *)"duration")) {
+				track->duration = g_ascii_strtoll(name,NULL,10);
+			}
+		
 	}
 }
 
@@ -168,7 +173,8 @@ foreach_xspf(gpointer data,
 	metadata *track = (metadata *) data;
 	XspfReader *self = XSPF_READER(user_data);
 	xmlNodePtr tracknode;
-	xmlNodePtr location, title,artist;
+	xmlNodePtr location, title,artist,duration;
+	gchar buffer[20];
 
 	if(data != NULL)
 	{
@@ -176,15 +182,18 @@ foreach_xspf(gpointer data,
 		xmlAddChild(self->priv->tracklist, tracknode);
 
 		location = xmlNewNode(NULL,BAD_CAST "location");
-
+		duration = xmlNewNode(NULL,BAD_CAST "duration");
+		
 		xmlAddChild(location, xmlNewText((xmlChar *)track->uri));
 		xmlAddChild(tracknode, location);
+		
+		snprintf(buffer,19,"%li",track->duration);
 
 		if(track->artist)
 		{
 
 			title = xmlNewNode(NULL,BAD_CAST "title");
-			artist =  xmlNewNode(NULL,BAD_CAST "creator");     
+			artist =  xmlNewNode(NULL,BAD_CAST "creator");
 
 			xmlAddChild(title, xmlNewText((xmlChar *)track->title));
 			xmlAddChild(artist, xmlNewText((xmlChar *)track->artist));
@@ -192,6 +201,8 @@ foreach_xspf(gpointer data,
 			xmlAddChild(tracknode, title);
 			xmlAddChild(tracknode, artist);
 		}
+		xmlAddChild(duration, xmlNewText((xmlChar *)buffer));
+		xmlAddChild(tracknode, duration);
 	}
 
 	ts_metadata_free(track);

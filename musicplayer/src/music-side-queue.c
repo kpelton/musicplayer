@@ -104,7 +104,7 @@ music_side_queue_dequeue(MusicSideQueue *self)
 
 		if(id)
 			retid = *id;
-
+		
 		g_free(last->data);
 		g_list_free1(last);
 

@@ -51,6 +51,7 @@ enum
 	COLUMN_URI,
 	COLUMN_ID,
 	COLUMN_MOD,
+	COLUMN_LENGTH,
 	N_COLUMNS,
 
 };
@@ -263,6 +264,7 @@ struct _MusicQueuePrivate{
 	TagScanner *ts;
 	PlaylistReader *read;
 	guint i;
+	gint64 totallength;
 	guint currid;
 	guint size;
 	gboolean changed;
@@ -549,7 +551,8 @@ music_queue_init (MusicQueue *self)
 	self->priv->mutex = g_mutex_new ();
 	self->priv->thread = NULL;
 	self->priv->sidequeue = music_side_queue_new ();
-
+	self->priv->currid=0;
+	self->priv->totallength=0;
 	self->priv->ts = tag_scanner_new ();
 
 	music_queue_read_start_playlist(outputdir,self);
@@ -571,7 +574,7 @@ init_widgets(MusicQueue *self)
 
 	gtk_widget_show (self->priv->scrolledwindow);
 
-	self->priv->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_INT,G_TYPE_BOOLEAN,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,-1);
+	self->priv->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_INT,G_TYPE_BOOLEAN,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_INT64,-1);
 
 	//add model to widget we want the jump window to have the filter store and the queue
 	// to have the regular list store
@@ -716,9 +719,10 @@ static void play_file (GtkTreeView *treeview,
 	GtkTreeModel *model=NULL;
 	gchar *id=NULL;
 	model = gtk_tree_view_get_model(treeview);
-
-	if(self->priv->currid > 0)
+	       
+	if(self->priv->currid > 0)	
 		gtk_list_store_set(self->priv->store,&self->priv->curr,COLUMN_PLAYING,FALSE,-1);
+
 	if (gtk_tree_model_get_iter (model, &iter,path))
 	{
 		self->priv->curr = iter;
@@ -1162,6 +1166,7 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 	gchar *name=NULL;
 	GError *err =NULL;
 	gchar buffer[1024];
+	gchar buffer2[11];
 	gchar *valid=NULL;
 	GFile *file=NULL;
 	GFileInfo *info=NULL;
@@ -1185,65 +1190,69 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 	}
 	valid =  g_file_get_uri(file);
 
-	gdk_threads_enter();
-	gtk_list_store_append(self->priv->store, &iter);
-
-	//gtk_list_store_set(self->priv->store,&iter,COLUMN_TITLE,out,-1);    
-	gtk_list_store_set(self->priv->store,&iter,COLUMN_URI,valid,-1);  
-
-	g_snprintf(buffer,10,"%i",self->priv->i);
-	gtk_list_store_set(self->priv->store,&iter,COLUMN_ID,buffer,-1);  
-
+	g_snprintf(buffer2,10,"%i",self->priv->i);
 
 	mod = g_file_info_get_attribute_uint64(info,
 	                                       G_FILE_ATTRIBUTE_TIME_MODIFIED); 
 
 	g_snprintf(buffer,20,"%lu",(unsigned long int)mod);
 
-
-
-	gtk_list_store_set(self->priv->store,&iter,COLUMN_MOD,buffer,-1);
-	gdk_threads_leave();
-
 	g_mutex_lock(self->priv->mutex);  //lock the tag scanner so we dont screw up the pipeline in ts
+	
 	if(!track)
 		md=ts_get_metadata(valid,self->priv->ts);
 	else
 		md = track;
 	g_mutex_unlock(self->priv->mutex); 
-	gdk_threads_enter();
 
-	if(md != NULL && md->title != NULL && md->artist !=NULL) //we have tags
+	if(md->title != NULL && md->artist !=NULL) //we have tags
 	{	  
-		gtk_list_store_set(self->priv->store,&iter,COLUMN_TITLE,md->title,-1);
-		gtk_list_store_set(self->priv->store,&iter,COLUMN_ARTIST,md->artist,-1);
-
 		g_snprintf(buffer,strlen(md->artist)+strlen(md->title)+4,
 		           "%s - %s",md->artist,md->title);
-		gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,buffer,-1);
-
-		if (track) //either free value obtained from tag scanner or free passed in value
-			ts_metadata_free(track);
-		else
-			ts_metadata_free(md);
-		self->priv->size++;
+		gdk_threads_enter();
+		gtk_list_store_append(self->priv->store, &iter);
+		gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,buffer,
+		                   		COLUMN_TITLE,md->title,
+		                   		COLUMN_ARTIST,md->artist,
+		                   		COLUMN_LENGTH,md->duration,
+								COLUMN_ID,buffer2,
+		                   		COLUMN_URI,valid,
+		                   		COLUMN_MOD,buffer,
+		                   		COLUMN_PLAYING,FALSE,
+		                   			                   
+		                   -1);
+		
+		gdk_threads_leave();
+		
 	}
 	else //no tags go by file name
 	{
+		
 		name = (gchar *)parse_file_name(file);//some kind of error here so have to cast
-
-		gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,name,-1);   
-		gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,FALSE,-1);
-
-
+		gdk_threads_enter();
+		gtk_list_store_append(self->priv->store, &iter);
+		gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,FALSE,
+		                   COLUMN_SONG,name,
+		                   COLUMN_LENGTH,md->duration,
+						   COLUMN_ID,buffer2,
+		                   COLUMN_URI,valid,
+		                   COLUMN_MOD,buffer,-1);
+		gdk_threads_leave();
 		g_free(name);
-		if(track)
-			ts_metadata_free(track);	
-		self->priv->size++;
+		
 	}
+	//common to all
+	self->priv->size++;
+	if (track){ //either free value obtained from tag scanner or free passed in value
+		self->priv->totallength+=track->duration;
+		ts_metadata_free(track);	
+	}
+	else{
+		self->priv->totallength+=md->duration;
+		ts_metadata_free(track);
+	}
+		//end
 
-
-	gdk_threads_leave();
 
 	g_signal_emit (self, signals[NEWFILE],0,NULL);
 	g_free(valid);
@@ -1729,6 +1738,7 @@ static void remove_files_from_list(GList * rows,
 	gchar *id=NULL;
 	GtkTreeRowReference  *rowref=NULL;
 	GList *node = rows;
+	gint64 length;
 
 
 
@@ -1750,8 +1760,8 @@ static void remove_files_from_list(GList * rows,
 			                                       (GtkTreeRowReference*) 
 			                                       node->data);
 			gtk_tree_model_get_iter (model, &iter,path);
-			gtk_tree_model_get (model, &iter, COLUMN_ID, &id, -1);
-
+			gtk_tree_model_get (model, &iter, COLUMN_ID, &id, COLUMN_LENGTH,&length,-1);
+			self->priv->totallength-=length;
 			//last one was deleted or all was deleted
 			if(atoi(id) == self->priv->currid)
 			{
@@ -2132,7 +2142,6 @@ music_queue_get_list(MusicQueue *self)
 	metadata *track = NULL;
 	GtkTreeIter iter;
 	GList *list = NULL;
-	gchar *artist, *title, *uri;
 
 	if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store),&iter))
 	{
@@ -2140,34 +2149,30 @@ music_queue_get_list(MusicQueue *self)
 		do
 		{
 			track = ts_metadata_new();
-
 			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
-			                    &iter,COLUMN_TITLE, &title, -1); 
-
-			track->title = title;
-			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
-			                    &iter,COLUMN_ARTIST, &artist, -1); 
-
-			track->artist = artist;
-
-			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
-			                    &iter,COLUMN_URI, &uri, -1);
-			track->uri = uri;
+			                    &iter,
+			                    COLUMN_TITLE, &(track->title), 
+			                    COLUMN_ARTIST,&(track->artist),
+			                    COLUMN_URI,   &(track->uri),
+			                    COLUMN_LENGTH,&(track->duration),-1); 
 
 			list =  g_list_append(list,(gpointer)track); 
 		}while(gtk_tree_model_iter_next(
 		                                GTK_TREE_MODEL(self->priv->store),
 		                                &iter));
 	}
-
-
 	return list;
-
 }
 
 guint
 music_queue_get_size(MusicQueue *self)
 {
 	return self->priv->size;
-
 }
+
+gint64
+music_queue_get_length(MusicQueue *self)
+{
+	return self->priv->totallength;
+}
+

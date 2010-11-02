@@ -81,9 +81,25 @@ gboolean stats_plugin_music_plugin_activate (MusicPlugin *self,MusicMainWindow *
 static gboolean 
 draw_stats(gpointer data)
 {
-
 	StatsPlugin * self = (StatsPlugin *)data;
-	gchar *buffer = g_strdup_printf("Files:%u",music_queue_get_size(self->queue)); 
+	gint64 seconds = music_queue_get_length(self->queue)/GST_SECOND;
+	gint64 minutes = 0;
+	gint64 leftover =0;
+	gint64 hours = 0;
+	gchar str[51];
+
+
+	minutes = seconds / 60.;
+	hours = minutes/60.;
+	minutes = (minutes - (60*hours));
+	
+	leftover = (seconds - (minutes *60));
+
+
+	g_snprintf(str,50,"%li Hours %li Minutes" ,hours,minutes,leftover);
+	
+	gchar *buffer = g_strdup_printf("Files:%u       %s",music_queue_get_size(self->queue),
+	                                str); 
 
 	gtk_label_set_text(GTK_LABEL(self->text),buffer);
 	g_free(buffer);
