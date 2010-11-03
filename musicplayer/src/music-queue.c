@@ -17,6 +17,8 @@ struct
 	gchar *datestr; 
 	guint  date;
 	gint id;    
+	gint64 length;
+	
 }typedef sortnode;
 
 
@@ -36,7 +38,8 @@ struct
 typedef enum
 {
 	SORT_DATE,
-	SORT_TITLE
+	SORT_TITLE,
+	SORT_LENGTH
 
 
 }sorttype;
@@ -64,7 +67,8 @@ enum
 enum
 {
 	SORTID_ARTIST,
-	SORTID_TITLE
+	SORTID_TITLE,
+	SORTID_LENGTH
 };
 
 typedef enum {
@@ -171,6 +175,9 @@ static gboolean
 handle_key_input(GtkWidget *widget,
                  GdkEventKey *key,
                  gpointer user_data);
+static void 
+sort_by_length  (gpointer    callback_data,
+               gpointer user_data);
 static
 gpointer add_threaded_folders(gpointer user_data);
 
@@ -1489,7 +1496,7 @@ static GtkWidget *
 get_context_menu(gpointer user_data)
 {
 
-	GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2, *queue, *seperator3;
+	GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2, *queue, *seperator3,*sort3;
 	gboolean test;
 
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1508,6 +1515,7 @@ get_context_menu(gpointer user_data)
 	current = gtk_menu_item_new_with_label("Jump To Current Song");
 	sort   = gtk_menu_item_new_with_label("Sort By Artist");
 	sort2   = gtk_menu_item_new_with_label("Sort By Date");
+	sort3   = gtk_menu_item_new_with_label("Sort By Length");
 	queue = gtk_menu_item_new_with_label("Add To Side Queue");
 
 
@@ -1529,6 +1537,9 @@ get_context_menu(gpointer user_data)
 	                  user_data);
 	g_signal_connect (G_OBJECT (sort2), "activate",
 	                  G_CALLBACK (sort_by_date),
+	                  user_data);
+	g_signal_connect (G_OBJECT (sort3), "activate",
+	                  G_CALLBACK (sort_by_length),
 	                  user_data);
 	g_signal_connect (G_OBJECT (plugins), "activate",
 	                  G_CALLBACK (plugins_item_selected),
@@ -1557,7 +1568,7 @@ get_context_menu(gpointer user_data)
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator2 );
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort2);
-
+	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort3);
 
 
 	return menu;
@@ -1915,6 +1926,13 @@ sort_by_date  (gpointer    callback_data,
 	sort_list(callback_data,user_data,SORT_DATE);
 }
 
+static void 
+sort_by_length  (gpointer    callback_data,
+               gpointer user_data)
+{
+	sort_list(callback_data,user_data,SORT_LENGTH);
+}
+
 
 static void
 sort_list(gpointer    callback_data,
@@ -1943,6 +1961,7 @@ sort_list(gpointer    callback_data,
 		do
 		{
 			node = g_malloc(sizeof(sortnode));
+			node->length=0;
 			switch(sorttype)
 			{
 				case SORT_TITLE:		
@@ -1960,6 +1979,15 @@ sort_list(gpointer    callback_data,
 					node->date = strtoul(node->datestr,NULL, 10);
 
 					break;
+
+				case SORT_LENGTH:
+
+					node->type = SORT_LENGTH;		        
+					gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
+					                    &iter,COLUMN_LENGTH, &(node->length), -1); 
+					break;
+
+				
 			}
 
 			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
@@ -2041,6 +2069,7 @@ traverse_tree  (gpointer data,
 			if(node->datestr)
 				g_free(node->datestr);
 		}
+		
 		g_free(node);
 	}
 	return FALSE;
@@ -2058,6 +2087,8 @@ compare_sort_nodes(sortnode *node1,
 	gchar *title2 = NULL;
 	guint date1 =0; 
 	guint date2= 0;
+	gint64 len1=0;
+	gint64 len2=0;
 
 	if(node1->type == SORT_TITLE)
 	{
@@ -2081,14 +2112,15 @@ compare_sort_nodes(sortnode *node1,
 		}
 
 	}
-	if(node1->type  == SORT_DATE)
+	else if(node1->type  == SORT_DATE)
 	{
 		if(node1)
-			date1= node1->date; 
+			date1= node1->date;
+			
 
 		if(node2)
 			date2 = node2->date;
-
+		
 		//title is empty
 		if(date1 == 0 || date2 == 0)
 		{
@@ -2102,6 +2134,32 @@ compare_sort_nodes(sortnode *node1,
 			ret = (date1 > date2) ? 1 : -1;
 		}
 	}
+	else if(node1->type  == SORT_LENGTH)
+	{
+		if(node1 &&node1->length)
+			len1= node1->length; 
+
+		if(node2 && node2->length)
+			len2 = node2->length;
+		
+		//title is empty
+		if(len1 == 0 || len2 == 0)
+		{
+			if (len1 == 0 && len2 == 0)
+				return 0;
+
+			ret = (len1== 0) ? -1 : 1;
+
+		}else
+		{
+			ret = (len1 > len2) ? 1 : -1;
+		}
+	}
+	else{
+		return 0;
+	}
+
+	
 	return ret;
 }
 
