@@ -34,6 +34,7 @@ typedef struct {
 	gint id3;
 	GtkWidget *hbox;
 	GtkWidget *text;
+	GtkWidget *text2;
 	gchar *buffer;
 	gint count;
 	MusicQueue *queue;

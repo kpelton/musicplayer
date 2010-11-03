@@ -63,7 +63,10 @@ gboolean stats_plugin_music_plugin_activate (MusicPlugin *self,MusicMainWindow *
 
 	stats->hbox = gtk_hbox_new(FALSE,0);
 	stats->text = gtk_label_new ("");
+	stats->text2 = gtk_label_new ("");
+	gtk_misc_set_alignment(GTK_MISC(stats->text2), 1.0f, 1.0f);
 	gtk_box_pack_start (GTK_BOX (stats->hbox), stats->text, FALSE, FALSE,0);
+	gtk_box_pack_start (GTK_BOX (stats->hbox), stats->text2, TRUE, TRUE,0);
 	gtk_box_pack_start (GTK_BOX (mw->mainvbox), stats->hbox, FALSE, FALSE,0);
 
 	gtk_widget_show_all(stats->hbox);
@@ -96,12 +99,12 @@ draw_stats(gpointer data)
 	leftover = (seconds - (minutes *60));
 
 
-	g_snprintf(str,50,"%li Hours %li Minutes" ,hours,minutes,leftover);
+	g_snprintf(str,50,"%li Hours %li Minutes " ,hours,minutes,leftover);
 	
-	gchar *buffer = g_strdup_printf("Files:%u       %s",music_queue_get_size(self->queue),
-	                                str); 
+	gchar *buffer = g_strdup_printf("Files:%u", music_queue_get_size(self->queue));
 
 	gtk_label_set_text(GTK_LABEL(self->text),buffer);
+	gtk_label_set_text(GTK_LABEL(self->text2),str);
 	g_free(buffer);
 	return TRUE;
 }
