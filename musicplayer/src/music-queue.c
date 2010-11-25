@@ -122,9 +122,7 @@ static void
 music_queue_read_start_playlist(gchar *location,
                                 MusicQueue *self);
 //static void playfile (GtkTreeSelection *selection, gpointer data);
-static void 
-next_file (GsPlayer *player,
-           gpointer user_data);
+
 static void
 on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
                       GtkSelectionData *seldata, guint info, guint time,
@@ -1281,18 +1279,44 @@ music_queue_new_with_player(GsPlayer *player)
 	self =g_object_new (MUSIC_TYPE_QUEUE, NULL);
 	self->priv->player =player;
 
-	g_signal_connect (self->priv->player, "eof",
-	                  G_CALLBACK(next_file),
-	                  (gpointer)self);
+	
 
 
 	return GTK_WIDGET(self);
 }
 
 //need to free paths here
-static void 
-next_file            (GsPlayer      *player,
-                      gpointer         user_data)
+
+void 
+music_queue_prev_file(GsPlayer      *player,
+                     gpointer    user_data)
+{
+	MusicQueue *self = (MusicQueue *) user_data;
+	GtkTreeModel *model=NULL;
+	GtkTreePath *path= NULL;
+
+	if (self->priv->currid > 0) //only when there are files in the playlist
+	{
+		gtk_tree_selection_unselect_all(self->priv->currselection); 
+		gtk_list_store_set(self->priv->store,&self->priv->curr,COLUMN_PLAYING,FALSE,-1); 
+
+		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
+		path = gtk_tree_model_get_path(model,&self->priv->curr);
+		
+		if(gtk_tree_path_prev(path)) // if there is a previous file
+		{	//first select the song to be played
+			gtk_tree_model_get_iter(model,&self->priv->curr,path);
+			gtk_tree_selection_select_iter(self->priv->currselection,&self->priv->curr); 
+			play_file(GTK_TREE_VIEW(self->priv->treeview),path,NULL,user_data);
+			gtk_tree_path_free(path);
+		}
+	}
+
+}
+
+void 
+music_queue_next_file   (GsPlayer      *player,
+                     	gpointer    user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GtkTreeModel *model=NULL;
@@ -1303,10 +1327,6 @@ next_file            (GsPlayer      *player,
 	gboolean test;	
 
 	g_object_get(G_OBJECT(self),"musicqueue-repeat",&test,NULL);
-
-
-
-
 
 
 	if (self->priv->currid > 0) //only when there are files in the playlist
@@ -1344,7 +1364,7 @@ next_file            (GsPlayer      *player,
 	}
 }
 
-
+				  
 
 static void 
 add_columns(MusicQueue *self)
@@ -1354,7 +1374,6 @@ add_columns(MusicQueue *self)
 	gchar *font = NULL;
 	g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
 
-	printf("font:%s\n",font);
 
 	renderer = gtk_cell_renderer_text_new ();
 	g_object_set(G_OBJECT(renderer),"ellipsize",PANGO_ELLIPSIZE_END,NULL);
@@ -1370,16 +1389,12 @@ add_columns(MusicQueue *self)
 	                                                   COLUMN_PLAYING,
 	                                                   "weight",
 	                                                   COLUMN_WEIGHT,
-
 	                                                   NULL);
 
-
-
-
-
-
-
 	gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->treeview), column);
+
+	
+	
 
 
 }

@@ -75,7 +75,16 @@ music_queue_get_size(MusicQueue *self);
 
 gint64
 music_queue_get_length(MusicQueue *self);
+
+void 
+music_queue_next_file (GsPlayer *player,
+           			  gpointer user_data);
+void 
+music_queue_prev_file(GsPlayer      *player,
+                      gpointer    user_data);
+
 //end public methods
+
 G_END_DECLS
 
 #endif /* _MUSIC_QUEUE */

@@ -405,7 +405,6 @@ my_bus_callback (GstBus     *bus,
 				break;
 			}
 
-
 		default:
 
 			return TRUE;
@@ -482,7 +481,7 @@ void gst_new_tags                (const GstTagList *list,
 
 	}
 	else if(strcmp(tag,GST_TAG_DURATION)== 0){ 
-		gst_tag_list_get_uint64(list,GST_TAG_DURATION,&(track->duration)); 
+		gst_tag_list_get_int64(list,GST_TAG_DURATION,&(track->duration)); 
 	}else{
 
 	}	 

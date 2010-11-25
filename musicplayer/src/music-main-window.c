@@ -255,6 +255,18 @@ init_widgets(MusicMainWindow *self)
 	g_signal_connect (G_OBJECT (self), "key_press_event",
 	                  G_CALLBACK (key_press_cb),
 	                  self);
+	
+	g_signal_connect (G_OBJECT (self->nextbutton), "released",
+	                  G_CALLBACK(music_queue_next_file),
+	                  (gpointer)self->queue);
+	
+	g_signal_connect (G_OBJECT (self->prevbutton), "released",
+	                  G_CALLBACK(music_queue_prev_file),
+	                  (gpointer)self->queue);
+
+	g_signal_connect (self->player, "eof",
+	                  G_CALLBACK(music_queue_next_file),
+	                  (gpointer)self->queue);
 
 
 
