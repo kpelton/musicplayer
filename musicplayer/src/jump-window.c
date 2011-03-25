@@ -329,36 +329,25 @@ gboolean	check_visible								(GtkTreeModel *model,
 
 	gchar *song=NULL;
 	JumpWindow *self = JUMP_WINDOW(data);
-	gchar *songlow=NULL;
-	gchar *textlow=NULL;
 	const gchar *text;
 
 	text = gtk_entry_get_text(GTK_ENTRY(self->entry));
 
 	if(text){
 
-		gtk_tree_model_get (model, iter, COLUMN_SONG, &song, -1);
-		if(song){
-			songlow =	g_utf8_strdown (song, g_utf8_strlen(song,500));
-
-
-			if(g_strrstr(songlow,text))
-			{
-				g_free(song);
-				g_free(songlow);
-				g_free(textlow);
-				return TRUE;
+		gtk_tree_model_get (model, iter, COLUMN_SONG, &song, -1);	
+			if(song){
+				if(strcasestr(song,text))
+				{
+					g_free(song);
+					return TRUE;
+				}
+				else
+				{
+					g_free(song);
+					return FALSE;
+				}
 			}
-			else
-			{
-				g_free(song);
-				g_free(songlow);
-				g_free(textlow);
-				return FALSE;
-			}
-
-			g_free(song);
-		}
 	}
 	return TRUE;
 }
