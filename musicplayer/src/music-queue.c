@@ -14,8 +14,7 @@ struct
 {
 	gchar *title;
 	guint type;
-	gchar *datestr; 
-	guint  date;
+	guint64  date;
 	gint id;    
 	gint64 length;
 	
@@ -579,7 +578,7 @@ init_widgets(MusicQueue *self)
 
 	gtk_widget_show (self->priv->scrolledwindow);
 
-	self->priv->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_INT,G_TYPE_BOOLEAN,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_INT64,-1);
+	self->priv->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_INT,G_TYPE_BOOLEAN,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_UINT64,G_TYPE_INT64,-1);
 
 	//add model to widget we want the jump window to have the filter store and the queue
 	// to have the regular list store
@@ -1170,7 +1169,7 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 	GtkTreeIter   iter;
 	gchar *name=NULL;
 	GError *err =NULL;
-	gchar buffer[1024];
+	gchar buffertitle[1024];
 	gchar buffer2[11];
 	gchar *valid=NULL;
 	GFile *file=NULL;
@@ -1182,7 +1181,7 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 	self->priv->i++;
 
 	file =g_file_new_for_commandline_arg(uri);
-	info= g_file_query_info(file,"time::modified,standard::display-name",
+	info= g_file_query_info(file,"time::*",
 	                        G_FILE_QUERY_INFO_NONE,  NULL,&err);    
 
 	if(err != NULL)
@@ -1198,10 +1197,8 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 	g_snprintf(buffer2,10,"%i",self->priv->i);
 
 	mod = g_file_info_get_attribute_uint64(info,
-	                                       G_FILE_ATTRIBUTE_TIME_MODIFIED); 
-
-	g_snprintf(buffer,20,"%lu",(unsigned long int)mod);
-
+	                                     G_FILE_ATTRIBUTE_TIME_MODIFIED); 
+	
 	g_mutex_lock(self->priv->mutex);  //lock the tag scanner so we dont screw up the pipeline in ts
 	
 	if(!track)
@@ -1212,17 +1209,17 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 
 	if(md->title != NULL && md->artist !=NULL) //we have tags
 	{	  
-		g_snprintf(buffer,strlen(md->artist)+strlen(md->title)+4,
+		g_snprintf(buffertitle,strlen(md->artist)+strlen(md->title)+4,
 		           "%s - %s",md->artist,md->title);
 		gdk_threads_enter();
 		gtk_list_store_append(self->priv->store, &iter);
-		gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,buffer,
+		gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,buffertitle,
 		                   		COLUMN_TITLE,md->title,
 		                   		COLUMN_ARTIST,md->artist,
-		                   		COLUMN_LENGTH,md->duration,
+				   COLUMN_LENGTH,md->duration,
 								COLUMN_ID,buffer2,
 		                   		COLUMN_URI,valid,
-		                   		COLUMN_MOD,buffer,
+		                   		COLUMN_MOD,mod,
 		                   		COLUMN_PLAYING,FALSE,
 		                   			                   
 		                   -1);
@@ -1241,7 +1238,7 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 		                   COLUMN_LENGTH,md->duration,
 						   COLUMN_ID,buffer2,
 		                   COLUMN_URI,valid,
-		                   COLUMN_MOD,buffer,-1);
+		                   COLUMN_MOD,mod,-1);
 		gdk_threads_leave();
 		g_free(name);
 		
@@ -1990,8 +1987,7 @@ sort_list(gpointer    callback_data,
 
 					node->type = SORT_DATE;		        
 					gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
-					                    &iter,COLUMN_MOD, &(node->datestr), -1); 
-					node->date = strtoul(node->datestr,NULL, 10);
+					                    &iter,COLUMN_MOD, &(node->date), -1); 
 
 					break;
 
@@ -2078,11 +2074,6 @@ traverse_tree  (gpointer data,
 		{
 			if(node->title)
 				g_free(node->title);
-		}
-		if(node->type == SORT_DATE)
-		{
-			if(node->datestr)
-				g_free(node->datestr);
 		}
 		
 		g_free(node);

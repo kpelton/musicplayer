@@ -580,7 +580,7 @@ FGREP='/bin/grep -F'
 LD='/usr/bin/ld -m elf_x86_64'
 NM='/usr/bin/nm -B'
 LN_S='ln -s'
-max_cmd_len='1572864'
+max_cmd_len='3458764513820540925'
 ac_objext='o'
 exeext=''
 lt_unset='unset'
@@ -673,8 +673,8 @@ postuninstall_cmds=''
 finish_cmds='PATH="\$PATH:/sbin" ldconfig -n $libdir'
 finish_eval=''
 hardcode_into_libs='yes'
-sys_lib_search_path_spec='/usr/lib/gcc/x86_64-linux-gnu/4.4.5 /usr/lib /lib /usr/lib/x86_64-linux-gnu'
-sys_lib_dlsearch_path_spec='/lib /usr/lib /usr/lib/nvidia-current /usr/lib32/nvidia-current /usr/lib32/alsa-lib /usr/lib/alsa-lib /usr/local/lib /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu '
+sys_lib_search_path_spec='/usr/lib/x86_64-linux-gnu/gcc/x86_64-linux-gnu/4.5.2 /usr/lib/x86_64-linux-gnu /lib /usr/lib'
+sys_lib_dlsearch_path_spec='/lib /usr/lib /usr/lib/nvidia-current /usr/lib32/nvidia-current /lib32 /usr/lib32 /usr/lib32/alsa-lib /usr/lib/alsa-lib /usr/local/lib /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu '
 hardcode_action='immediate'
 enable_dlopen='unknown'
 enable_dlopen_self='unknown'
@@ -817,30 +817,30 @@ S["am__EXEEXT_FALSE"]=""
 S["am__EXEEXT_TRUE"]="#"
 S["LTLIBOBJS"]=""
 S["LIBOBJS"]=""
-S["UNIQUE_LIBS"]="-pthread -L/usr/local/lib -lunique-1.0 -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lm -lcairo "\
-"-lpng14 -lpango-1.0 -lfreetype -lfontconfig -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0  "
-S["UNIQUE_CFLAGS"]="-pthread -I/usr/local/include/libpng14 -I/usr/include/unique-1.0 -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/inc"\
-"lude/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -"\
-"I/usr/include/pixman-1 -I/usr/include/freetype2  "
-S["LIBNOTIFY_LIBS"]="-pthread -L/usr/local/lib -L/lib -lnotify -lgtk-x11-2.0 -ldbus-glib-1 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf"\
-"-2.0 -lm -lcairo -lpng14 -lpango-1.0 -lfreetype -lfontconfig -lgmodule-2.0 -ldbus-1 -lpthread -lgobject-2.0 -lgthread-2.0 -lrt -lglib-2.0  "
-S["LIBNOTIFY_CFLAGS"]="-pthread -I/usr/local/include/libpng14 -I/usr/include/gtk-2.0 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/dbus-1.0 -I/usr/lib"\
-"/dbus-1.0/include -I/usr/lib/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/u"\
-"sr/include/gio-unix-2.0/ -I/usr/include/pixman-1 -I/usr/include/freetype2  "
-S["GTK_LIBS"]="-pthread -L/usr/local/lib -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lm -lcairo -lpng14 -lpan"\
-"go-1.0 -lfreetype -lfontconfig -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0  "
-S["GTK_CFLAGS"]="-pthread -I/usr/local/include/libpng14 -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/"\
-"gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/pixman-1 -I/"\
-"usr/include/freetype2  "
+S["UNIQUE_LIBS"]="-pthread -L/usr/lib/x86_64-linux-gnu -lunique-1.0 -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -"\
+"lm -lcairo -lpango-1.0 -lfreetype -lfontconfig -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0  "
+S["UNIQUE_CFLAGS"]="-pthread -I/usr/local/include/libpng14 -I/usr/include/atk-1.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/glib-2.0 -I/usr/l"\
+"ib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/freetype2 -I/usr/include/unique-1.0 -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/inc"\
+"lude/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pixman-1  "
+S["LIBNOTIFY_LIBS"]="-pthread -L/usr/lib/x86_64-linux-gnu -lnotify -lgtk-x11-2.0 -ldbus-glib-1 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pi"\
+"xbuf-2.0 -lm -lcairo -lpango-1.0 -lfreetype -lfontconfig -lgmodule-2.0 -ldbus-1 -lpthread -lgobject-2.0 -lgthread-2.0 -lrt -lglib-2.0  "
+S["LIBNOTIFY_CFLAGS"]="-pthread -I/usr/local/include/libpng14 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/dbus-1.0 -I/usr/lib/x86_6"\
+"4-linux-gnu/dbus-1.0/include -I/usr/include/atk-1.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/freetype2 -I/usr/include/gt"\
+"k-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pixman-1  "
+S["GTK_LIBS"]="-pthread -L/usr/lib/x86_64-linux-gnu -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lm -lcairo -l"\
+"pango-1.0 -lfreetype -lfontconfig -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0  "
+S["GTK_CFLAGS"]="-pthread -I/usr/local/include/libpng14 -I/usr/include/atk-1.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/glib-2.0 -I/usr/l"\
+"ib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/freetype2 -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/cairo -I/usr/include/"\
+"gdk-pixbuf-2.0 -I/usr/include/pixman-1  "
 S["GST_LDFLAGS"]=""
-S["GST_LIBS"]="-pthread -lgstreamer-0.10 -lgobject-2.0 -lgmodule-2.0 -lxml2 -lgthread-2.0 -lrt -lglib-2.0  "
-S["GST_CFLAGS"]="-pthread -I/usr/include/gstreamer-0.10 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/libxml2  "
+S["GST_LIBS"]="-pthread -L/usr/lib/x86_64-linux-gnu -lgstreamer-0.10 -lgobject-2.0 -lgmodule-2.0 -lxml2 -lgthread-2.0 -lrt -lglib-2.0  "
+S["GST_CFLAGS"]="-pthread -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/gstreamer-0.10 -I/usr/include/libxml2  "
 S["GLIB_LDFLAGS"]=""
-S["GLIB_LIBS"]="-pthread -Wl,--export-dynamic -L/usr/local/lib -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lm "\
-"-lcairo -lpng14 -lpango-1.0 -lfreetype -lfontconfig -lgobject-2.0 -lgthread-2.0 -lgmodule-2.0 -lrt -lgconf-2 -lglib-2.0  "
-S["GLIB_CFLAGS"]="-pthread -DORBIT2=1 -I/usr/local/include/libpng14 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/incl"\
-"ude -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/p"\
-"ixman-1 -I/usr/include/freetype2 -I/usr/include/gconf/2 -I/usr/include/orbit-2.0  "
+S["GLIB_LIBS"]="-pthread -Wl,--export-dynamic -L/usr/lib/x86_64-linux-gnu -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixb"\
+"uf-2.0 -lm -lcairo -lpango-1.0 -lfreetype -lfontconfig -lgobject-2.0 -lgthread-2.0 -lgmodule-2.0 -lrt -lgconf-2 -lglib-2.0  "
+S["GLIB_CFLAGS"]="-pthread -DORBIT2=1 -I/usr/local/include/libpng14 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/atk-1.0 -I/usr"\
+"/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/freetype2 -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/cairo -I/u"\
+"sr/include/gdk-pixbuf-2.0 -I/usr/include/pixman-1 -I/usr/include/gconf/2 -I/usr/include/orbit-2.0  "
 S["PKG_CONFIG_LIBDIR"]=""
 S["PKG_CONFIG_PATH"]=""
 S["PKG_CONFIG"]="/usr/bin/pkg-config"

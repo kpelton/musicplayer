@@ -12548,36 +12548,6 @@ fi
 gst010_toolsdir=`$PKG_CONFIG --variable=toolsdir gstreamer-0.10`
 gst010_inspect="$gst010_toolsdir/gst-inspect-0.10"
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking GStreamer 0.10 inspection tool" >&5
-$as_echo_n "checking GStreamer 0.10 inspection tool... " >&6; }
-if test -r "$gst010_inspect"; then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-	as_fn_error $? "
-		Cannot find required GStreamer-0.10 tool 'gst-inspect-0.10'.
-		It should be part of gstreamer-0_10-utils. Please install it.
-	" "$LINENO" 5
-fi
-
-for base_element in playbin gconfaudiosink
-do
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking GStreamer 0.10 $base_element plugin" >&5
-$as_echo_n "checking GStreamer 0.10 $base_element plugin... " >&6; }
-	if $gst010_inspect $base_element >/dev/null 2>/dev/null; then
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-		as_fn_error $? "
-			Cannot find required GStreamer-0.10 plugin '$base_element'.
-			It should be part of gst-plugins-base. Please install it.
-		" "$LINENO" 5
-	fi
-done
 
 
 pkg_failed=no

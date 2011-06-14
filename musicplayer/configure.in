@@ -44,32 +44,6 @@ dnl Check for required plugins
 gst010_toolsdir=`$PKG_CONFIG --variable=toolsdir gstreamer-0.10`
 gst010_inspect="$gst010_toolsdir/gst-inspect-0.10"
 
-dnl Give error and exit if we don't have the gst_inspect tool
-AC_MSG_CHECKING([GStreamer 0.10 inspection tool])
-if test -r "$gst010_inspect"; then
-	AC_MSG_RESULT([yes])
-else
-	AC_MSG_RESULT([no])
-	AC_MSG_ERROR([
-		Cannot find required GStreamer-0.10 tool 'gst-inspect-0.10'.
-		It should be part of gstreamer-0_10-utils. Please install it.
-	])
-fi
-
-dnl Check for elements from gst-plugins-base
-for base_element in playbin gconfaudiosink
-do
-	AC_MSG_CHECKING([GStreamer 0.10 $base_element plugin])
-	if $gst010_inspect $base_element >/dev/null 2>/dev/null; then
-		AC_MSG_RESULT([yes])
-	else
-		AC_MSG_RESULT([no])
-		AC_MSG_ERROR([
-			Cannot find required GStreamer-0.10 plugin '$base_element'.
-			It should be part of gst-plugins-base. Please install it.
-		])
-	fi
-done
 
 PKG_CHECK_MODULES([GTK],[gtk+-2.0 gthread-2.0])
 
