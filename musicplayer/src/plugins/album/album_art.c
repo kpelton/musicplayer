@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <glib/gstdio.h>
 
 
 static const char PLUGIN_NAME[] = "AlbumArt";
@@ -33,7 +34,7 @@ static void album_art_new_file(GsPlayer *player,
                                metadata* p_track,gpointer user_data);
 
 
-static void album_art_download_art(AlbumArt *self,char *msg,guint hash);
+static void album_art_download_art(AlbumArt *self,const char *msg,guint hash);
 void 
 album_art_got_xml_response(SoupSession *session,
 			  SoupMessage *msg,
@@ -77,35 +78,34 @@ album_art_got_image_response(SoupSession *session,
     home = g_getenv ("HOME");
     gchar *outputdir=NULL;
     int file;
-    gchar *fname;
-
+    int retval;
 
     outputdir = g_strdup_printf("%s/.musicplayer/art/%u",home,self->hash);
     file = open(outputdir,O_WRONLY |O_CREAT,S_IRUSR|S_IWUSR);
-    write(file,msg->response_body->data,msg->response_body->length);
+    retval = write(file,msg->response_body->data,msg->response_body->length);
+   
     close(file);
-    gtk_image_set_from_pixbuf(GTK_IMAGE(self->album),
+    if (retval >0)
+	gtk_image_set_from_pixbuf(GTK_IMAGE(self->album),
 			      gdk_pixbuf_new_from_file_at_size (
 								outputdir,64,64,NULL));
-    gtk_image_set_from_file(self->album,outputdir);
     g_free(outputdir);
     
     
 }
 
-static void album_art_download_art(AlbumArt *self,char *msg,guint hash)
+static void album_art_download_art(AlbumArt *self,const char *msg,guint hash)
 {
     char *start;
     char *end;
     char startstr[] = "<image size=\"medium\">";
-    char endstr[] = "</image>";
     int comblen = strlen(startstr);
     SoupMessage *smsg;
     SoupSession * session;
-    int response;
+
  
-    int file;
-    gchar *fname;
+    
+    
     
     start = strstr(msg,startstr);
 
@@ -113,7 +113,7 @@ static void album_art_download_art(AlbumArt *self,char *msg,guint hash)
 	end = strstr(start,"</image>");
 	*end = '\0';
 	start+=comblen;
-	session = soup_session_async_new_with_options(NULL);
+	session = soup_session_async_new();
 	smsg = soup_message_new ("GET",start);
 	soup_session_queue_message(session,smsg,album_art_got_image_response,self);
     }
@@ -158,14 +158,13 @@ static void album_art_new_file(GsPlayer *player,
 	const char url [] = "http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=b25b959554ed76058ac220b7b2e0a026&";
 	char url2[5000];
 	char buffer[5000];
-	int response;
 	char *outputdir;
 	guint hash;
 	const gchar *home;
 	home = g_getenv ("HOME");
 
 
-	gtk_image_clear (self->album);
+	gtk_image_clear (GTK_IMAGE(self->album));
 	
 	if(p_track->artist && p_track->album)   
 	    {
@@ -180,7 +179,7 @@ static void album_art_new_file(GsPlayer *player,
 		    }
 		    else{
 			snprintf(url2,5000,"%sartist=%s&album=%s",url,p_track->artist,p_track->album);
-			session = soup_session_sync_new_with_options(NULL);
+			session = soup_session_sync_new();
 			msg = soup_message_new ("GET",url2);
 			soup_session_queue_message(session,msg,album_art_got_xml_response,self);
 		    }
