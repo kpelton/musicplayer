@@ -753,6 +753,8 @@ GTK_CFLAGS
 GST_LDFLAGS
 GST_LIBS
 GST_CFLAGS
+LIBSOUP_LIBS
+LIBSOUP_CFLAGS
 GLIB_LDFLAGS
 GLIB_LIBS
 GLIB_CFLAGS
@@ -890,6 +892,8 @@ PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
 GLIB_CFLAGS
 GLIB_LIBS
+LIBSOUP_CFLAGS
+LIBSOUP_LIBS
 GST_CFLAGS
 GST_LIBS
 GTK_CFLAGS
@@ -1550,6 +1554,10 @@ Some influential environment variables:
               path overriding pkg-config's built-in search path
   GLIB_CFLAGS C compiler flags for GLIB, overriding pkg-config
   GLIB_LIBS   linker flags for GLIB, overriding pkg-config
+  LIBSOUP_CFLAGS
+              C compiler flags for LIBSOUP, overriding pkg-config
+  LIBSOUP_LIBS
+              linker flags for LIBSOUP, overriding pkg-config
   GST_CFLAGS  C compiler flags for GST, overriding pkg-config
   GST_LIBS    linker flags for GST, overriding pkg-config
   GTK_CFLAGS  C compiler flags for GTK, overriding pkg-config
@@ -4426,13 +4434,13 @@ if test "${lt_cv_nm_interface+set}" = set; then :
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:4429: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:4437: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:4432: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:4440: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:4435: output\"" >&5)
+  (eval echo "\"\$as_me:4443: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -5638,7 +5646,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5641 "configure"' > conftest.$ac_ext
+  echo '#line 5649 "configure"' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7163,11 +7171,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7166: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7174: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7170: \$? = $ac_status" >&5
+   echo "$as_me:7178: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7502,11 +7510,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7505: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7513: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7509: \$? = $ac_status" >&5
+   echo "$as_me:7517: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7607,11 +7615,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7610: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7618: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7614: \$? = $ac_status" >&5
+   echo "$as_me:7622: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -7662,11 +7670,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7665: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7673: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7669: \$? = $ac_status" >&5
+   echo "$as_me:7677: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10046,7 +10054,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 10049 "configure"
+#line 10057 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10142,7 +10150,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 10145 "configure"
+#line 10153 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12432,6 +12440,96 @@ fi
 
 
 
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LIBSOUP" >&5
+$as_echo_n "checking for LIBSOUP... " >&6; }
+
+if test -n "$LIBSOUP_CFLAGS"; then
+    pkg_cv_LIBSOUP_CFLAGS="$LIBSOUP_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libsoup-2.4 >= 2.26\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libsoup-2.4 >= 2.26") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LIBSOUP_CFLAGS=`$PKG_CONFIG --cflags "libsoup-2.4 >= 2.26" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$LIBSOUP_LIBS"; then
+    pkg_cv_LIBSOUP_LIBS="$LIBSOUP_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libsoup-2.4 >= 2.26\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libsoup-2.4 >= 2.26") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LIBSOUP_LIBS=`$PKG_CONFIG --libs "libsoup-2.4 >= 2.26" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        LIBSOUP_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "libsoup-2.4 >= 2.26" 2>&1`
+        else
+	        LIBSOUP_PKG_ERRORS=`$PKG_CONFIG --print-errors "libsoup-2.4 >= 2.26" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$LIBSOUP_PKG_ERRORS" >&5
+
+	as_fn_error $? "Package requirements (libsoup-2.4 >= 2.26) were not met:
+
+$LIBSOUP_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables LIBSOUP_CFLAGS
+and LIBSOUP_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details." "$LINENO" 5
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables LIBSOUP_CFLAGS
+and LIBSOUP_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details" "$LINENO" 5 ; }
+else
+	LIBSOUP_CFLAGS=$pkg_cv_LIBSOUP_CFLAGS
+	LIBSOUP_LIBS=$pkg_cv_LIBSOUP_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+fi
+
+
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GST" >&5
@@ -12833,7 +12931,7 @@ else
 $as_echo "yes" >&6; }
 
 fi
-ac_config_files="$ac_config_files Makefile src/Makefile src/plugins/Makefile src/plugins/real/Makefile src/plugins/visual/Makefile src/plugins/stats/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/plugins/Makefile src/plugins/real/Makefile src/plugins/visual/Makefile src/plugins/stats/Makefile src/plugins/album/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -13824,6 +13922,7 @@ do
     "src/plugins/real/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/real/Makefile" ;;
     "src/plugins/visual/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/visual/Makefile" ;;
     "src/plugins/stats/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/stats/Makefile" ;;
+    "src/plugins/album/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/album/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5 ;;
   esac

@@ -478,7 +478,6 @@ void gst_new_tags                (const GstTagList *list,
 			g_free(str);
 
 		}
-
 	}
 	else if(strcmp(tag,GST_TAG_DURATION)== 0){ 
 		gst_tag_list_get_int64(list,GST_TAG_DURATION,&(track->duration)); 
@@ -492,10 +491,12 @@ gboolean gs_get_tags(GsPlayer *player)
 {
 	if(!player->lock)
 	{ 
-		player->track->uri = strdup(player->uri);
-		g_signal_emit (player, signals[NEWFILE],0,player->track);
+	       player->track->uri = strdup(player->uri);
+	       	g_signal_emit (player, signals[NEWFILE],0,player->track);
 		player->lock = TRUE;
+			
 		return FALSE;
+
 
 	}
 	else

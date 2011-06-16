@@ -30,7 +30,9 @@ PKG_CHECK_MODULES(GLIB,[
 
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LDFLAGS)
-
+PKG_CHECK_MODULES(LIBSOUP, [libsoup-2.4 >= 2.26])
+AC_SUBST(LIBSOUP_CFLAGS)
+AC_SUBST(LIBSOUP_LIBS)
 PKG_CHECK_MODULES(GST,[
   gstreamer-0.10 >= $GSTPLUG_REQS
   ])
@@ -69,6 +71,7 @@ src/plugins/Makefile
 src/plugins/real/Makefile
 src/plugins/visual/Makefile
 src/plugins/stats/Makefile
+src/plugins/album/Makefile
 ])
 
 

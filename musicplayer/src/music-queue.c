@@ -463,7 +463,7 @@ music_queue_class_init (MusicQueueClass *klass)
 	                              G_PARAM_READWRITE);
 
 
-	signals[NEWFILE]= g_signal_new ("new-file",
+	signals[NEWFILE]= g_signal_new ("music-queue-new-file",
 	                                G_TYPE_FROM_CLASS (klass),
 	                                G_SIGNAL_RUN_CLEANUP | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
 	                                0 /* closure */,
@@ -1064,11 +1064,12 @@ traverse_folders(gpointer data,
 gboolean 
 check_type_supported(const gchar *type)
 {
-	if(strcmp(type,"audio/mpeg") == 0)
+    printf("%s\n",type);
+    if(strcmp(type,"audio/mpeg") == 0)
 		return TRUE;
 	if(strcmp(type,"audio/ogg")  == 0)
 		return TRUE;
-	if(strcmp(type,"audio/x-flac") == 0)
+	if(strcmp(type,"audio/flac") == 0)
 		return TRUE;
 	if(strcmp(type,"audio/wma")  == 0)
 		return TRUE;
@@ -1120,6 +1121,7 @@ choose_file_action(gchar * uri,
 	GList *list;
 	MusicQueue *self = (MusicQueue *) user_data;
 
+	
 	if(strcmp(type,"audio/mpeg") == 0)
 	{
 		add_file(uri,user_data,NULL);
@@ -1128,7 +1130,7 @@ choose_file_action(gchar * uri,
 	{
 		add_file(uri,user_data,NULL);
 	}
-	else if(strcmp(type,"audio/x-flac") == 0)
+	else if(strcmp(type,"audio/flac") == 0)
 	{
 		add_file(uri,user_data,NULL);
 	}
@@ -1717,19 +1719,7 @@ plugins_item_selected  (gpointer    callback_data,
 
 	gtk_widget_show(dialog);
 }
-/*
- static void 
- set_font   (gpointer    callback_data,
-             guint       callback_action,
-             GtkWidget  *widget)
-			 {
 
-				 GtkWidget *   font_window = gtk_font_selection_dialog_new       ("Select playlist font"); 
-
-				 gtk_widget_show(font_window); 
-
-				 }
-				 */
 static void 
 set_repeat (GtkCheckMenuItem *widget,
             gpointer user_data)

@@ -378,7 +378,7 @@ static void mwindow_new_file (GsPlayer *player,
 	gchar *escaped_title=NULL;
 	GFile *file=NULL;
 
-
+	
 
 	if(p_track->artist && p_track->title){
 		g_snprintf(title,1023,"%s - %s",p_track->artist, p_track->title);
