@@ -23,7 +23,6 @@ struct
 
 struct
 {
-	GHashTable *htable;
 	gint *order;
 	gint curr;
 }typedef traversestr;
@@ -204,8 +203,7 @@ got_jump(JumpWindow *jwindow,
 
 static gint 
 compare_sort_nodes(sortnode *node1, 
-                   sortnode *node2,
-                   gpointer userdata);
+                   sortnode *node2);
 
 static void
 sort_by_artist(gpointer    callback_data,
@@ -222,6 +220,7 @@ sort_list(gpointer    callback_data,
 
 static gboolean
 traverse_tree (gpointer data,
+               gpointer data2,
                gpointer userdata);
 
 
@@ -1946,6 +1945,7 @@ sort_list(gpointer    callback_data,
 
 	GHashTable *htable=NULL;
 	GList *list=NULL; 
+	GTree  *tree = NULL;
 	gchar *cid=NULL;
 	gint *id=NULL;
 	gint *curri=NULL;
@@ -1959,6 +1959,7 @@ sort_list(gpointer    callback_data,
 		htable = g_hash_table_new_full(g_int_hash,g_int_equal,
 		                               g_free,
 		                               g_free);
+		tree = g_tree_new((GCompareFunc)compare_sort_nodes);
 
 		do
 		{
@@ -2001,10 +2002,8 @@ sort_list(gpointer    callback_data,
 			node->id = *id;
 
 			*curri=i;
-			list = g_list_insert_sorted_with_data(list,(gpointer)node,
-			                                      (GCompareDataFunc)compare_sort_nodes,
-			                                      self);  
-			g_hash_table_insert(htable,id,curri);
+
+			g_tree_insert(tree,node,curri);
 			++i;
 
 		}while(gtk_tree_model_iter_next(
@@ -2013,11 +2012,10 @@ sort_list(gpointer    callback_data,
 
 
 
-		str.htable=htable;
 		str.order = g_malloc(sizeof(gint)*i+1);        
 		str.curr=0; //reset our counter for our new order
 
-		g_list_foreach(list,(GFunc)traverse_tree,&str); 
+		g_tree_foreach(tree,traverse_tree,&str); 
 
 
 		gtk_list_store_reorder(GTK_LIST_STORE(self->priv->store),str.order);
@@ -2028,10 +2026,7 @@ sort_list(gpointer    callback_data,
 		//free list of nodes
 		//free our order
 		g_free(str.order);
-
-		//destroy data structures
-		g_list_free(list);
-		g_hash_table_destroy(htable);
+		g_tree_destroy(tree);
 
 
 	}
@@ -2041,6 +2036,7 @@ sort_list(gpointer    callback_data,
 
 static gboolean 
 traverse_tree  (gpointer data,
+                gpointer data2,
                 gpointer userdata)
 {
 	if(data)
@@ -2053,8 +2049,7 @@ traverse_tree  (gpointer data,
 		currid= node->id;
 
 
-		old= (gint *)g_hash_table_lookup(str->htable,&currid); 
-
+		old= (gint *)data2;
 
 		str->order[str->curr]=*old;
 
@@ -2065,7 +2060,7 @@ traverse_tree  (gpointer data,
 			if(node->title)
 				g_free(node->title);
 		}
-		
+		g_free(old);
 		g_free(node);
 	}
 	return FALSE;
@@ -2073,8 +2068,7 @@ traverse_tree  (gpointer data,
 
 static gint 
 compare_sort_nodes(sortnode *node1, 
-                   sortnode *node2,
-                   gpointer userdata)
+                   sortnode *node2)
 {
 	int ret=0;
 
