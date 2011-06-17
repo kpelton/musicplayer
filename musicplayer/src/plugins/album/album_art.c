@@ -21,6 +21,13 @@ static const char COPYRIGHT[] = "Kyle Pelton";
 static const char WEBSITE[] = "www.squidman.net";
 //static gboolean is_configurable = FALSE;
 
+struct {
+    guint hash;
+    AlbumArt *self;
+}typedef AsyncMsg;
+
+
+
 gboolean 
 album_art_music_plugin_activate ( MusicPlugin  *self,MusicMainWindow *mw);
 
@@ -34,7 +41,6 @@ static void album_art_new_file(GsPlayer *player,
                                metadata* p_track,gpointer user_data);
 
 
-static void album_art_download_art(AlbumArt *self,const char *msg,guint hash);
 void 
 album_art_got_xml_response(SoupSession *session,
 			  SoupMessage *msg,
@@ -45,6 +51,7 @@ album_art_got_image_response(SoupSession *session,
 			  SoupMessage *msg,
 			  gpointer user_data);
 
+static void album_art_download_art(AsyncMsg *amsg,const char *msg);
 
 G_DEFINE_TYPE (AlbumArt, album_art, MUSIC_TYPE_PLUGIN);
 
@@ -73,28 +80,31 @@ album_art_got_image_response(SoupSession *session,
 			  SoupMessage *msg,
 			  gpointer user_data)
 {
-    AlbumArt * self = (AlbumArt *)user_data;
+    AsyncMsg * amsg = (AsyncMsg *)user_data;
     const gchar *home;
-    home = g_getenv ("HOME");
+    
     gchar *outputdir=NULL;
     int file;
     int retval;
 
-    outputdir = g_strdup_printf("%s/.musicplayer/art/%u",home,self->hash);
-    file = open(outputdir,O_WRONLY |O_CREAT,S_IRUSR|S_IWUSR);
-    retval = write(file,msg->response_body->data,msg->response_body->length);
-   
-    close(file);
-    if (retval >0)
-	gtk_image_set_from_pixbuf(GTK_IMAGE(self->album),
-			      gdk_pixbuf_new_from_file_at_size (
+    if (msg->status_code == 200){
+	home = g_getenv ("HOME");
+	outputdir = g_strdup_printf("%s/.musicplayer/art/%u",home,amsg->hash);
+	file = open(outputdir,O_WRONLY |O_CREAT,S_IRUSR|S_IWUSR);
+	retval = write(file,msg->response_body->data,msg->response_body->length);
+	
+	close(file);
+	if (retval >0)
+	    gtk_image_set_from_pixbuf(GTK_IMAGE(amsg->self->album),
+				      gdk_pixbuf_new_from_file_at_size (
 								outputdir,64,64,NULL));
-    g_free(outputdir);
-    
+	g_free(outputdir);
+    }
+    g_free(amsg);
     
 }
 
-static void album_art_download_art(AlbumArt *self,const char *msg,guint hash)
+static void album_art_download_art(AsyncMsg *amsg,const char *msg)
 {
     char *start;
     char *end;
@@ -115,7 +125,9 @@ static void album_art_download_art(AlbumArt *self,const char *msg,guint hash)
 	start+=comblen;
 	session = soup_session_async_new();
 	smsg = soup_message_new ("GET",start);
-	soup_session_queue_message(session,smsg,album_art_got_image_response,self);
+	soup_session_queue_message(session,smsg,album_art_got_image_response,amsg);
+    }else{
+	g_free(amsg);
     }
     
 }
@@ -162,6 +174,8 @@ static void album_art_new_file(GsPlayer *player,
 	guint hash;
 	const gchar *home;
 	home = g_getenv ("HOME");
+	AsyncMsg *amsg;
+
 
 
 	gtk_image_clear (GTK_IMAGE(self->album));
@@ -170,7 +184,10 @@ static void album_art_new_file(GsPlayer *player,
 	    {
 		snprintf(buffer,5000,"%s%s",p_track->artist,p_track->album);
 		hash = g_str_hash(buffer);
-		self->hash = hash;
+
+		amsg = g_malloc(sizeof(AsyncMsg));
+		amsg->hash = hash;
+		amsg->self = self;
 		outputdir = g_strdup_printf("%s/.musicplayer/art/%u",home,hash);
 		if (g_file_test(outputdir,G_FILE_TEST_EXISTS)){
 		    gtk_image_set_from_pixbuf(GTK_IMAGE(self->album),
@@ -181,7 +198,7 @@ static void album_art_new_file(GsPlayer *player,
 			snprintf(url2,5000,"%sartist=%s&album=%s",url,p_track->artist,p_track->album);
 			session = soup_session_sync_new();
 			msg = soup_message_new ("GET",url2);
-			soup_session_queue_message(session,msg,album_art_got_xml_response,self);
+			soup_session_queue_message(session,msg,album_art_got_xml_response,amsg);
 		    }
               }
 
@@ -192,8 +209,14 @@ album_art_got_xml_response(SoupSession *session,
 			  SoupMessage *msg,
 			  gpointer user_data)
 {
-    AlbumArt * self = (AlbumArt *)user_data;
-    album_art_download_art(self,msg->response_body->data,self->hash);
+    AsyncMsg *amsg = (AsyncMsg *)user_data;
+
+    if (msg->status_code == 200){
+	album_art_download_art(amsg,msg->response_body->data);
+    }
+    else{
+	g_free(amsg);
+    }
 }
 
 gboolean album_art_music_plugin_deactivate ( MusicPlugin *user_data)
