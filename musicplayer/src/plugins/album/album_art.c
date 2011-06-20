@@ -24,6 +24,7 @@ static const char WEBSITE[] = "www.squidman.net";
 struct {
     guint hash;
     AlbumArt *self;
+    metadata *curr;
 }typedef AsyncMsg;
 
 
@@ -92,14 +93,17 @@ album_art_got_image_response(SoupSession *session,
 	outputdir = g_strdup_printf("%s/.musicplayer/art/%u",home,amsg->hash);
 	file = open(outputdir,O_WRONLY |O_CREAT,S_IRUSR|S_IWUSR);
 	retval = write(file,msg->response_body->data,msg->response_body->length);
-	
 	close(file);
-	if (retval >0)
+	if (retval >0 &&(strcmp(amsg->self->mw->currsong->artist,amsg->curr->artist) == 0)
+	    && (strcmp(amsg->curr->album,amsg->self->mw->currsong->album) ==0)){
+	    
 	    gtk_image_set_from_pixbuf(GTK_IMAGE(amsg->self->album),
 				      gdk_pixbuf_new_from_file_at_size (
 								outputdir,64,64,NULL));
-	g_free(outputdir);
+	}
+	    g_free(outputdir);
     }
+    ts_metadata_free(amsg->curr);
     g_free(amsg);
     
 }
@@ -116,7 +120,6 @@ static void album_art_download_art(AsyncMsg *amsg,const char *msg)
  
     
     
-    
     start = strstr(msg,startstr);
 
     if (start != NULL){
@@ -127,6 +130,7 @@ static void album_art_download_art(AsyncMsg *amsg,const char *msg)
 	smsg = soup_message_new ("GET",start);
 	soup_session_queue_message(session,smsg,album_art_got_image_response,amsg);
     }else{
+	ts_metadata_free(amsg->curr);
 	g_free(amsg);
     }
     
@@ -185,9 +189,7 @@ static void album_art_new_file(GsPlayer *player,
 		snprintf(buffer,5000,"%s%s",p_track->artist,p_track->album);
 		hash = g_str_hash(buffer);
 
-		amsg = g_malloc(sizeof(AsyncMsg));
-		amsg->hash = hash;
-		amsg->self = self;
+		
 		outputdir = g_strdup_printf("%s/.musicplayer/art/%u",home,hash);
 		if (g_file_test(outputdir,G_FILE_TEST_EXISTS)){
 		    gtk_image_set_from_pixbuf(GTK_IMAGE(self->album),
@@ -195,6 +197,11 @@ static void album_art_new_file(GsPlayer *player,
 										outputdir,64,64,NULL));
 		    }
 		    else{
+			amsg = g_malloc(sizeof(AsyncMsg));
+			amsg->hash = hash;
+			amsg->self = self;
+			amsg->curr = ts_metadata_new();
+			ts_metadata_copy(p_track,amsg->curr);
 			snprintf(url2,5000,"%sartist=%s&album=%s",url,p_track->artist,p_track->album);
 			session = soup_session_sync_new();
 			msg = soup_message_new ("GET",url2);
@@ -215,7 +222,9 @@ album_art_got_xml_response(SoupSession *session,
 	album_art_download_art(amsg,msg->response_body->data);
     }
     else{
+	ts_metadata_free(amsg->curr);
 	g_free(amsg);
+	
     }
 }
 

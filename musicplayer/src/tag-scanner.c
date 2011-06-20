@@ -3,6 +3,7 @@
 #include "tag-scanner.h"
 #include "music-queue.h"
 #include <string.h>
+#include <glib.h>
 //#define DEBUG
 
 
@@ -180,6 +181,26 @@ ts_get_metadata(gchar * uri,TagScanner * self)
 
 	self->pipeline = NULL;
 	return self->track;
+
+
+}
+
+void ts_metadata_copy(metadata *src,metadata *dst){
+	if(src){
+		if(src->uri)
+		    dst->uri = g_strdup(src->uri);
+		if(src->title)
+		    dst->title = g_strdup(src->title);
+		if(src->artist)
+		    dst->artist = g_strdup(src->artist);
+		if(src->genre)
+		    dst->genre = g_strdup(src->genre);
+		if(src->album)
+		    dst->album = g_strdup(src->album);
+		if(src->codec)
+		    dst->codec = g_strdup(src->codec);
+		dst->duration  = src->duration;
+	}
 
 
 }

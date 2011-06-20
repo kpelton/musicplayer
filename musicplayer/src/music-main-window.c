@@ -103,6 +103,7 @@ music_main_window_init (MusicMainWindow *self)
 {
 
 	init_widgets(self);
+	self->currsong = NULL;
 	self->client = gconf_client_get_default ();
 
 	//was expanded when they quit last time 
@@ -378,14 +379,18 @@ static void mwindow_new_file (GsPlayer *player,
 	gchar *escaped_title=NULL;
 	GFile *file=NULL;
 
-	
+	ts_metadata_free(self->currsong);
+	self->currsong = ts_metadata_new();
+	ts_metadata_copy(p_track,self->currsong);
 
 	if(p_track->artist && p_track->title){
-		g_snprintf(title,1023,"%s - %s",p_track->artist, p_track->title);
+		g_snprintf(title,1023,"%s - %s",p_track->artist, p_track->title);           
 		gtk_window_set_title(GTK_WINDOW(self),title);
 		escaped_artist = g_markup_escape_text(p_track->artist,-1);
 		escaped_title  = g_markup_escape_text(p_track->title,-1);
 		music_song_entry_set_text(MUSIC_SONG_ENTRY(self->songlabel),title);
+
+		
 		g_free(escaped_title);
 		g_free(escaped_artist);
 		if(p_track->album)

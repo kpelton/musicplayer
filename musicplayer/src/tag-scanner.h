@@ -64,6 +64,7 @@ void ts_metadata_list_free(GList *head);
 metadata * ts_get_metadata(gchar * uri,TagScanner * self);
 void ts_metadata_free(metadata *track);
 metadata * ts_metadata_new();
+void ts_metadata_copy(metadata *src,metadata *dst);
 metadata * ts_parse_file_name(gchar *metadata);
 G_END_DECLS
 

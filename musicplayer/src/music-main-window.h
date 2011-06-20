@@ -11,6 +11,7 @@
 #include "music-queue.h"
 #include "music-seek.h"
 #include "music-volume.h"
+#include "tag-scanner.h"
 G_BEGIN_DECLS
 
 #define MUSIC_TYPE_MAIN_WINDOW music_main_window_get_type()
@@ -50,6 +51,7 @@ typedef struct {
 	gint dwidth;
 	gint signum;
 	gboolean expanded;
+        metadata *currsong;
 
 } MusicMainWindow;
 
