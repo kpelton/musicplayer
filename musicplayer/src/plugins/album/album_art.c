@@ -88,6 +88,8 @@ album_art_got_image_response(SoupSession *session,
     int file;
     int retval;
 
+    //this code is linux specific and needs to be changed to use glib
+
     if (msg->status_code == 200){
 	home = g_getenv ("HOME");
 	outputdir = g_strdup_printf("%s/.musicplayer/art/%u",home,amsg->hash);
@@ -159,9 +161,11 @@ gboolean album_art_music_plugin_activate (MusicPlugin *self,MusicMainWindow *mw)
 	g_free(outputdir);
 
 	
-	  gtk_box_pack_start (GTK_BOX (real->mw->mainhbox), real->album, TRUE, TRUE,10);
-	    
-	  gtk_widget_show(real->album);
+	gtk_box_pack_start (GTK_BOX (real->mw->mainhbox), real->album, TRUE, TRUE,10);
+	
+	gtk_widget_show(real->album);
+	if (real->mw->currsong)
+	    album_art_new_file(NULL,real->mw->currsong,real);
 	return TRUE;
 }
 
