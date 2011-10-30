@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = src/plugins/real
+subdir = src/plugins/album
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -67,12 +67,12 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
-real_la_LIBADD =
-am_real_la_OBJECTS = real_la-real.lo
-real_la_OBJECTS = $(am_real_la_OBJECTS)
-real_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(real_la_CFLAGS) $(CFLAGS) \
-	$(real_la_LDFLAGS) $(LDFLAGS) -o $@
+album_art_la_LIBADD =
+am_album_art_la_OBJECTS = album_art_la-album_art.lo
+album_art_la_OBJECTS = $(am_album_art_la_OBJECTS)
+album_art_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(album_art_la_CFLAGS) \
+	$(CFLAGS) $(album_art_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -86,8 +86,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(real_la_SOURCES)
-DIST_SOURCES = $(real_la_SOURCES)
+SOURCES = $(album_art_la_SOURCES)
+DIST_SOURCES = $(album_art_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -222,11 +222,11 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 modules_flags = -avoid-version -module
-pkglib_LTLIBRARIES = real.la
-real_la_SOURCES = real.h real.c
-real_la_LDFLAGS = $(modules_flags) "-lnotify"
-real_la_CPPFLAGS = $(common_defines)
-real_la_CFLAGS = $(GST_CFLAGS) $(GLIB_CFLAGS) $(GTK_CFLAGS)\
+pkglib_LTLIBRARIES = album_art.la
+album_art_la_SOURCES = album_art.h album_art.c
+album_art_la_LDFLAGS = $(modules_flags) `pkg-config --libs libsoup-2.4`
+album_art_la_CPPFLAGS = $(common_defines) `pkg-config --cflags libsoup-2.4`
+album_art_la_CFLAGS = $(GST_CFLAGS) $(GLIB_CFLAGS) $(GTK_CFLAGS)\
 	$(DEPENDENCY_CFLAGS)	\
 	$(AM_CFLAGS)		\
 	-I$(top_srcdir)/src	\
@@ -245,9 +245,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/plugins/real/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/plugins/album/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/plugins/real/Makefile
+	  $(AUTOMAKE) --gnu src/plugins/album/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -297,8 +297,8 @@ clean-pkglibLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-real.la: $(real_la_OBJECTS) $(real_la_DEPENDENCIES) 
-	$(real_la_LINK) -rpath $(pkglibdir) $(real_la_OBJECTS) $(real_la_LIBADD) $(LIBS)
+album_art.la: $(album_art_la_OBJECTS) $(album_art_la_DEPENDENCIES) 
+	$(album_art_la_LINK) -rpath $(pkglibdir) $(album_art_la_OBJECTS) $(album_art_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -306,7 +306,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/real_la-real.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/album_art_la-album_art.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -329,12 +329,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-real_la-real.lo: real.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(real_la_CPPFLAGS) $(CPPFLAGS) $(real_la_CFLAGS) $(CFLAGS) -MT real_la-real.lo -MD -MP -MF $(DEPDIR)/real_la-real.Tpo -c -o real_la-real.lo `test -f 'real.c' || echo '$(srcdir)/'`real.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/real_la-real.Tpo $(DEPDIR)/real_la-real.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='real.c' object='real_la-real.lo' libtool=yes @AMDEPBACKSLASH@
+album_art_la-album_art.lo: album_art.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(album_art_la_CPPFLAGS) $(CPPFLAGS) $(album_art_la_CFLAGS) $(CFLAGS) -MT album_art_la-album_art.lo -MD -MP -MF $(DEPDIR)/album_art_la-album_art.Tpo -c -o album_art_la-album_art.lo `test -f 'album_art.c' || echo '$(srcdir)/'`album_art.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/album_art_la-album_art.Tpo $(DEPDIR)/album_art_la-album_art.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='album_art.c' object='album_art_la-album_art.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(real_la_CPPFLAGS) $(CPPFLAGS) $(real_la_CFLAGS) $(CFLAGS) -c -o real_la-real.lo `test -f 'real.c' || echo '$(srcdir)/'`real.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(album_art_la_CPPFLAGS) $(CPPFLAGS) $(album_art_la_CFLAGS) $(CFLAGS) -c -o album_art_la-album_art.lo `test -f 'album_art.c' || echo '$(srcdir)/'`album_art.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

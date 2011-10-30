@@ -236,9 +236,9 @@ music_plugin_manager_construct_tree (MusicPluginManager *self)
 	                  "toggled",
 	                  G_CALLBACK (active_toggled_cb),
 	                  self);
-	column = gtk_tree_view_column_new_with_attributes ("",
+	column = gtk_tree_view_column_new_with_attributes ("test",
 	                                                   cell,
-	                                                   "active",                                       
+	                                                   "active",ACTIVE_COLUMN,                                    
 	                                                   NULL);
 
 

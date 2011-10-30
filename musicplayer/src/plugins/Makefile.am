@@ -1,1 +1,1 @@
-SUBDIRS =  real visual stats album
+SUBDIRS =   stats album
