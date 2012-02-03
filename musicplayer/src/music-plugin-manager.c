@@ -230,17 +230,20 @@ music_plugin_manager_construct_tree (MusicPluginManager *self)
 	gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (self->priv->tree), FALSE);
 
 	/* first column */
+        
 	cell = gtk_cell_renderer_toggle_new ();
 	g_object_set (cell, "xpad", 6, NULL);
 	g_signal_connect (cell,
 	                  "toggled",
 	                  G_CALLBACK (active_toggled_cb),
 	                  self);
-	column = gtk_tree_view_column_new_with_attributes ("",
+	printf("test\n");
+        column = gtk_tree_view_column_new_with_attributes ("Title",
 	                                                   cell,
-	                                                   "active",                                       
+	                                                   "active",
+                                                           ACTIVE_COLUMN,                                      
 	                                                   NULL);
-
+        printf("test\n");
 
 	gtk_tree_view_column_set_spacing (column, 6);
 	gtk_tree_view_append_column (GTK_TREE_VIEW (self->priv->tree), column);
@@ -353,8 +356,8 @@ active_toggled_cb (GtkCellRendererToggle *cell,
 	gtk_tree_model_get (model, &iter, ACTIVE_COLUMN, &active, -1);
 
 
-	if (&iter != NULL)
-		music_plugin_manager_set_active (self, &iter, model,active);
+
+	music_plugin_manager_set_active (self, &iter, model,active);
 
 	gtk_tree_path_free (path);
 }
