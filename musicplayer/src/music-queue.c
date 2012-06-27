@@ -690,8 +690,8 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 	if(gtk_drag_get_source_widget (context)  == NULL){
 
 
-
-		list = g_uri_list_extract_uris ((char *)seldata->data);
+      //3.0 fail here
+      //list = g_uri_list_extract_uris ((guchar *)seldata->data);
 		for(i=0; list[i] != NULL; i++)
 		{
 			slist = g_slist_append (slist,list[i]);
@@ -1656,21 +1656,21 @@ handle_key_input(GtkWidget *widget,
 {
 
 	MusicQueue *self = (MusicQueue *) user_data;
-	if(event->keyval == GDK_Delete && has_selected(self) == TRUE)
+	if(event->keyval == GDK_KEY_Delete && has_selected(self) == TRUE)
 		remove_files(NULL,user_data);
 
-	if(event->keyval == GDK_j || event->keyval == GDK_J)
+	if(event->keyval == GDK_KEY_j || event->keyval == GDK_KEY_J)
 	{
 
 		make_jump_window(self);
 		return TRUE;
 	}
-	if(event->keyval == GDK_c || event->keyval == GDK_C)
+	if(event->keyval == GDK_KEY_c || event->keyval == GDK_KEY_C)
 	{
 		jump_to_current_song(NULL, user_data);
 		return TRUE;
 	}
-	if(event->keyval == GDK_q || event->keyval == GDK_Q)
+	if(event->keyval == GDK_KEY_q || event->keyval == GDK_KEY_Q)
 	{
 		add_to_side_queue(NULL, user_data);
 		return TRUE;

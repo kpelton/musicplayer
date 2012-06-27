@@ -216,7 +216,7 @@ static gboolean key_press_event_cb(GtkWidget *widget,
                                    gpointer data)
 {
 	JumpWindow *self = JUMP_WINDOW(data);
-	if(event->keyval == GDK_Escape)
+	if(event->keyval == GDK_KEY_Escape)
 	{
 		gtk_widget_destroy(GTK_WIDGET(self));
 		return TRUE;
