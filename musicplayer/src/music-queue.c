@@ -2098,7 +2098,9 @@ compare_sort_nodes(sortnode *node1,
 		}
 		else
 		{
-			ret =strcmp(title1,title2);
+            if ((ret =strcmp(title1,title2)) == 0)
+                ret = -1;
+            
 		}
 
 	}
@@ -2115,7 +2117,7 @@ compare_sort_nodes(sortnode *node1,
 		if(date1 == 0 || date2 == 0)
 		{
 			if (date1 == 0 && date2 == 0)
-				return 0;
+				return -1;
 
 			ret = (date1== 0) ? -1 : 1;
 
@@ -2136,7 +2138,7 @@ compare_sort_nodes(sortnode *node1,
 		if(len1 == 0 || len2 == 0)
 		{
 			if (len1 == 0 && len2 == 0)
-				return 0;
+				return -1;
 
 			ret = (len1== 0) ? -1 : 1;
 
@@ -2146,7 +2148,7 @@ compare_sort_nodes(sortnode *node1,
 		}
 	}
 	else{
-		return 0;
+		return -1;
 	}
 
 	
