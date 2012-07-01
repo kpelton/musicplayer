@@ -134,7 +134,7 @@ init_widgets(MusicMainWindow *self)
 
 	// gtk_window_set_resizable (GTK_WINDOW(self),FALSE);
 
-	gtk_window_set_title (GTK_WINDOW (self), ("test"));
+	gtk_window_set_title (GTK_WINDOW (self), ("squid player"));
 
 	//add mainvbox to mainwindow
 	self->mainvbox = gtk_vbox_new(FALSE,0);
