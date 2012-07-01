@@ -83,8 +83,6 @@ music_store_row_drop_possible (GtkTreeDragDest  *drag_dest_parent,
 	GtkTreeDragDest  *drag_dest = GTK_TREE_DRAG_DEST(gtk_tree_model_filter_get_model(GTK_TREE_MODEL_FILTER(drag_dest_parent)));
 	indices = gtk_tree_path_get_indices (dest_path);
 
-	if (indices[0] <= g_sequence_get_length (GTK_LIST_STORE (drag_dest)->seq))
-		return TRUE;
 
 	return FALSE;
 

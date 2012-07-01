@@ -613,10 +613,6 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
-UNIQUE_LIBS
-UNIQUE_CFLAGS
-LIBNOTIFY_LIBS
-LIBNOTIFY_CFLAGS
 GTK_LIBS
 GTK_CFLAGS
 GST_LDFLAGS
@@ -770,11 +766,7 @@ LIBSOUP_LIBS
 GST_CFLAGS
 GST_LIBS
 GTK_CFLAGS
-GTK_LIBS
-LIBNOTIFY_CFLAGS
-LIBNOTIFY_LIBS
-UNIQUE_CFLAGS
-UNIQUE_LIBS'
+GTK_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1437,13 +1429,6 @@ Some influential environment variables:
   GST_LIBS    linker flags for GST, overriding pkg-config
   GTK_CFLAGS  C compiler flags for GTK, overriding pkg-config
   GTK_LIBS    linker flags for GTK, overriding pkg-config
-  LIBNOTIFY_CFLAGS
-              C compiler flags for LIBNOTIFY, overriding pkg-config
-  LIBNOTIFY_LIBS
-              linker flags for LIBNOTIFY, overriding pkg-config
-  UNIQUE_CFLAGS
-              C compiler flags for UNIQUE, overriding pkg-config
-  UNIQUE_LIBS linker flags for UNIQUE, overriding pkg-config
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -13017,8 +13002,8 @@ fi
 
 
 
-GLIB_REQS=2.13.4
-GTK_REQS=2.16.0
+GLIB_REQS=2.0
+GTK_REQS=3.0
 GST_MAJORMINOR=0.10
 GST_REQS=0.10.24
 GSTPLUG_REQS=0.10.00
@@ -13156,14 +13141,14 @@ if test -n "$GLIB_CFLAGS"; then
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"
   glib-2.0 >= \$GLIB_REQS
   gio-2.0
-  gtk+-2.0 >= \$GTK_REQS
+  gtk+-3.0 >= \$GTK_REQS
   gmodule-2.0
   gconf-2.0
   \""; } >&5
   ($PKG_CONFIG --exists --print-errors "
   glib-2.0 >= $GLIB_REQS
   gio-2.0
-  gtk+-2.0 >= $GTK_REQS
+  gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
   ") 2>&5
@@ -13173,7 +13158,7 @@ if test -n "$GLIB_CFLAGS"; then
   pkg_cv_GLIB_CFLAGS=`$PKG_CONFIG --cflags "
   glib-2.0 >= $GLIB_REQS
   gio-2.0
-  gtk+-2.0 >= $GTK_REQS
+  gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
   " 2>/dev/null`
@@ -13191,14 +13176,14 @@ if test -n "$GLIB_LIBS"; then
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"
   glib-2.0 >= \$GLIB_REQS
   gio-2.0
-  gtk+-2.0 >= \$GTK_REQS
+  gtk+-3.0 >= \$GTK_REQS
   gmodule-2.0
   gconf-2.0
   \""; } >&5
   ($PKG_CONFIG --exists --print-errors "
   glib-2.0 >= $GLIB_REQS
   gio-2.0
-  gtk+-2.0 >= $GTK_REQS
+  gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
   ") 2>&5
@@ -13208,7 +13193,7 @@ if test -n "$GLIB_LIBS"; then
   pkg_cv_GLIB_LIBS=`$PKG_CONFIG --libs "
   glib-2.0 >= $GLIB_REQS
   gio-2.0
-  gtk+-2.0 >= $GTK_REQS
+  gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
   " 2>/dev/null`
@@ -13235,7 +13220,7 @@ fi
 	        GLIB_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "
   glib-2.0 >= $GLIB_REQS
   gio-2.0
-  gtk+-2.0 >= $GTK_REQS
+  gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
   " 2>&1`
@@ -13243,7 +13228,7 @@ fi
 	        GLIB_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "
   glib-2.0 >= $GLIB_REQS
   gio-2.0
-  gtk+-2.0 >= $GTK_REQS
+  gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
   " 2>&1`
@@ -13254,7 +13239,7 @@ fi
 	as_fn_error $? "Package requirements (
   glib-2.0 >= $GLIB_REQS
   gio-2.0
-  gtk+-2.0 >= $GTK_REQS
+  gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
   ) were not met:
@@ -13513,12 +13498,12 @@ if test -n "$GTK_CFLAGS"; then
     pkg_cv_GTK_CFLAGS="$GTK_CFLAGS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"gtk+-2.0 gthread-2.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "gtk+-2.0 gthread-2.0") 2>&5
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"gtk+-3.0 gthread-2.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "gtk+-3.0 gthread-2.0") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_GTK_CFLAGS=`$PKG_CONFIG --cflags "gtk+-2.0 gthread-2.0" 2>/dev/null`
+  pkg_cv_GTK_CFLAGS=`$PKG_CONFIG --cflags "gtk+-3.0 gthread-2.0" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -13530,12 +13515,12 @@ if test -n "$GTK_LIBS"; then
     pkg_cv_GTK_LIBS="$GTK_LIBS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"gtk+-2.0 gthread-2.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "gtk+-2.0 gthread-2.0") 2>&5
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"gtk+-3.0 gthread-2.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "gtk+-3.0 gthread-2.0") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_GTK_LIBS=`$PKG_CONFIG --libs "gtk+-2.0 gthread-2.0" 2>/dev/null`
+  pkg_cv_GTK_LIBS=`$PKG_CONFIG --libs "gtk+-3.0 gthread-2.0" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -13556,14 +13541,14 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        GTK_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "gtk+-2.0 gthread-2.0" 2>&1`
+	        GTK_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "gtk+-3.0 gthread-2.0" 2>&1`
         else
-	        GTK_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "gtk+-2.0 gthread-2.0" 2>&1`
+	        GTK_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "gtk+-3.0 gthread-2.0" 2>&1`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$GTK_PKG_ERRORS" >&5
 
-	as_fn_error $? "Package requirements (gtk+-2.0 gthread-2.0) were not met:
+	as_fn_error $? "Package requirements (gtk+-3.0 gthread-2.0) were not met:
 
 $GTK_PKG_ERRORS
 
@@ -13613,187 +13598,6 @@ $as_echo "#define TOTEM_RUN_IN_SOURCE_TREE 1" >>confdefs.h
 fi
 
 
-pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LIBNOTIFY" >&5
-$as_echo_n "checking for LIBNOTIFY... " >&6; }
-
-if test -n "$LIBNOTIFY_CFLAGS"; then
-    pkg_cv_LIBNOTIFY_CFLAGS="$LIBNOTIFY_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libnotify \""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libnotify ") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_LIBNOTIFY_CFLAGS=`$PKG_CONFIG --cflags "libnotify " 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-if test -n "$LIBNOTIFY_LIBS"; then
-    pkg_cv_LIBNOTIFY_LIBS="$LIBNOTIFY_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libnotify \""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libnotify ") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_LIBNOTIFY_LIBS=`$PKG_CONFIG --libs "libnotify " 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        LIBNOTIFY_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libnotify " 2>&1`
-        else
-	        LIBNOTIFY_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libnotify " 2>&1`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$LIBNOTIFY_PKG_ERRORS" >&5
-
-	as_fn_error $? "Package requirements (libnotify ) were not met:
-
-$LIBNOTIFY_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables LIBNOTIFY_CFLAGS
-and LIBNOTIFY_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details." "$LINENO" 5
-elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables LIBNOTIFY_CFLAGS
-and LIBNOTIFY_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details" "$LINENO" 5; }
-else
-	LIBNOTIFY_CFLAGS=$pkg_cv_LIBNOTIFY_CFLAGS
-	LIBNOTIFY_LIBS=$pkg_cv_LIBNOTIFY_LIBS
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-fi
-
-pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for UNIQUE" >&5
-$as_echo_n "checking for UNIQUE... " >&6; }
-
-if test -n "$UNIQUE_CFLAGS"; then
-    pkg_cv_UNIQUE_CFLAGS="$UNIQUE_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"unique-1.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "unique-1.0") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_UNIQUE_CFLAGS=`$PKG_CONFIG --cflags "unique-1.0" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-if test -n "$UNIQUE_LIBS"; then
-    pkg_cv_UNIQUE_LIBS="$UNIQUE_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"unique-1.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "unique-1.0") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_UNIQUE_LIBS=`$PKG_CONFIG --libs "unique-1.0" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        UNIQUE_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "unique-1.0" 2>&1`
-        else
-	        UNIQUE_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "unique-1.0" 2>&1`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$UNIQUE_PKG_ERRORS" >&5
-
-	as_fn_error $? "Package requirements (unique-1.0) were not met:
-
-$UNIQUE_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables UNIQUE_CFLAGS
-and UNIQUE_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details." "$LINENO" 5
-elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables UNIQUE_CFLAGS
-and UNIQUE_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details" "$LINENO" 5; }
-else
-	UNIQUE_CFLAGS=$pkg_cv_UNIQUE_CFLAGS
-	UNIQUE_LIBS=$pkg_cv_UNIQUE_LIBS
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-fi
 ac_config_files="$ac_config_files Makefile src/Makefile src/plugins/Makefile src/plugins/real/Makefile src/plugins/visual/Makefile src/plugins/stats/Makefile src/plugins/album/Makefile"
 
 cat >confcache <<\_ACEOF

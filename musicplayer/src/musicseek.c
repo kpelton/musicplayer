@@ -86,7 +86,7 @@ music_seek_new_with_adj_and_player(GtkAdjustment *ad,GsPlayer *player)
 	me->adj = ad;
 	me->player = player;
 	gtk_range_set_adjustment(GTK_RANGE(me),me->adj);
-	gtk_range_set_update_policy(GTK_RANGE(me),GTK_UPDATE_DELAYED);
+	//gtk_range_set_update_policy(GTK_RANGE(me),GTK_UPDATE_DELAYED);
 
 
 	g_signal_connect ((gpointer) GTK_WIDGET(me), "change-value",
