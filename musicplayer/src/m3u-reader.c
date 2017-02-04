@@ -6,7 +6,7 @@
 #include <gio/gio.h>
 #include <glib.h>
 #include <string.h>
-
+#include <stdio.h>
 #define MIME_TYPE "audio/x-mpegurl"
 
 

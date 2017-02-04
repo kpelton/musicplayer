@@ -638,13 +638,13 @@ GTK_CFLAGS
 GST_LDFLAGS
 GST_LIBS
 GST_CFLAGS
+GLIB_LDFLAGS
+GLIB_LIBS
+GLIB_CFLAGS
 LIBXML2_LIBS
 LIBXML2_CFLAGS
 LIBSOUP_LIBS
 LIBSOUP_CFLAGS
-GLIB_LDFLAGS
-GLIB_LIBS
-GLIB_CFLAGS
 PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
@@ -790,12 +790,12 @@ CPP
 PKG_CONFIG
 PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
-GLIB_CFLAGS
-GLIB_LIBS
 LIBSOUP_CFLAGS
 LIBSOUP_LIBS
 LIBXML2_CFLAGS
 LIBXML2_LIBS
+GLIB_CFLAGS
+GLIB_LIBS
 GST_CFLAGS
 GST_LIBS
 GTK_CFLAGS
@@ -1470,8 +1470,6 @@ Some influential environment variables:
               directories to add to pkg-config's search path
   PKG_CONFIG_LIBDIR
               path overriding pkg-config's built-in search path
-  GLIB_CFLAGS C compiler flags for GLIB, overriding pkg-config
-  GLIB_LIBS   linker flags for GLIB, overriding pkg-config
   LIBSOUP_CFLAGS
               C compiler flags for LIBSOUP, overriding pkg-config
   LIBSOUP_LIBS
@@ -1480,6 +1478,8 @@ Some influential environment variables:
               C compiler flags for LIBXML2, overriding pkg-config
   LIBXML2_LIBS
               linker flags for LIBXML2, overriding pkg-config
+  GLIB_CFLAGS C compiler flags for GLIB, overriding pkg-config
+  GLIB_LIBS   linker flags for GLIB, overriding pkg-config
   GST_CFLAGS  C compiler flags for GST, overriding pkg-config
   GST_LIBS    linker flags for GST, overriding pkg-config
   GTK_CFLAGS  C compiler flags for GTK, overriding pkg-config
@@ -2181,8 +2181,8 @@ ac_config_headers="$ac_config_headers config.h"
 
 PACKAGE=musicplayer
 VERSION=0.2
-CFLAGS="$CFLAGS -Wall -g -O2"
-
+CFLAGS="$CFLAGS  -pthread -I/usr/include/libsoup-2.4 -I/usr/include/libxml2 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/libxml2 -O3"
+LDFLAGS="$LDFLAGS -lxml2 -lgthread-2.0 -pthread -lglib-2.0"
 am__api_version='1.15'
 
 ac_aux_dir=
@@ -13696,10 +13696,9 @@ fi
 
 GLIB_REQS=2.0
 GTK_REQS=3.0
-GST_MAJORMINOR=0.10
-GST_REQS=0.10.24
-GSTPLUG_REQS=0.10.00
-
+GST_MAJORMINOR=1.0
+GST_REQS=1.0
+GSTPLUG_REQS=1.0
 
 
 
@@ -13821,6 +13820,195 @@ $as_echo "no" >&6; }
 		PKG_CONFIG=""
 	fi
 fi
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LIBSOUP" >&5
+$as_echo_n "checking for LIBSOUP... " >&6; }
+
+if test -n "$LIBSOUP_CFLAGS"; then
+    pkg_cv_LIBSOUP_CFLAGS="$LIBSOUP_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libsoup-2.4 >= 2.26\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libsoup-2.4 >= 2.26") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LIBSOUP_CFLAGS=`$PKG_CONFIG --cflags "libsoup-2.4 >= 2.26" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$LIBSOUP_LIBS"; then
+    pkg_cv_LIBSOUP_LIBS="$LIBSOUP_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libsoup-2.4 >= 2.26\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libsoup-2.4 >= 2.26") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LIBSOUP_LIBS=`$PKG_CONFIG --libs "libsoup-2.4 >= 2.26" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        LIBSOUP_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libsoup-2.4 >= 2.26" 2>&1`
+        else
+	        LIBSOUP_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libsoup-2.4 >= 2.26" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$LIBSOUP_PKG_ERRORS" >&5
+
+	as_fn_error $? "Package requirements (libsoup-2.4 >= 2.26) were not met:
+
+$LIBSOUP_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables LIBSOUP_CFLAGS
+and LIBSOUP_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details." "$LINENO" 5
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables LIBSOUP_CFLAGS
+and LIBSOUP_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details" "$LINENO" 5; }
+else
+	LIBSOUP_CFLAGS=$pkg_cv_LIBSOUP_CFLAGS
+	LIBSOUP_LIBS=$pkg_cv_LIBSOUP_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+fi
+
+
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LIBXML2" >&5
+$as_echo_n "checking for LIBXML2... " >&6; }
+
+if test -n "$LIBXML2_CFLAGS"; then
+    pkg_cv_LIBXML2_CFLAGS="$LIBXML2_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libxml-2.0 >= 2.0 \""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libxml-2.0 >= 2.0 ") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LIBXML2_CFLAGS=`$PKG_CONFIG --cflags "libxml-2.0 >= 2.0 " 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$LIBXML2_LIBS"; then
+    pkg_cv_LIBXML2_LIBS="$LIBXML2_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libxml-2.0 >= 2.0 \""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libxml-2.0 >= 2.0 ") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LIBXML2_LIBS=`$PKG_CONFIG --libs "libxml-2.0 >= 2.0 " 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        LIBXML2_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libxml-2.0 >= 2.0 " 2>&1`
+        else
+	        LIBXML2_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libxml-2.0 >= 2.0 " 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$LIBXML2_PKG_ERRORS" >&5
+
+	as_fn_error $? "Package requirements (libxml-2.0 >= 2.0 ) were not met:
+
+$LIBXML2_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables LIBXML2_CFLAGS
+and LIBXML2_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details." "$LINENO" 5
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables LIBXML2_CFLAGS
+and LIBXML2_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details" "$LINENO" 5; }
+else
+	LIBXML2_CFLAGS=$pkg_cv_LIBXML2_CFLAGS
+	LIBXML2_LIBS=$pkg_cv_LIBXML2_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+fi
+
+
+
+
+
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GLIB" >&5
@@ -13970,193 +14158,6 @@ fi
 
 
 
-pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LIBSOUP" >&5
-$as_echo_n "checking for LIBSOUP... " >&6; }
-
-if test -n "$LIBSOUP_CFLAGS"; then
-    pkg_cv_LIBSOUP_CFLAGS="$LIBSOUP_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libsoup-2.4 >= 2.26\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libsoup-2.4 >= 2.26") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_LIBSOUP_CFLAGS=`$PKG_CONFIG --cflags "libsoup-2.4 >= 2.26" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-if test -n "$LIBSOUP_LIBS"; then
-    pkg_cv_LIBSOUP_LIBS="$LIBSOUP_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libsoup-2.4 >= 2.26\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libsoup-2.4 >= 2.26") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_LIBSOUP_LIBS=`$PKG_CONFIG --libs "libsoup-2.4 >= 2.26" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        LIBSOUP_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libsoup-2.4 >= 2.26" 2>&1`
-        else
-	        LIBSOUP_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libsoup-2.4 >= 2.26" 2>&1`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$LIBSOUP_PKG_ERRORS" >&5
-
-	as_fn_error $? "Package requirements (libsoup-2.4 >= 2.26) were not met:
-
-$LIBSOUP_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables LIBSOUP_CFLAGS
-and LIBSOUP_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details." "$LINENO" 5
-elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables LIBSOUP_CFLAGS
-and LIBSOUP_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details" "$LINENO" 5; }
-else
-	LIBSOUP_CFLAGS=$pkg_cv_LIBSOUP_CFLAGS
-	LIBSOUP_LIBS=$pkg_cv_LIBSOUP_LIBS
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-fi
-
-
-
-pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LIBXML2" >&5
-$as_echo_n "checking for LIBXML2... " >&6; }
-
-if test -n "$LIBXML2_CFLAGS"; then
-    pkg_cv_LIBXML2_CFLAGS="$LIBXML2_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libxml-2.0 >= 2.00\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libxml-2.0 >= 2.00") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_LIBXML2_CFLAGS=`$PKG_CONFIG --cflags "libxml-2.0 >= 2.00" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-if test -n "$LIBXML2_LIBS"; then
-    pkg_cv_LIBXML2_LIBS="$LIBXML2_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libxml-2.0 >= 2.00\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libxml-2.0 >= 2.00") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_LIBXML2_LIBS=`$PKG_CONFIG --libs "libxml-2.0 >= 2.00" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        LIBXML2_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libxml-2.0 >= 2.00" 2>&1`
-        else
-	        LIBXML2_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libxml-2.0 >= 2.00" 2>&1`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$LIBXML2_PKG_ERRORS" >&5
-
-	as_fn_error $? "Package requirements (libxml-2.0 >= 2.00) were not met:
-
-$LIBXML2_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables LIBXML2_CFLAGS
-and LIBXML2_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details." "$LINENO" 5
-elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables LIBXML2_CFLAGS
-and LIBXML2_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details" "$LINENO" 5; }
-else
-	LIBXML2_CFLAGS=$pkg_cv_LIBXML2_CFLAGS
-	LIBXML2_LIBS=$pkg_cv_LIBXML2_LIBS
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-fi
-
-
-
-
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GST" >&5
@@ -14167,16 +14168,16 @@ if test -n "$GST_CFLAGS"; then
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"
-  gstreamer-0.10 >= \$GSTPLUG_REQS
+  gstreamer-1.0 >= \$GSTPLUG_REQS
   \""; } >&5
   ($PKG_CONFIG --exists --print-errors "
-  gstreamer-0.10 >= $GSTPLUG_REQS
+  gstreamer-1.0 >= $GSTPLUG_REQS
   ") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
   pkg_cv_GST_CFLAGS=`$PKG_CONFIG --cflags "
-  gstreamer-0.10 >= $GSTPLUG_REQS
+  gstreamer-1.0 >= $GSTPLUG_REQS
   " 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
@@ -14190,16 +14191,16 @@ if test -n "$GST_LIBS"; then
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"
-  gstreamer-0.10 >= \$GSTPLUG_REQS
+  gstreamer-1.0 >= \$GSTPLUG_REQS
   \""; } >&5
   ($PKG_CONFIG --exists --print-errors "
-  gstreamer-0.10 >= $GSTPLUG_REQS
+  gstreamer-1.0 >= $GSTPLUG_REQS
   ") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
   pkg_cv_GST_LIBS=`$PKG_CONFIG --libs "
-  gstreamer-0.10 >= $GSTPLUG_REQS
+  gstreamer-1.0 >= $GSTPLUG_REQS
   " 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
@@ -14222,18 +14223,18 @@ else
 fi
         if test $_pkg_short_errors_supported = yes; then
 	        GST_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "
-  gstreamer-0.10 >= $GSTPLUG_REQS
+  gstreamer-1.0 >= $GSTPLUG_REQS
   " 2>&1`
         else
 	        GST_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "
-  gstreamer-0.10 >= $GSTPLUG_REQS
+  gstreamer-1.0 >= $GSTPLUG_REQS
   " 2>&1`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$GST_PKG_ERRORS" >&5
 
 	as_fn_error $? "Package requirements (
-  gstreamer-0.10 >= $GSTPLUG_REQS
+  gstreamer-1.0 >= $GSTPLUG_REQS
   ) were not met:
 
 $GST_PKG_ERRORS
@@ -14383,7 +14384,6 @@ fi
 $as_echo "#define TOTEM_RUN_IN_SOURCE_TREE 1" >>confdefs.h
 
 fi
-
 
 ac_config_files="$ac_config_files Makefile src/Makefile src/plugins/Makefile src/plugins/real/Makefile src/plugins/visual/Makefile src/plugins/stats/Makefile src/plugins/album/Makefile"
 

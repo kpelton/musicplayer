@@ -97,7 +97,7 @@ gs_player_class_init (GsPlayerClass *klass)
 static void
 gs_player_init (GsPlayer *me)
 {
-	me->play = gst_element_factory_make ("playbin2", "playbin");
+	me->play = gst_element_factory_make ("playbin", "playbin");
 	me->gconf = gst_element_factory_make("gconfaudiosink","audio-sink");
 
 	g_object_set(G_OBJECT(me->play),"audio-sink",me->gconf,NULL);
@@ -174,8 +174,8 @@ gboolean gs_getLength(GsPlayer *me)
 
 
 	if(isPlaying(me) || isPaused(me)){ 
-		if (gst_element_query_position (me->play, &fmt, &pos)
-		    && gst_element_query_duration (me->play, &fmt, &len)) {
+		if (gst_element_query_position (me->play, fmt, &pos)
+		    && gst_element_query_duration (me->play, fmt, &len)) {
 				g_print ("Time: %" GST_TIME_FORMAT " / %" GST_TIME_FORMAT "\r",
 				         GST_TIME_ARGS (pos), GST_TIME_ARGS (len));
 			}
@@ -195,8 +195,8 @@ gdouble gs_getPercentage(GsPlayer *me)
 
 	//if(me->isPlaying == TRUE){
 	if(isPlaying(me) || isPaused(me)){
-		if (gst_element_query_position (me->play, &fmt, &pos)
-		    && gst_element_query_duration (me->play, &fmt, &len)) {
+		if (gst_element_query_position (me->play, fmt, &pos)
+		    && gst_element_query_duration (me->play, fmt, &len)) {
 				pos2=pos;
 				len2=len;
 				p= pos2/len *100;
@@ -244,7 +244,7 @@ static gint64 gs_PercentToTime(GsPlayer *me, gdouble percent){
 
 	//if(me->isPlaying == TRUE){
 	if(isPlaying(me) || isPaused(me)  ){
-		if(gst_element_query_duration (me->play, &fmt, &len)){
+		if(gst_element_query_duration (me->play, fmt, &len)){
 
 			//convert percent to fraction before
 			sec = (percent/100.) *len;
@@ -272,12 +272,12 @@ gboolean gs_CurrTime(GsPlayer *me, gchar *curr)
 	//if(me->isPlaying == TRUE)
 	if(isPlaying(me) || isPaused(me)){  
 
-		if (gst_element_query_position (me->play, &fmt, &pos) && gst_element_query_duration (me->play, &fmt, &len))
+		if (gst_element_query_position (me->play, fmt, &pos) && gst_element_query_duration (me->play, fmt, &len))
 		{
 			gs_SecondsToReal(pos/GST_SECOND,real);
 			gs_SecondsToReal(len/GST_SECOND,real2);
 			g_snprintf(curr,49,"%s of %s" ,real,real2);
-			return TRUE;
+            return TRUE;
 		}
 	}	    
 	return FALSE;

@@ -332,7 +332,7 @@ cb_newpad (GstElement *decodebin,
 	GstPad *audiopad;
 	GstElement *fakesink = (GstElement *) data;
 
-	audiopad = gst_element_get_pad (fakesink, "sink");
+	audiopad = gst_element_get_request_pad (fakesink, "sink");
 
 
 	g_object_unref(audiopad);

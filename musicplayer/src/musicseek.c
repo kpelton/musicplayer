@@ -4,7 +4,7 @@
 #include "player.h"
 #include <gtk/gtk.h>
 G_DEFINE_TYPE (MusicSeek, music_seek, GTK_TYPE_HSCALE);
-static void 
+static gboolean
 change_scroll ( gpointer         user_data);
 
 static gchar * 
@@ -98,13 +98,16 @@ music_seek_new_with_adj_and_player(GtkAdjustment *ad,GsPlayer *player)
 	                  (gpointer)(me->player));
 
 	//hack to make the left click behave as middle click
-	g_signal_connect ((gpointer) GTK_WIDGET(me), "button-press-event",
+
+	
+	 g_signal_connect ((gpointer) GTK_WIDGET(me), "button-press-event",
 	                  (gpointer)button_pressed,
 	                  (gpointer)(me->player));
 
 	g_signal_connect ((gpointer) GTK_WIDGET(me), "button-release-event",
 	                  (gpointer)button_released,
-	                  (gpointer)(me->player));
+                  (gpointer)(me->player));
+
 	//end hack
 	g_timeout_add (200,(gpointer)change_scroll, me->player);
 
@@ -119,7 +122,7 @@ button_pressed  (GtkWidget      *widget,
 {
 	GsPlayer *player = (GsPlayer *) user_data;
 	gs_pause(player);
-	event->button = 2;
+	//event->button = 2;
 
 	return FALSE;
 
@@ -131,27 +134,31 @@ button_released(GtkWidget      *widget,
 {
 	GsPlayer *player = (GsPlayer *) user_data;
 	gs_pauseResume(player);
-	event->button = 2;
+	//event->button = 2;
+
 	return FALSE;
 
 }
 
 
-static void 
+static gboolean 
 change_scroll( gpointer  user_data)
 
 {
+
 
 	GsPlayer *player = (GsPlayer *) user_data;
 	gdouble curr; 
 	GtkAdjustment  *adj;
 
+
 	curr= gs_getPercentage(player);
 
-	adj =(GtkAdjustment  *) gtk_adjustment_new (curr, 0, 100, 3, 10, 1);
+	adj =(GtkAdjustment  *) gtk_adjustment_new (curr, 0, 100, 1, 1, 1);
 
 	gtk_range_set_adjustment(GTK_RANGE(player->scroll),GTK_ADJUSTMENT(adj));
-
+	gtk_widget_queue_draw(player->scroll);
+    return TRUE;
 
 
 }
@@ -164,7 +171,6 @@ print_time (GtkScale *scale,
 {
 	GsPlayer *player = (GsPlayer *) user_data;
 	gchar *str;
-
 	str = (gchar *) g_malloc(sizeof(gchar)*50);
 
 
@@ -175,7 +181,8 @@ print_time (GtkScale *scale,
 	else
 	{
 		g_strlcpy(str,"0:00 of 0:00",50);
-		return str;
+	
+     	return str;
 		gs_pauseResume(player);
 	}
 
