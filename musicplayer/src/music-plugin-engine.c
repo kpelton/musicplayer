@@ -85,9 +85,9 @@ gboolean load_all (MusicMainWindow * mainwindow)
 	GList *listbeg;
 	listbeg = list;
 #ifdef TOTEM_RUN_IN_SOURCE_TREE
-	//music_plugins_find_plugins("plugins",&list);
+	music_plugins_find_plugins("plugins",&list);
 #else
-	//music_plugins_find_plugins(PLUGIN_DIR,&list);
+	music_plugins_find_plugins(PLUGIN_DIR,&list);
 #endif
 	list = listbeg;
 

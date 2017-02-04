@@ -27,7 +27,6 @@ static void gst_new_tags                (const GstTagList *list,
 static void
 cb_newpad (GstElement *decodebin,
            GstPad     *pad,
-           gboolean    last,
            gpointer    data);
 
 
@@ -132,27 +131,30 @@ ts_get_metadata(gchar * uri,TagScanner * self)
 	//create all
 	self->pipeline = gst_pipeline_new ("pipeline");
 
-	self->filesrc = gst_element_factory_make ("giosrc", "source");
-	self->dec  = gst_element_factory_make ("decodebin", "decodebin");
-	self->fakesink = gst_element_factory_make ("fakesink", "sink");
+	self->dec  = gst_element_factory_make ("uridecodebin", "decodebin");
+	gst_bin_add (GST_BIN (self->pipeline), self->dec);
+	g_object_set (G_OBJECT (self->dec), "uri", uri, NULL);
 
+	self->fakesink = gst_element_factory_make ("fakesink", NULL);
+	gst_bin_add (GST_BIN (self->pipeline), self->fakesink);
+	g_signal_connect (self->dec, "pad-added", G_CALLBACK (cb_newpad),self->fakesink);
 	self->bus = gst_pipeline_get_bus (GST_PIPELINE (self->pipeline));
 	//signals
-	g_signal_connect (self->dec, "new-decoded-pad", G_CALLBACK (cb_newpad),self->fakesink);
+
 
 
 
 	//connect everything
-	gst_bin_add (GST_BIN (self->pipeline), self->filesrc);
-	gst_bin_add (GST_BIN (self->pipeline), self->fakesink);
-	gst_bin_add (GST_BIN (self->pipeline), self->dec);
 
-	gst_element_link (self->filesrc,self->dec);
+
+
+
+
 
 	self->already_found = FALSE;
 
 
-	g_object_set (G_OBJECT (self->filesrc), "location", uri, NULL);
+//g_object_set (self->dec, "uri", uri, NULL);
 	//gst_bus_add_watch (self->bus, my_bus_callback, self);
 	gst_element_set_state (self->pipeline, GST_STATE_PAUSED);
 
@@ -326,18 +328,17 @@ my_bus_callback (GstBus     *bus,
 static void
 cb_newpad (GstElement *decodebin,
            GstPad     *pad,
-           gboolean    last,
            gpointer    data)
 {
-	GstPad *audiopad;
+	GstPad *sinkpad;
 	GstElement *fakesink = (GstElement *) data;
 
-	audiopad = gst_element_get_request_pad (fakesink, "sink");
-
-
-	g_object_unref(audiopad);
-
-	gst_pad_link (pad, audiopad);
+  sinkpad = gst_element_get_static_pad (fakesink, "sink");
+  if (!gst_pad_is_linked (sinkpad)) {
+    if (gst_pad_link (pad, sinkpad) != GST_PAD_LINK_OK)
+      g_error ("Failed to link pads!");
+  }
+  gst_object_unref (sinkpad);
 }
 
 
