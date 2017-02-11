@@ -72,10 +72,7 @@ AC_OUTPUT([
 Makefile
 src/Makefile
 src/plugins/Makefile
-src/plugins/real/Makefile
-src/plugins/visual/Makefile
 src/plugins/stats/Makefile
-src/plugins/album/Makefile
 ])
 
 
