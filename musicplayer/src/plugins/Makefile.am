@@ -1,1 +1,1 @@
-SUBDIRS =   stats album
+SUBDIRS =   stats
