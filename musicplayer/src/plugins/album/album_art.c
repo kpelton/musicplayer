@@ -101,7 +101,7 @@ album_art_got_image_response(SoupSession *session,
 	    
 	    gtk_image_set_from_pixbuf(GTK_IMAGE(amsg->self->album),
 				      gdk_pixbuf_new_from_file_at_size (
-								outputdir,64,64,NULL));
+								outputdir,48,48,NULL));
 	}
 	    g_free(outputdir);
     }
@@ -185,8 +185,7 @@ static void album_art_new_file(GsPlayer *player,
 	AsyncMsg *amsg;
 
 
-
-	gtk_image_clear (GTK_IMAGE(self->album));
+	gtk_image_set_from_icon_name(GTK_IMAGE(self->album),"image-missing",GTK_ICON_SIZE_DIALOG);
 	
 	if(p_track->artist && p_track->album)   
 	    {
@@ -198,7 +197,7 @@ static void album_art_new_file(GsPlayer *player,
 		if (g_file_test(outputdir,G_FILE_TEST_EXISTS)){
 		    gtk_image_set_from_pixbuf(GTK_IMAGE(self->album),
 					      gdk_pixbuf_new_from_file_at_size (
-										outputdir,64,64,NULL));
+										outputdir,48,48,NULL));
 		    }
 		    else{
 			amsg = g_malloc(sizeof(AsyncMsg));

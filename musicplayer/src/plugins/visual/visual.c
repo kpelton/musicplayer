@@ -54,6 +54,8 @@ gboolean visual_plugin_activate (MusicPlugin *user_data,MusicMainWindow *mw)
 	GstPad *pad;
 	GstElement *vis_bin;
 	GstCaps *caps = NULL;
+	guint flags;
+	
 
 
 
@@ -62,9 +64,10 @@ gboolean visual_plugin_activate (MusicPlugin *user_data,MusicMainWindow *mw)
 
 
 	vis_bin = gst_bin_new("vis_bin");
-	self->goom = gst_element_factory_make("goom","sink");
+	//self->goom = gst_element_factory_make("goom2k1","sink");
 
 
+	self->goom = gst_element_factory_make("monoscope","sink");
 
 	gst_bin_add_many (GST_BIN (vis_bin), self->goom,vis_capsfilter,NULL);
 	/* Sink ghostpad */
@@ -90,8 +93,8 @@ gboolean visual_plugin_activate (MusicPlugin *user_data,MusicMainWindow *mw)
 	GstStructure *s = gst_caps_get_structure (caps, 0);
 
 	/* Fixate */
-	gst_structure_fixate_field_nearest_int (s, "width", 800);
-	gst_structure_fixate_field_nearest_int (s, "height", 600);
+	gst_structure_fixate_field_nearest_int (s, "width", 1024);
+	gst_structure_fixate_field_nearest_int (s, "height", 768);
 
 
 	/* set this */
@@ -101,7 +104,9 @@ gboolean visual_plugin_activate (MusicPlugin *user_data,MusicMainWindow *mw)
 
 	self->bin = vis_bin;
 	g_object_set(G_OBJECT(self->mw->player->play),"vis-plugin",vis_bin,NULL);
-
+	 g_object_get (G_OBJECT(self->mw->player->play), "flags", &flags, NULL);
+	flags |= (1<<3);
+	g_object_set (G_OBJECT(self->mw->player->play), "flags", flags, NULL);
 	return TRUE;
 }
 
@@ -114,6 +119,7 @@ gboolean visual_plugin_deactivate ( MusicPlugin *user_data)
 
 	gst_element_set_state (self->bin, GST_STATE_NULL);
 	gst_element_set_state (self->mw->player->play, GST_STATE_NULL);
+	
 
 	g_object_set(G_OBJECT(self->mw->player->play),"vis-plugin",NULL,NULL);
 
