@@ -377,7 +377,7 @@ music_queue_dispose (GObject *object)
 			if((list = music_queue_get_list(self)) != NULL)
 			{
 				playlist_reader_write_list(self->priv->read,outputdir,list);
-				free(outputdir);
+				g_free(outputdir);
 				g_list_free(list);
 			} 
 
@@ -678,10 +678,9 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 
 	MusicQueue *self = (MusicQueue *) userdata;
 	gchar **list=NULL;
-	gchar *uris= NULL;
+	const guchar *uris;
 	int i;
 	GSList *slist = NULL;
-	guchar drag_text_data =NULL;
 	threadstr *str = g_malloc(sizeof(threadstr));	
 
 	str->self = self;

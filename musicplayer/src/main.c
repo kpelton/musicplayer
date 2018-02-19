@@ -19,34 +19,20 @@ int main (int argc, char *argv[])
 {
 	GtkWidget *mainwindow;
 
-    g_thread_init(NULL);
-	gdk_threads_init();
-	g_type_init(); 
 	gtk_init (&argc, &argv);
-
 	make_pref_folder();
+	gst_init (&argc, &argv);
 
-		gst_init (&argc, &argv);
+	gconf_init(argc, argv, NULL);
 
-		gconf_init(argc, argv, NULL);
-
-		mainwindow = music_main_window_new ();
-		gtk_widget_show (mainwindow);
-
-        //		g_object_set(G_OBJECT (mainwindow), "title","squid player",NULL);
-
-
-		if(argc >1)
-			music_main_play_file(MUSIC_MAIN_WINDOW(mainwindow),argv[1]);
-
-		gdk_threads_enter();
-
-		gtk_main ();
-		gdk_threads_leave();	
+	mainwindow = music_main_window_new ();
+	gtk_widget_show (mainwindow);
 
 
 
-    
+	if(argc >1)
+		music_main_play_file(MUSIC_MAIN_WINDOW(mainwindow),argv[1]);
+	gtk_main ();
 	return 0;
 
 }

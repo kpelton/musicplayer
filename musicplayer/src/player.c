@@ -127,7 +127,7 @@ void gs_playFile(GsPlayer *me , const char *location)
 	gst_element_set_state (me->play, GST_STATE_NULL);
 
 	if(me->track)
-		free(me->track);
+		g_free(me->track);
 
 	me->track = ts_metadata_new();
 
