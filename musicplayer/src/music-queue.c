@@ -709,7 +709,6 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 	} else{
 		self->priv->changed = TRUE;
 	}
-	gtk_drag_finish(context,TRUE,FALSE,time);
 
 }
 
