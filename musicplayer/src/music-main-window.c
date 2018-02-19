@@ -179,10 +179,11 @@ init_widgets(MusicMainWindow *self)
 
 	self->mainhbox = gtk_hbox_new (FALSE, 0);
 
-	self->pausebutton = gtk_button_new_from_stock (GTK_STOCK_MEDIA_PAUSE);
-	self->playbutton  = gtk_button_new_from_stock (GTK_STOCK_MEDIA_PLAY);
-	self->prevbutton = gtk_button_new_from_stock (GTK_STOCK_MEDIA_PREVIOUS);
-	self->nextbutton  = gtk_button_new_from_stock (GTK_STOCK_MEDIA_NEXT);
+	self->pausebutton = gtk_button_new_from_icon_name (GTK_STOCK_MEDIA_PAUSE,GTK_ICON_SIZE_LARGE_TOOLBAR);
+	
+	self->playbutton  = gtk_button_new_from_icon_name (GTK_STOCK_MEDIA_PLAY,GTK_ICON_SIZE_LARGE_TOOLBAR);
+	self->prevbutton = gtk_button_new_from_icon_name (GTK_STOCK_MEDIA_PREVIOUS,GTK_ICON_SIZE_LARGE_TOOLBAR);
+	self->nextbutton  = gtk_button_new_from_icon_name (GTK_STOCK_MEDIA_NEXT,GTK_ICON_SIZE_LARGE_TOOLBAR);
 	self->volumebutton = music_volume_new_with_player(self->player);
 	self->albumlabel = gtk_label_new ("");
 
