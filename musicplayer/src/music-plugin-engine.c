@@ -6,6 +6,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #include "music-main-window.h"
+#include "plugin-engine.h"
 #endif
 
 G_DEFINE_TYPE (MusicPluginEngine, music_plugin_engine, MUSIC_TYPE_PLUGIN_ENGINE)

@@ -4,14 +4,14 @@
  * Copyright (C)  2009 <>
 	 * 
  */
-
+//strstrcase is not a standard function need GNU source define
+#define _GNU_SOURCE
 #include "jump-window.h"
 #include <glib.h>
-#include <string.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdk.h>
 #include <stdlib.h>
-
+#include <string.h>
 enum
 {
 	COLUMN_ARTIST,
@@ -134,8 +134,8 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 {
 	gtk_window_set_title (GTK_WINDOW (self), ("Jump"));
 
-	self->mainhbox = gtk_hbox_new (FALSE, 0);
-	self->mainvbox = gtk_vbox_new (FALSE, 0);
+	self->mainhbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+	self->mainvbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
 
 	self->entry = 	gtk_entry_new();
 	self->filter =  GTK_TREE_MODEL_FILTER(model);
@@ -169,9 +169,7 @@ static void init_widgets(JumpWindow *self, GtkTreeModel *model)
 	g_object_set (G_OBJECT (self->treeview),"headers-visible"  ,FALSE,
 	              "headers-clickable",FALSE,NULL);
 
-	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (self->treeview),TRUE);
-
-	gtk_entry_set_icon_from_stock (GTK_ENTRY(self->entry),GTK_ENTRY_ICON_SECONDARY, "gtk-clear");
+	gtk_entry_set_icon_from_icon_name (GTK_ENTRY(self->entry),GTK_ENTRY_ICON_SECONDARY, "gtk-clear");
 
 	gtk_tree_model_filter_set_visible_func (GTK_TREE_MODEL_FILTER(model),check_visible,self,NULL);
 

@@ -17,13 +17,9 @@ static GHashTable *music_plugins = NULL;
 
 static MusicMainWindow *mw = NULL;
 
-
 static 
 gboolean music_plugins_load_all (MusicMainWindow * mainwindows);
 
-static void  
-music_plugins_find_plugins (gchar * start,
-                            GList **list);
 static gboolean
 load_file(gchar *location,MusicMainWindow * mainwindows);
 
@@ -223,7 +219,7 @@ music_plugins_get_list()
 	else
 		return NULL;
 }
-static void 
+void 
 music_plugins_find_plugins (gchar * start,
                             GList **list)
 {

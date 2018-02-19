@@ -3,6 +3,7 @@
 #include "music-main-window.h"
 #include "music-queue.h"
 #include "music-song-entry.h"
+#include "plugin-engine.h"
 #include "tag-scanner.h"
 #include "utils.h"
 #include <gio/gio.h>
@@ -65,7 +66,7 @@ music_main_window_dispose (GObject *object)
 	//MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);	
 
 	G_OBJECT_CLASS (music_main_window_parent_class)->dispose (object);
-	exit(0);
+	gtk_main_quit();
 
 }
 
@@ -137,8 +138,8 @@ init_widgets(MusicMainWindow *self)
 	gtk_window_set_title (GTK_WINDOW (self), ("squid player"));
 
 	//add mainvbox to mainwindow
-	self->mainvbox = gtk_vbox_new(FALSE,0);
-	hbox = gtk_hbox_new(FALSE,0);
+	self->mainvbox = gtk_box_new(GTK_ORIENTATION_VERTICAL,0);
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,0);
 
 	gtk_container_add (GTK_CONTAINER (self), self->mainvbox);
 
@@ -177,13 +178,13 @@ init_widgets(MusicMainWindow *self)
 
 	//Hbox and buttons albumlabel
 
-	self->mainhbox = gtk_hbox_new (FALSE, 0);
+	self->mainhbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
 
-	self->pausebutton = gtk_button_new_from_icon_name (GTK_STOCK_MEDIA_PAUSE,GTK_ICON_SIZE_LARGE_TOOLBAR);
+	self->pausebutton = gtk_button_new_from_icon_name ("media-playback-pause",GTK_ICON_SIZE_LARGE_TOOLBAR);
 	
-	self->playbutton  = gtk_button_new_from_icon_name (GTK_STOCK_MEDIA_PLAY,GTK_ICON_SIZE_LARGE_TOOLBAR);
-	self->prevbutton = gtk_button_new_from_icon_name (GTK_STOCK_MEDIA_PREVIOUS,GTK_ICON_SIZE_LARGE_TOOLBAR);
-	self->nextbutton  = gtk_button_new_from_icon_name (GTK_STOCK_MEDIA_NEXT,GTK_ICON_SIZE_LARGE_TOOLBAR);
+	self->playbutton  = gtk_button_new_from_icon_name ("media-playback-start",GTK_ICON_SIZE_LARGE_TOOLBAR);
+	self->prevbutton = gtk_button_new_from_icon_name ("media-skip-backward",GTK_ICON_SIZE_LARGE_TOOLBAR);
+	self->nextbutton  = gtk_button_new_from_icon_name ("media-skip-forward",GTK_ICON_SIZE_LARGE_TOOLBAR);
 	self->volumebutton = music_volume_new_with_player(self->player);
 	self->albumlabel = gtk_label_new ("");
 

@@ -103,12 +103,13 @@ music_plugin_init_widgets(MusicPluginManager *self)
 	gtk_label_set_markup (GTK_LABEL (label), markup);
 	g_free (markup);
 
-	pm = gtk_vbox_new(FALSE,0);
+	pm = gtk_box_new(GTK_ORIENTATION_VERTICAL,0);
 
 	gtk_container_add (GTK_CONTAINER (self), pm);
 
 	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_CENTER);
-	gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+	gtk_label_set_xalign(GTK_LABEL(label),0.0f);
+	gtk_label_set_yalign(GTK_LABEL(label),0.5f);
 
 	gtk_box_pack_start (GTK_BOX (pm), label, FALSE, TRUE, 0);
 
@@ -127,15 +128,15 @@ music_plugin_init_widgets(MusicPluginManager *self)
 	music_plugin_manager_construct_tree(self);
 	gtk_container_add (GTK_CONTAINER (viewport), self->priv->tree);
 
-	hbuttonbox = gtk_hbox_new (FALSE,10);
+	hbuttonbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL,10);
 	gtk_box_pack_start (GTK_BOX (pm), hbuttonbox, FALSE, FALSE, 0);
 
 
-	self->priv->about = gtk_button_new_from_stock (GTK_STOCK_ABOUT);
+	self->priv->about = gtk_button_new_with_label ("about");
 	gtk_container_add (GTK_CONTAINER (hbuttonbox), self->priv->about);
 
 
-	self->priv->config = gtk_button_new_from_stock( GTK_STOCK_PREFERENCES);
+	self->priv->config = gtk_button_new_with_label("preferences");
 	gtk_container_add (GTK_CONTAINER (hbuttonbox), self->priv->config);
 
 
@@ -226,7 +227,6 @@ music_plugin_manager_construct_tree (MusicPluginManager *self)
 	                         GTK_TREE_MODEL (model));
 	g_object_unref (model);
 
-	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (self->priv->tree), TRUE);
 	gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (self->priv->tree), FALSE);
 
 	/* first column */
