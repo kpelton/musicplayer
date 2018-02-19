@@ -1,0 +1,8 @@
+To install
+aclocal
+libtoolize
+automake --add-missing
+autoconf
+./configure --disable-run-in-source-tree
+make
+sudo make install
