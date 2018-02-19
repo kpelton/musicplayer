@@ -3,7 +3,7 @@
 #include "music-seek.h"
 #include "player.h"
 #include <gtk/gtk.h>
-G_DEFINE_TYPE (MusicSeek, music_seek, GTK_TYPE_HSCALE);
+G_DEFINE_TYPE (MusicSeek, music_seek, GTK_TYPE_SCALE);
 static gboolean
 change_scroll ( gpointer         user_data);
 
