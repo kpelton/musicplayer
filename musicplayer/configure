@@ -2181,8 +2181,7 @@ ac_config_headers="$ac_config_headers config.h"
 
 PACKAGE=musicplayer
 VERSION=0.2
-CFLAGS="$CFLAGS  -pthread -I/usr/include/libsoup-2.4 -I/usr/include/libxml2 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/libxml2 -O3"
-LDFLAGS="$LDFLAGS -lxml2 -lgthread-2.0 -pthread -lglib-2.0"
+CFLAGS="$CFLAGS -O3"
 am__api_version='1.15'
 
 ac_aux_dir=
@@ -14024,6 +14023,7 @@ if test -n "$GLIB_CFLAGS"; then
   gtk+-3.0 >= \$GTK_REQS
   gmodule-2.0
   gconf-2.0
+  gthread-2.0
   \""; } >&5
   ($PKG_CONFIG --exists --print-errors "
   glib-2.0 >= $GLIB_REQS
@@ -14031,6 +14031,7 @@ if test -n "$GLIB_CFLAGS"; then
   gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
+  gthread-2.0
   ") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
@@ -14041,6 +14042,7 @@ if test -n "$GLIB_CFLAGS"; then
   gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
+  gthread-2.0
   " 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
@@ -14059,6 +14061,7 @@ if test -n "$GLIB_LIBS"; then
   gtk+-3.0 >= \$GTK_REQS
   gmodule-2.0
   gconf-2.0
+  gthread-2.0
   \""; } >&5
   ($PKG_CONFIG --exists --print-errors "
   glib-2.0 >= $GLIB_REQS
@@ -14066,6 +14069,7 @@ if test -n "$GLIB_LIBS"; then
   gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
+  gthread-2.0
   ") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
@@ -14076,6 +14080,7 @@ if test -n "$GLIB_LIBS"; then
   gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
+  gthread-2.0
   " 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
@@ -14103,6 +14108,7 @@ fi
   gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
+  gthread-2.0
   " 2>&1`
         else
 	        GLIB_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "
@@ -14111,6 +14117,7 @@ fi
   gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
+  gthread-2.0
   " 2>&1`
         fi
 	# Put the nasty error message in config.log where it belongs
@@ -14122,6 +14129,7 @@ fi
   gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
   gconf-2.0
+  gthread-2.0
   ) were not met:
 
 $GLIB_PKG_ERRORS
@@ -14385,7 +14393,7 @@ $as_echo "#define TOTEM_RUN_IN_SOURCE_TREE 1" >>confdefs.h
 
 fi
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/plugins/Makefile src/plugins/real/Makefile src/plugins/visual/Makefile src/plugins/stats/Makefile src/plugins/album/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/plugins/Makefile src/plugins/stats/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -15408,10 +15416,7 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/plugins/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/Makefile" ;;
-    "src/plugins/real/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/real/Makefile" ;;
-    "src/plugins/visual/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/visual/Makefile" ;;
     "src/plugins/stats/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/stats/Makefile" ;;
-    "src/plugins/album/Makefile") CONFIG_FILES="$CONFIG_FILES src/plugins/album/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
