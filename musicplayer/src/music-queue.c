@@ -677,35 +677,39 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 {
 
 	MusicQueue *self = (MusicQueue *) userdata;
-	char **list=NULL;
+	gchar **list=NULL;
+	gchar *uris= NULL;
 	int i;
 	GSList *slist = NULL;
+	guchar drag_text_data =NULL;
 	threadstr *str = g_malloc(sizeof(threadstr));	
 
 	str->self = self;
 	//add to list;
-
-
 	//check to see if it was internal
 	if(gtk_drag_get_source_widget (context)  == NULL){
 
+		uris = gtk_selection_data_get_data(seldata);
+		list = g_strsplit(uris,"\r\n",0);
 
-      //3.0 fail here
-      //list = g_uri_list_extract_uris ((guchar *)seldata->data);
-		for(i=0; list[i] != NULL; i++)
-		{
-			slist = g_slist_append (slist,list[i]);
+		if (list != NULL) {
+			for(i=0; list[i] != NULL; i++)
+			{
+				//g_strsplit will return empty string of last entry
+				if(g_strcmp0(list[i],"") != 0) {
+					printf("%s\n",list[i]);
+					slist = g_slist_append (slist,list[i]);
+				}
+			}
+			str->user_data = slist;
+			g_thread_create(add_threaded_slist,str,TRUE,NULL);
+		} else {
+			printf("Didn't get any URIs on drag data\n");
 		}
-
-		str->user_data = slist;
-		g_thread_create(add_threaded_slist,str,TRUE,NULL);  
-	}
-
-	//internal drag 
-	else{
+	} else{
 		self->priv->changed = TRUE;
 	}
-
+	gtk_drag_finish(context,TRUE,FALSE,time);
 
 }
 

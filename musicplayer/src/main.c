@@ -24,7 +24,7 @@ int main (int argc, char *argv[])
 	g_type_init(); 
 	gtk_init (&argc, &argv);
 
-		make_pref_folder();
+	make_pref_folder();
 
 		gst_init (&argc, &argv);
 
