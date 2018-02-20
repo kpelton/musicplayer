@@ -596,7 +596,9 @@ init_widgets(MusicQueue *self)
 	g_object_set (G_OBJECT (self->priv->treeview),"headers-visible"  ,FALSE,
 	              "headers-clickable",FALSE,NULL);
 
-	self->priv->openbutton = gtk_button_new_from_stock(GTK_STOCK_ADD);
+	self->priv->openbutton = gtk_button_new_from_icon_name("list-add",GTK_ICON_SIZE_BUTTON);
+	gtk_button_set_label(GTK_BUTTON(self->priv->openbutton),"Add Files");
+	gtk_button_set_always_show_image(GTK_BUTTON(self->priv->openbutton),TRUE);
 	gtk_box_pack_start (GTK_BOX (self),self->priv->openbutton, FALSE, TRUE, 0);
 	gtk_widget_show(self->priv->openbutton);
 
