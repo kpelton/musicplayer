@@ -278,8 +278,6 @@ struct _MusicQueuePrivate{
 	gboolean repeat;
 	GSList *list;
 	GList *dlist;
-	GMutex *mutex;
-	GThread *thread;
 	MusicSideQueue *sidequeue;
 };
 
@@ -406,9 +404,6 @@ music_queue_dispose (GObject *object)
 			g_object_unref(self->priv->sidequeue);
 			g_object_unref(self->priv->ts);
 
-			if(self->priv->thread == NULL)
-				g_mutex_free(self->priv->mutex);	
-
 
 			G_OBJECT_CLASS (music_queue_parent_class)->dispose (object);
 		}
@@ -512,8 +507,7 @@ music_queue_read_start_playlist(gchar *location,
 
 	playlist_reader_read_list(self->priv->read,location,&list);
 	str->user_data = list;
-	g_thread_new("Add files",add_threaded_dlist,str);
-
+	gdk_threads_add_idle((GSourceFunc)add_threaded_dlist,str);
 	g_object_unref(self->priv->read);
 
 }
@@ -552,8 +546,6 @@ music_queue_init (MusicQueue *self)
 	self->priv->drag_started=FALSE;
 	self->priv->ts = NULL;
 	self->priv->read = PLAYLIST_READER(xspf_reader_new());
-	self->priv->mutex = g_mutex_new ();
-	self->priv->thread = NULL;
 	self->priv->sidequeue = music_side_queue_new ();
 	self->priv->currid=0;
 	self->priv->totallength=0;
@@ -703,7 +695,7 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 				}
 			}
 			str->user_data = slist;
-			g_thread_new("Add files",add_threaded_slist,str);
+			gdk_threads_add_idle((GSourceFunc)add_threaded_slist,str);
 		} else {
 			printf("Didn't get any URIs on drag data\n");
 		}
@@ -906,7 +898,6 @@ file_chooser_cb(GtkWidget *data,
 
 	else if (response  == GTK_RESPONSE_ACCEPT)
 	{
-		g_mutex_lock(self->priv->mutex); 
 		slist =  gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
 		//set our last dir to one they chose
 
@@ -923,9 +914,7 @@ file_chooser_cb(GtkWidget *data,
 		gtk_widget_destroy (dialog);
 
 		str->user_data = slist;
-		g_thread_new("Add files",add_threaded_slist,str);
-
-		g_mutex_unlock(self->priv->mutex); 
+		gdk_threads_add_idle((GSourceFunc)add_threaded_slist,str);
 
 	}
 	else if(response == 1) //folder(s) selected
@@ -939,17 +928,14 @@ file_chooser_cb(GtkWidget *data,
 			g_free(current_folder);
 		}
 
-		g_mutex_lock(self->priv->mutex); 
 		slist= gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
 
 		if(check_for_folders(self->priv->list))
 		{
 			gtk_widget_destroy (dialog);
 			str->user_data = slist;
-			self->priv->thread = g_thread_new("Add files",add_threaded_folders,str);
-
+			gdk_threads_add_idle((GSourceFunc)add_threaded_folders,str);
 		}
-		g_mutex_unlock(self->priv->mutex); 
 	}
 }
 
@@ -1098,6 +1084,7 @@ scan_file_action(gpointer data,
 	                         G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE ,
 	                         0,NULL,
 	                         &err);
+
 	if (err != NULL)
 	{
 		/* Report error to user, and free error */
@@ -1204,19 +1191,16 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 	mod = g_file_info_get_attribute_uint64(info,
 	                                     G_FILE_ATTRIBUTE_TIME_MODIFIED); 
 	
-	g_mutex_lock(self->priv->mutex);  //lock the tag scanner so we dont screw up the pipeline in ts
 	
 	if(!track)
 		md=ts_get_metadata(valid,self->priv->ts);
 	else
 		md = track;
-	g_mutex_unlock(self->priv->mutex); 
 
 	if(md->title != NULL && md->artist !=NULL) //we have tags
 	{	  
 		g_snprintf(buffertitle,strlen(md->artist)+strlen(md->title)+4,
 		           "%s - %s",md->artist,md->title);
-		gdk_threads_enter();
 		gtk_list_store_append(self->priv->store, &iter);
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,buffertitle,
 		                   		COLUMN_TITLE,md->title,
@@ -1228,15 +1212,11 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 		                   		COLUMN_PLAYING,FALSE,
 		                   			                   
 		                   -1);
-		
-		gdk_threads_leave();
-		
 	}
 	else //no tags go by file name
 	{
 		
 		name = (gchar *)parse_file_name(file);//some kind of error here so have to cast
-		gdk_threads_enter();
 		gtk_list_store_append(self->priv->store, &iter);
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,FALSE,
 		                   COLUMN_SONG,name,
@@ -1244,7 +1224,6 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 						   COLUMN_ID,buffer2,
 		                   COLUMN_URI,valid,
 		                   COLUMN_MOD,mod,-1);
-		gdk_threads_leave();
 		g_free(name);
 		
 	}
