@@ -8,6 +8,7 @@
 #include <glib.h>
 #include <gio/gio.h>
 #include <string.h>
+#include <stdlib.h>
 G_DEFINE_TYPE (MusicQueue, music_queue, GTK_TYPE_VBOX)
 
 struct
@@ -511,7 +512,7 @@ music_queue_read_start_playlist(gchar *location,
 
 	playlist_reader_read_list(self->priv->read,location,&list);
 	str->user_data = list;
-	g_thread_create(add_threaded_dlist,str,TRUE,NULL);  
+	g_thread_new("Add files",add_threaded_dlist,str);
 
 	g_object_unref(self->priv->read);
 
@@ -650,7 +651,6 @@ init_widgets(MusicQueue *self)
 
 	//gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (self->priv->scrolledwindow), GTK_SHADOW_ETCHED_IN);
 
-	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (self->priv->treeview),TRUE);
 
 	//DnD stuff
 	gtk_tree_view_set_reorderable(GTK_TREE_VIEW(self->priv->treeview),TRUE);
@@ -703,7 +703,7 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 				}
 			}
 			str->user_data = slist;
-			g_thread_create(add_threaded_slist,str,TRUE,NULL);
+			g_thread_new("Add files",add_threaded_slist,str);
 		} else {
 			printf("Didn't get any URIs on drag data\n");
 		}
@@ -794,9 +794,9 @@ add_from_dialog(GtkWidget *widget,
 	dialog = gtk_file_chooser_dialog_new ("Open File",
 	                                      NULL,
 	                                      GTK_FILE_CHOOSER_ACTION_OPEN,
-	                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-	                                      GTK_STOCK_OPEN,1,	   
-	                                      GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
+	                                      "Cancel", GTK_RESPONSE_CANCEL,
+	                                      "Open",1,
+	                                      "Add", GTK_RESPONSE_ACCEPT,
 	                                      NULL);
 
 
@@ -923,7 +923,7 @@ file_chooser_cb(GtkWidget *data,
 		gtk_widget_destroy (dialog);
 
 		str->user_data = slist;
-		g_thread_create(add_threaded_slist,str,TRUE,NULL);  
+		g_thread_new("Add files",add_threaded_slist,str);
 
 		g_mutex_unlock(self->priv->mutex); 
 
@@ -946,7 +946,7 @@ file_chooser_cb(GtkWidget *data,
 		{
 			gtk_widget_destroy (dialog);
 			str->user_data = slist;
-			self->priv->thread = g_thread_create(add_threaded_folders,str,TRUE,NULL);  
+			self->priv->thread = g_thread_new("Add files",add_threaded_folders,str);
 
 		}
 		g_mutex_unlock(self->priv->mutex); 
@@ -1521,7 +1521,7 @@ get_context_menu(gpointer user_data)
 	menu = gtk_menu_new();
 
 
-	self->priv->delete = gtk_image_menu_item_new_from_stock(GTK_STOCK_DELETE,NULL);
+	self->priv->delete =  gtk_menu_item_new_with_mnemonic("Remove");
 
 	plugins   = gtk_menu_item_new_with_label("Plugins");
 	repeat =  gtk_check_menu_item_new_with_label("Repeat");
