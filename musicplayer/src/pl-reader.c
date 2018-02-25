@@ -19,10 +19,10 @@ playlist_reader_get_type (void)
 	if (iface_type == 0)
 	{
 		static const GTypeInfo info = {
-			sizeof (PlaylistReaderInterface),
-			playlist_reader_base_init,   /* base_init */
-			NULL,   /* base_finalize */
-		};
+		sizeof (PlaylistReaderInterface),
+		playlist_reader_base_init,   /* base_init */
+		NULL,   /* base_finalize */
+	};
 
 		iface_type = g_type_register_static (G_TYPE_INTERFACE, "PlaylistReader",
 		                                     &info, 0);

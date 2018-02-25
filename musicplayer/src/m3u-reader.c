@@ -29,8 +29,8 @@ G_DEFINE_TYPE_WITH_CODE (M3uReader, m3u_reader, G_TYPE_OBJECT,
 
 static gboolean
 m3u_reader_read_list(PlaylistReader *plist,
-		     gchar *location,
-		     GList **list)
+                     gchar *location,
+                     GList **list)
 {
 	gsize count=0;
 	//GError *er=NULL;    
@@ -65,11 +65,11 @@ m3u_reader_read_list(PlaylistReader *plist,
 
 	}
 	g_file_load_contents    (file,
-				 NULL,      				
-				 &buffer,
-				 &count,
-				 NULL,
-				 &err);
+	                         NULL,      				
+	                         &buffer,
+	                         &count,
+	                         NULL,
+	                         &err);
 	g_object_unref(file);
 
 	if(count >0 && !err)
@@ -99,8 +99,8 @@ m3u_reader_read_list(PlaylistReader *plist,
 					g_snprintf(newuri,strlen(escaped)+strlen(uri)+2,"%s/%s",uri,escaped);
 					file =g_file_new_for_commandline_arg(newuri);
 					info = g_file_query_info(file,G_FILE_ATTRIBUTE_STANDARD_TYPE,0,NULL,&err);
-					
-					
+
+
 					if(!err)
 					{
 						md=ts_get_metadata (newuri,ts);
@@ -122,10 +122,10 @@ m3u_reader_read_list(PlaylistReader *plist,
 					{
 						fprintf (stderr, "Unable to read file: %s\n", err->message);
 						g_error_free (err);
-					    	err = NULL;
+						err = NULL;
 					}
 					g_object_unref(file);
-					
+
 					g_free(escaped);
 					g_free(newuri);   
 				}
@@ -133,7 +133,7 @@ m3u_reader_read_list(PlaylistReader *plist,
 			g_free(uri);
 			g_strfreev(lines); 
 			g_object_unref(ts);
-		    	g_free(buffer); 
+			g_free(buffer); 
 			return TRUE;
 		}
 	}
@@ -179,7 +179,7 @@ m3u_reader_class_init (M3uReaderClass *klass)
 static void
 m3u_reader_init (M3uReader *self)
 {
-   
+
 }
 
 M3uReader*

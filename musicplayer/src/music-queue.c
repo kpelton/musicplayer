@@ -18,7 +18,7 @@ struct
 	guint64  date;
 	gint id;    
 	gint64 length;
-	
+
 }typedef sortnode;
 
 
@@ -174,7 +174,7 @@ handle_key_input(GtkWidget *widget,
                  gpointer user_data);
 static void 
 sort_by_length  (gpointer    callback_data,
-               gpointer user_data);
+                 gpointer user_data);
 static
 gpointer add_threaded_folders(gpointer user_data);
 
@@ -192,7 +192,7 @@ has_selected(MusicQueue *self);
  set_font   (gpointer    callback_data,
              guint       callback_action,
              GtkWidget  *widget);
-			 */
+ */
 static void 
 set_repeat   (GtkCheckMenuItem *widget,
               gpointer user_data);
@@ -519,7 +519,7 @@ music_queue_init (MusicQueue *self)
 	char *outputdir;
 	const char *home;
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (self),
-                                  GTK_ORIENTATION_VERTICAL);
+	                                GTK_ORIENTATION_VERTICAL);
 
 
 	home = g_getenv ("HOME");
@@ -720,7 +720,7 @@ static void play_file (GtkTreeView *treeview,
 	GtkTreeModel *model=NULL;
 	gchar *id=NULL;
 	model = gtk_tree_view_get_model(treeview);
-	       
+
 	if(self->priv->currid > 0)	
 		gtk_list_store_set(self->priv->store,&self->priv->curr,COLUMN_PLAYING,FALSE,-1);
 
@@ -1055,8 +1055,8 @@ traverse_folders(gpointer data,
 gboolean 
 check_type_supported(const gchar *type)
 {
-    printf("%s\n",type);
-    if(strcmp(type,"audio/mpeg") == 0)
+	printf("%s\n",type);
+	if(strcmp(type,"audio/mpeg") == 0)
 		return TRUE;
 	if(strcmp(type,"audio/ogg")  == 0)
 		return TRUE;
@@ -1177,9 +1177,9 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 	g_snprintf(buffer2,10,"%i",self->priv->i);
 
 	mod = g_file_info_get_attribute_uint64(info,
-	                                     G_FILE_ATTRIBUTE_TIME_MODIFIED); 
-	
-	
+	                                       G_FILE_ATTRIBUTE_TIME_MODIFIED); 
+
+
 	if(!track)
 		md=ts_get_metadata(valid,self->priv->ts);
 	else
@@ -1191,29 +1191,29 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 		           "%s - %s",md->artist,md->title);
 		gtk_list_store_append(self->priv->store, &iter);
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_SONG,buffertitle,
-		                   		COLUMN_TITLE,md->title,
-		                   		COLUMN_ARTIST,md->artist,
-				   COLUMN_LENGTH,md->duration,
-								COLUMN_ID,buffer2,
-		                   		COLUMN_URI,valid,
-		                   		COLUMN_MOD,mod,
-		                   		COLUMN_PLAYING,FALSE,
-		                   			                   
+		                   COLUMN_TITLE,md->title,
+		                   COLUMN_ARTIST,md->artist,
+		                   COLUMN_LENGTH,md->duration,
+		                   COLUMN_ID,buffer2,
+		                   COLUMN_URI,valid,
+		                   COLUMN_MOD,mod,
+		                   COLUMN_PLAYING,FALSE,
+
 		                   -1);
 	}
 	else //no tags go by file name
 	{
-		
+
 		name = (gchar *)parse_file_name(file);//some kind of error here so have to cast
 		gtk_list_store_append(self->priv->store, &iter);
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,FALSE,
 		                   COLUMN_SONG,name,
 		                   COLUMN_LENGTH,md->duration,
-						   COLUMN_ID,buffer2,
+		                   COLUMN_ID,buffer2,
 		                   COLUMN_URI,valid,
 		                   COLUMN_MOD,mod,-1);
 		g_free(name);
-		
+
 	}
 	//common to all
 	self->priv->size++;
@@ -1225,7 +1225,7 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 		self->priv->totallength+=md->duration;
 		ts_metadata_free(track);
 	}
-		//end
+	//end
 
 
 	g_signal_emit (self, signals[NEWFILE],0,NULL);
@@ -1248,7 +1248,7 @@ music_queue_new_with_player(GsPlayer *player)
 	self =g_object_new (MUSIC_TYPE_QUEUE, NULL);
 	self->priv->player =player;
 
-	
+
 
 
 	return GTK_WIDGET(self);
@@ -1258,7 +1258,7 @@ music_queue_new_with_player(GsPlayer *player)
 
 void 
 music_queue_prev_file(GsPlayer      *player,
-                     gpointer    user_data)
+                      gpointer    user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GtkTreeModel *model=NULL;
@@ -1271,7 +1271,7 @@ music_queue_prev_file(GsPlayer      *player,
 
 		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
 		path = gtk_tree_model_get_path(model,&self->priv->curr);
-		
+
 		if(gtk_tree_path_prev(path)) // if there is a previous file
 		{	//first select the song to be played
 			gtk_tree_model_get_iter(model,&self->priv->curr,path);
@@ -1285,7 +1285,7 @@ music_queue_prev_file(GsPlayer      *player,
 
 void 
 music_queue_next_file   (GsPlayer      *player,
-                     	gpointer    user_data)
+                         gpointer    user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
 	GtkTreeModel *model=NULL;
@@ -1333,7 +1333,7 @@ music_queue_next_file   (GsPlayer      *player,
 	}
 }
 
-				  
+
 
 static void 
 add_columns(MusicQueue *self)
@@ -1362,8 +1362,8 @@ add_columns(MusicQueue *self)
 
 	gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->treeview), column);
 
-	
-	
+
+
 
 
 }
@@ -1900,7 +1900,7 @@ sort_by_date  (gpointer    callback_data,
 
 static void 
 sort_by_length  (gpointer    callback_data,
-               gpointer user_data)
+                 gpointer user_data)
 {
 	sort_list(callback_data,user_data,SORT_LENGTH);
 }
@@ -1960,7 +1960,7 @@ sort_list(gpointer    callback_data,
 					                    &iter,COLUMN_LENGTH, &(node->length), -1); 
 					break;
 
-				
+
 			}
 
 			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
@@ -2069,9 +2069,9 @@ compare_sort_nodes(sortnode *node1,
 		}
 		else
 		{
-            if ((ret =strcmp(title1,title2)) == 0)
-                ret = -1;
-            
+			if ((ret =strcmp(title1,title2)) == 0)
+				ret = -1;
+
 		}
 
 	}
@@ -2079,11 +2079,11 @@ compare_sort_nodes(sortnode *node1,
 	{
 		if(node1)
 			date1= node1->date;
-			
+
 
 		if(node2)
 			date2 = node2->date;
-		
+
 		//title is empty
 		if(date1 == 0 || date2 == 0)
 		{
@@ -2104,7 +2104,7 @@ compare_sort_nodes(sortnode *node1,
 
 		if(node2 && node2->length)
 			len2 = node2->length;
-		
+
 		//title is empty
 		if(len1 == 0 || len2 == 0)
 		{
@@ -2122,7 +2122,7 @@ compare_sort_nodes(sortnode *node1,
 		return -1;
 	}
 
-	
+
 	return ret;
 }
 
@@ -2141,15 +2141,15 @@ muisc_queue_path_from_id(MusicQueue *self,guint terms)
 		do
 		{
 
-			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), &iter, COLUMN_ID,& cid, -1);
-			id= atoi(cid);
-			if(id == terms)
-				path = gtk_tree_model_get_path (GTK_TREE_MODEL(self->priv->store),&iter); 
+		gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), &iter, COLUMN_ID,& cid, -1);
+		id= atoi(cid);
+		if(id == terms)
+			path = gtk_tree_model_get_path (GTK_TREE_MODEL(self->priv->store),&iter); 
 
 
-		}while(gtk_tree_model_iter_next(
-		                                GTK_TREE_MODEL(self->priv->store),
-		                                &iter) && id != terms);
+	}while(gtk_tree_model_iter_next(
+	                                GTK_TREE_MODEL(self->priv->store),
+	                                &iter) && id != terms);
 	}
 
 	return path;
@@ -2169,18 +2169,18 @@ music_queue_get_list(MusicQueue *self)
 		list = NULL;
 		do
 		{
-			track = ts_metadata_new();
-			gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
-			                    &iter,
-			                    COLUMN_TITLE, &(track->title), 
-			                    COLUMN_ARTIST,&(track->artist),
-			                    COLUMN_URI,   &(track->uri),
-			                    COLUMN_LENGTH,&(track->duration),-1); 
+		track = ts_metadata_new();
+		gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), 
+		                    &iter,
+		                    COLUMN_TITLE, &(track->title), 
+		                    COLUMN_ARTIST,&(track->artist),
+		                    COLUMN_URI,   &(track->uri),
+		                    COLUMN_LENGTH,&(track->duration),-1); 
 
-			list =  g_list_append(list,(gpointer)track); 
-		}while(gtk_tree_model_iter_next(
-		                                GTK_TREE_MODEL(self->priv->store),
-		                                &iter));
+		list =  g_list_append(list,(gpointer)track); 
+	}while(gtk_tree_model_iter_next(
+	                                GTK_TREE_MODEL(self->priv->store),
+	                                &iter));
 	}
 	return list;
 }

@@ -14,17 +14,17 @@
 #include <string.h>
 enum
 {
-	COLUMN_ARTIST,
-	COLUMN_TITLE,
-	COLUMN_SONG,
-	COLUMN_WEIGHT,
-	COLUMN_PLAYING,
-	COLUMN_URI,
-	COLUMN_ID,
-	COLUMN_MOD,
-	N_COLUMNS,
+	 COLUMN_ARTIST,
+	 COLUMN_TITLE,
+	 COLUMN_SONG,
+	 COLUMN_WEIGHT,
+	 COLUMN_PLAYING,
+	 COLUMN_URI,
+	 COLUMN_ID,
+	 COLUMN_MOD,
+	 N_COLUMNS,
 
-};
+ };
 
 
 typedef enum {
@@ -270,11 +270,11 @@ static void queue_button_pressed(GtkButton *button,  gpointer data)
 	gchar *id = NULL;
 	guint uid;
 	GtkTreePath *path=NULL;
-	
+
 	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->treeview));
 	model = gtk_tree_model_filter_get_model(self->filter);                                     
 	list = gtk_tree_selection_get_selected_rows (selection,NULL);
-	
+
 	if(g_list_length(list) >0)
 	{   
 		path = gtk_tree_model_filter_convert_path_to_child_path (self->filter,(GtkTreePath *)list->data);
@@ -287,7 +287,7 @@ static void queue_button_pressed(GtkButton *button,  gpointer data)
 			gtk_tree_path_free(path);
 		}
 	}
-	
+
 	g_list_foreach (list, (GFunc) gtk_tree_path_free, NULL);
 	g_list_free (list);
 
@@ -334,18 +334,18 @@ gboolean	check_visible								(GtkTreeModel *model,
 	if(text){
 
 		gtk_tree_model_get (model, iter, COLUMN_SONG, &song, -1);	
-			if(song){
-				if(strcasestr(song,text))
-				{
-					g_free(song);
-					return TRUE;
-				}
-				else
-				{
-					g_free(song);
-					return FALSE;
-				}
+		if(song){
+			if(strcasestr(song,text))
+			{
+				g_free(song);
+				return TRUE;
 			}
+			else
+			{
+				g_free(song);
+				return FALSE;
+			}
+		}
 	}
 	return TRUE;
 }

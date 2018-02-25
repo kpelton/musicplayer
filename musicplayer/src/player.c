@@ -176,9 +176,9 @@ gboolean gs_getLength(GsPlayer *me)
 	if(isPlaying(me) || isPaused(me)){ 
 		if (gst_element_query_position (me->play, fmt, &pos)
 		    && gst_element_query_duration (me->play, fmt, &len)) {
-				g_print ("Time: %" GST_TIME_FORMAT " / %" GST_TIME_FORMAT "\r",
-				         GST_TIME_ARGS (pos), GST_TIME_ARGS (len));
-			}
+			g_print ("Time: %" GST_TIME_FORMAT " / %" GST_TIME_FORMAT "\r",
+			         GST_TIME_ARGS (pos), GST_TIME_ARGS (len));
+		}
 	}
 	return TRUE;
 
@@ -197,11 +197,11 @@ gdouble gs_getPercentage(GsPlayer *me)
 	if(isPlaying(me) || isPaused(me)){
 		if (gst_element_query_position (me->play, fmt, &pos)
 		    && gst_element_query_duration (me->play, fmt, &len)) {
-				pos2=pos;
-				len2=len;
-				p= pos2/len *100;
-				return p;
-			}
+			pos2=pos;
+			len2=len;
+			p= pos2/len *100;
+			return p;
+		}
 	}
 	return 0;
 
@@ -277,7 +277,7 @@ gboolean gs_CurrTime(GsPlayer *me, gchar *curr)
 			gs_SecondsToReal(pos/GST_SECOND,real);
 			gs_SecondsToReal(len/GST_SECOND,real2);
 			g_snprintf(curr,49,"%s of %s" ,real,real2);
-            return TRUE;
+			return TRUE;
 		}
 	}	    
 	return FALSE;
@@ -355,19 +355,19 @@ my_bus_callback (GstBus     *bus,
 	//g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
 	switch (GST_MESSAGE_TYPE (message)) {
 		case GST_MESSAGE_ERROR: {
-			GError *err=NULL;
-			gchar *debug=NULL;
+		GError *err=NULL;
+		gchar *debug=NULL;
 
 
 
 
-			gst_message_parse_error (message, &err, &debug);
-			g_print ("Error: %s\n", err->message);
-			g_error_free (err);
-			g_free (debug);
+		gst_message_parse_error (message, &err, &debug);
+		g_print ("Error: %s\n", err->message);
+		g_error_free (err);
+		g_free (debug);
 
-			break;
-		}
+		break;
+	}
 
 		case GST_MESSAGE_TAG:
 
@@ -385,8 +385,8 @@ my_bus_callback (GstBus     *bus,
 		{
 
 
-			return TRUE;
-		}
+				return TRUE;
+			}
 
 			player->idle = g_idle_add    ((gpointer)gs_get_tags,
 			                              player);
@@ -491,10 +491,10 @@ gboolean gs_get_tags(GsPlayer *player)
 {
 	if(!player->lock)
 	{ 
-	       player->track->uri = strdup(player->uri);
-	       	g_signal_emit (player, signals[NEWFILE],0,player->track);
+		player->track->uri = strdup(player->uri);
+		g_signal_emit (player, signals[NEWFILE],0,player->track);
 		player->lock = TRUE;
-			
+
 		return FALSE;
 
 

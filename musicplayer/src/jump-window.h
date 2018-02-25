@@ -2,7 +2,7 @@
 /*
  * musicplayer
  * Copyright (C)  2009 <>
- * 
+	 * 
  */
 
 #ifndef _JUMP_WINDOW_H_
@@ -33,7 +33,7 @@ struct _JumpWindow
 {
 	GtkWindow parent_instance;
 	GtkWidget *mainvbox;
-    GtkWidget *mainhbox;
+	GtkWidget *mainhbox;
 	GtkWidget *entry;    
 	GtkWidget *treeview;
 	GtkWidget *openbutton;
@@ -42,7 +42,7 @@ struct _JumpWindow
 	GtkWidget *queuebutton;
 	GtkTreeModelFilter *filter;
 	MusicSideQueue *squeue;
-	
+
 };
 
 GType jump_window_get_type (void) G_GNUC_CONST;

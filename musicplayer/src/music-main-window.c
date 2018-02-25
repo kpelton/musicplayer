@@ -128,7 +128,7 @@ static void
 init_widgets(MusicMainWindow *self)
 {
 	GtkWidget *hbox;
-    char *markup;
+	char *markup;
 
 	//init player window
 	self->player = gs_player_new();
@@ -148,8 +148,8 @@ init_widgets(MusicMainWindow *self)
 	self->songlabel = gtk_label_new("");
 
 	gtk_label_set_line_wrap (GTK_LABEL(self->songlabel),TRUE);
-	
-    gtk_label_set_text(GTK_LABEL(self->songlabel),"No File Loaded");
+
+	gtk_label_set_text(GTK_LABEL(self->songlabel),"No File Loaded");
 	gtk_box_pack_start (GTK_BOX (self->mainvbox), hbox, FALSE, FALSE,0);
 
 	//gtk_box_pack_start (GTK_BOX (hbox), test, FALSE, FALSE,0);
@@ -181,7 +181,7 @@ init_widgets(MusicMainWindow *self)
 	self->mainhbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
 
 	self->pausebutton = gtk_button_new_from_icon_name ("media-playback-pause",GTK_ICON_SIZE_LARGE_TOOLBAR);
-	
+
 	self->playbutton  = gtk_button_new_from_icon_name ("media-playback-start",GTK_ICON_SIZE_LARGE_TOOLBAR);
 	self->prevbutton = gtk_button_new_from_icon_name ("media-skip-backward",GTK_ICON_SIZE_LARGE_TOOLBAR);
 	self->nextbutton  = gtk_button_new_from_icon_name ("media-skip-forward",GTK_ICON_SIZE_LARGE_TOOLBAR);
@@ -260,11 +260,11 @@ init_widgets(MusicMainWindow *self)
 	g_signal_connect (G_OBJECT (self), "key_press_event",
 	                  G_CALLBACK (key_press_cb),
 	                  self);
-	
+
 	g_signal_connect (G_OBJECT (self->nextbutton), "released",
 	                  G_CALLBACK(music_queue_next_file),
 	                  (gpointer)self->queue);
-	
+
 	g_signal_connect (G_OBJECT (self->prevbutton), "released",
 	                  G_CALLBACK(music_queue_prev_file),
 	                  (gpointer)self->queue);
@@ -382,7 +382,7 @@ static void mwindow_new_file (GsPlayer *player,
 	gchar *escaped_artist=NULL;
 	gchar *escaped_title=NULL;
 	GFile *file=NULL;
-    gchar *markup;
+	gchar *markup;
 
 	ts_metadata_free(self->currsong);
 	self->currsong = ts_metadata_new();
@@ -393,10 +393,10 @@ static void mwindow_new_file (GsPlayer *player,
 		gtk_window_set_title(GTK_WINDOW(self),title);
 		escaped_artist = g_markup_escape_text(p_track->artist,-1);
 		escaped_title  = g_markup_escape_text(p_track->title,-1);
-        markup = g_markup_printf_escaped ("<span style=\"oblique\" size=\"large\" >\n%s\n</span>", title);
-        gtk_label_set_markup (GTK_LABEL (self->songlabel), markup);
-        g_free (markup);
-		
+		markup = g_markup_printf_escaped ("<span style=\"oblique\" size=\"large\" >\n%s\n</span>", title);
+		gtk_label_set_markup (GTK_LABEL (self->songlabel), markup);
+		g_free (markup);
+
 		g_free(escaped_title);
 		g_free(escaped_artist);
 		if(p_track->album)
@@ -417,10 +417,10 @@ static void mwindow_new_file (GsPlayer *player,
 		escaped   = parse_file_name(file);
 		if(escaped)
 		{
-            gtk_label_set_text(GTK_LABEL(self->songlabel),escaped);
-            markup = g_markup_printf_escaped ("<span style=\"oblique\" size=\"large\" >\n%s\n</span>", escaped);
-            gtk_label_set_markup (GTK_LABEL (self->songlabel), markup);
-            g_free (markup);
+			gtk_label_set_text(GTK_LABEL(self->songlabel),escaped);
+			markup = g_markup_printf_escaped ("<span style=\"oblique\" size=\"large\" >\n%s\n</span>", escaped);
+			gtk_label_set_markup (GTK_LABEL (self->songlabel), markup);
+			g_free (markup);
 			gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
 			gtk_window_set_title(GTK_WINDOW(self),escaped);
 			g_object_unref(file);

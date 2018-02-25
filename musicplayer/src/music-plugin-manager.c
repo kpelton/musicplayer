@@ -148,7 +148,7 @@ music_plugin_init_widgets(MusicPluginManager *self)
 	                   "clicked",
 	                   G_CALLBACK (configure_button_cb),
 					   pm);
-					   */
+	 */
 	gtk_widget_show_all(pm);
 
 }
@@ -226,17 +226,17 @@ music_plugin_manager_construct_tree (MusicPluginManager *self)
 	gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (self->priv->tree), FALSE);
 
 	/* first column */
-        
+
 	cell = gtk_cell_renderer_toggle_new ();
 	g_object_set (cell, "xpad", 6, NULL);
 	g_signal_connect (cell,
 	                  "toggled",
 	                  G_CALLBACK (active_toggled_cb),
 	                  self);
-        column = gtk_tree_view_column_new_with_attributes ("Title",
+	column = gtk_tree_view_column_new_with_attributes ("Title",
 	                                                   cell,
 	                                                   "active",
-                                                           ACTIVE_COLUMN,                                      
+	                                                   ACTIVE_COLUMN,                                      
 	                                                   NULL);
 
 	gtk_tree_view_column_set_spacing (column, 6);
@@ -266,7 +266,7 @@ music_plugin_manager_construct_tree (MusicPluginManager *self)
 	                   "cursor_changed",
 	                   G_CALLBACK (cursor_changed_cb),
 					   pm);
-					   */
+	 */
 
 	g_signal_connect (self->priv->tree,
 	                  "cursor-changed",
@@ -277,11 +277,11 @@ music_plugin_manager_construct_tree (MusicPluginManager *self)
 	                   "button-press-event",
 	                   G_CALLBACK (button_press_event_cb),
 					   pm);
-					   g_signal_connect (pm->priv->tree,
-					                     "popup-menu",
-					                     G_CALLBACK (popup_menu_cb),
-										 pm);
-										 */
+	 g_signal_connect (pm->priv->tree,
+	                   "popup-menu",
+	                   G_CALLBACK (popup_menu_cb),
+					   pm);
+	 */
 	gtk_widget_show (self->priv->tree);
 }
 static void

@@ -51,7 +51,7 @@ typedef struct {
 	gint dwidth;
 	gint signum;
 	gboolean expanded;
-        metadata *currsong;
+	metadata *currsong;
 
 } MusicMainWindow;
 
