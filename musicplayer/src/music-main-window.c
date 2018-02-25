@@ -147,7 +147,7 @@ init_widgets(MusicMainWindow *self)
 	//song label
 	self->songlabel = gtk_label_new("");
 
-   
+	gtk_label_set_line_wrap (GTK_LABEL(self->songlabel),TRUE);
 	
     gtk_label_set_text(GTK_LABEL(self->songlabel),"No File Loaded");
 	gtk_box_pack_start (GTK_BOX (self->mainvbox), hbox, FALSE, FALSE,0);
