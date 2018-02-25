@@ -9,7 +9,7 @@
 #include <gio/gio.h>
 #include <string.h>
 #include <stdlib.h>
-G_DEFINE_TYPE (MusicQueue, music_queue, GTK_TYPE_VBOX)
+G_DEFINE_TYPE (MusicQueue, music_queue, GTK_TYPE_BOX)
 
 struct
 {
@@ -518,6 +518,8 @@ music_queue_init (MusicQueue *self)
 	gboolean repeat=FALSE;
 	char *outputdir;
 	const char *home;
+	gtk_orientable_set_orientation (GTK_ORIENTABLE (self),
+                                  GTK_ORIENTATION_VERTICAL);
 
 
 	home = g_getenv ("HOME");
@@ -1111,21 +1113,7 @@ choose_file_action(gchar * uri,
 	GList *list;
 	MusicQueue *self = (MusicQueue *) user_data;
 
-	
-	if(strcmp(type,"audio/mpeg") == 0)
-	{
-		add_file(uri,user_data,NULL);
-	}
-	else if(strcmp(type,"audio/ogg")  == 0)
-	{
-		add_file(uri,user_data,NULL);
-	}
-	else if(strcmp(type,"audio/flac") == 0)
-	{
-		add_file(uri,user_data,NULL);
-	}
-	else if(strcmp(type,"audio/wma")  == 0)
-	{
+	if (check_type_supported(type) == TRUE) {
 		add_file(uri,user_data,NULL);
 	}
 	else if(strcmp(type,"application/xspf+xml")  == 0)
