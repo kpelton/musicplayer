@@ -172,7 +172,7 @@ init_widgets(MusicMainWindow *self)
 
 	self->expander = gtk_expander_new("Play List");
 
-	gtk_container_add (GTK_CONTAINER (self->expander), self->queue);
+	//gtk_container_add (GTK_CONTAINER (self->expander), self->queue);
 
 
 
@@ -193,7 +193,7 @@ init_widgets(MusicMainWindow *self)
 	//packing of hbox expander in vbox
 
 	gtk_box_pack_start (GTK_BOX (self->mainvbox), self->mainhbox, FALSE, FALSE,0);
-	gtk_box_pack_start (GTK_BOX (self->mainvbox), self->expander, TRUE, TRUE,0);
+	gtk_box_pack_start (GTK_BOX (self->mainvbox), self->queue, TRUE, TRUE,0);
 
 	//pack into hbox
 	gtk_box_pack_start (GTK_BOX (self->mainhbox), self->playbutton, FALSE, FALSE,2);
