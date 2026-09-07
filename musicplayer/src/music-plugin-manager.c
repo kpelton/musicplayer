@@ -50,6 +50,9 @@ music_plugin_manager_set_active (MusicPluginManager *pm,
 static void
 about_button_cb(GtkButton *button,
                 gpointer userdata);
+static void
+configure_button_cb(GtkButton *button,
+                     gpointer userdata);
 
 static void
 music_plugin_manager_finalize (GObject *object)
@@ -143,14 +146,46 @@ music_plugin_init_widgets(MusicPluginManager *self)
 	                  G_CALLBACK (about_button_cb),
 	                  self);
 
-	/*
-	 g_signal_connect (pm->priv->configure_button,
-	                   "clicked",
-	                   G_CALLBACK (configure_button_cb),
-					   pm);
-	 */
+	g_signal_connect (self->priv->config,
+	                  "clicked",
+	                  G_CALLBACK (configure_button_cb),
+	                  self);
 	gtk_widget_show_all(pm);
 
+}
+
+static void
+configure_button_cb(GtkButton *button,
+                    gpointer userdata)
+{
+	MusicPluginManager *self = MUSIC_PLUGIN_MANAGER(userdata);
+	GtkTreeSelection *selection;
+	GtkTreeModel *model;
+	GtkTreeIter iter;
+	MusicPluginInfo *info;
+	GtkWidget *dialog;
+
+	(void) button;
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->tree));
+	if (!gtk_tree_selection_get_selected(selection, &model, &iter))
+		return;
+
+	gtk_tree_model_get(model, &iter, INFO_COLUMN, &info, -1);
+	if (info == NULL || info->plugin == NULL)
+		return;
+
+	dialog = music_plugin_get_config_window(info->plugin);
+	if (dialog == NULL)
+		return;
+	if (GTK_IS_WINDOW(dialog))
+		gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(self));
+	if (GTK_IS_DIALOG(dialog))
+	{
+		gtk_dialog_run(GTK_DIALOG(dialog));
+		gtk_widget_destroy(dialog);
+	}
+	else
+		gtk_widget_show(dialog);
 }
 static void
 about_button_cb(GtkButton *button,
@@ -317,7 +352,8 @@ row_activated_cb(GtkTreeView       *treeview,
 			g_return_if_fail (info != NULL);
 
 			gtk_widget_set_sensitive (GTK_WIDGET (self->priv->config),
-			                          info->details->is_configurable);
+			                          info->details->is_configurable &&
+			                          info->active && info->plugin != NULL);
 
 			g_list_foreach (list, (GFunc)gtk_tree_path_free, NULL);
 			g_list_free (list);
@@ -433,7 +469,8 @@ music_plugin_manager_populate_lists (MusicPluginManager *pm)
 		                    INFO_COLUMN, &info, -1);
 
 		gtk_widget_set_sensitive (GTK_WIDGET (pm->priv->config),
-		                          info->details->is_configurable);
+		                          info->details->is_configurable &&
+		                          info->active && info->plugin != NULL);
 	}
 	if(plugins)
 		g_list_free(plugins);
@@ -472,6 +509,9 @@ music_plugin_manager_set_active (MusicPluginManager *pm,
 
 	}
 	gtk_list_store_set (GTK_LIST_STORE (model), iter, ACTIVE_COLUMN,music_plugins_engine_plugin_is_active (info), -1);
+	gtk_widget_set_sensitive(GTK_WIDGET (pm->priv->config),
+	                         info->details->is_configurable &&
+	                         info->active && info->plugin != NULL);
 	return res;
 }
 
@@ -482,4 +522,3 @@ music_plugin_manager_new (void)
 
 	return self;
 }
-

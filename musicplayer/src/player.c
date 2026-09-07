@@ -7,7 +7,7 @@ static void gs_SecondsToReal(float fseconds, char *str);
 static gint64 gs_PercentToTime(GsPlayer *me, gdouble percent);
 static gboolean my_bus_callback (GstBus     *bus, GstMessage *message,gpointer    data);
 
-static int signals[5];
+static int signals[6];
 static void gst_new_tags                (const GstTagList *list,
                                          const gchar *tag,
                                          gpointer user_data);
@@ -22,7 +22,8 @@ typedef enum {
 	TAGS,
 	ERROR,
 	EOS,
-	NEWFILE
+	NEWFILE,
+	BUS_MESSAGE
 }SIGNALS;
 
 G_DEFINE_TYPE (GsPlayer, gs_player, G_TYPE_OBJECT)
@@ -34,7 +35,8 @@ gs_player_dispose (GObject *object)
 	{
 		gst_element_set_state (player->play, GST_STATE_NULL);
 		g_object_unref(player->play);
-		g_object_unref(player->gconf);
+		if (player->gconf)
+			g_object_unref(player->gconf);
 		player->play=NULL;
 
 		G_OBJECT_CLASS (gs_player_parent_class)->dispose (object);
@@ -87,6 +89,14 @@ gs_player_class_init (GsPlayerClass *klass)
 	                                1,
 	                                G_TYPE_POINTER);
 
+	signals[BUS_MESSAGE] = g_signal_new ("bus-message",
+	                                     G_TYPE_FROM_CLASS (klass),
+	                                     G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+	                                     0 /* closure */, NULL /* accumulator */,
+	                                     NULL /* accumulator data */,
+	                                     g_cclosure_marshal_VOID__POINTER,
+	                                     G_TYPE_NONE, 1, G_TYPE_POINTER);
+
 
 	object_class->dispose = gs_player_dispose;
 	object_class->finalize = gs_player_finalize;
@@ -97,10 +107,20 @@ gs_player_class_init (GsPlayerClass *klass)
 static void
 gs_player_init (GsPlayer *me)
 {
-	me->play = gst_element_factory_make ("playbin", "playbin");
-	me->gconf = gst_element_factory_make("gconfaudiosink","audio-sink");
+	GstElementFactory *audio_factory;
 
-	g_object_set(G_OBJECT(me->play),"audio-sink",me->gconf,NULL);
+	me->play = gst_element_factory_make ("playbin", "playbin");
+	audio_factory = gst_element_factory_find("gconfaudiosink");
+	if (audio_factory)
+	{
+		me->gconf = gst_element_factory_create(audio_factory, "audio-sink");
+		gst_object_unref(audio_factory);
+	}
+	if (me->gconf == NULL)
+		me->gconf = gst_element_factory_make("autoaudiosink", "audio-sink");
+
+	if (me->gconf)
+		g_object_set(G_OBJECT(me->play),"audio-sink",me->gconf,NULL);
 
 	gst_element_set_state (me->play, GST_STATE_READY);
 	me->isPlaying = FALSE;
@@ -138,7 +158,6 @@ void gs_playFile(GsPlayer *me , const char *location)
 
 	me->uri = g_strdup(location);
 	me->lock = FALSE;
-	gst_bus_add_watch (me->bus, my_bus_callback, me);
 
 }
 
@@ -212,7 +231,9 @@ gboolean isPlaying(GsPlayer *me)
 {
 	GstState curr;
 
-	gst_element_get_state(me->play,&curr,NULL,GST_SECOND);
+	/* This is called by the GTK seek-bar timer; never wait on a pipeline state
+	 * transition from the UI thread. */
+	gst_element_get_state(me->play,&curr,NULL,0);
 
 	if (curr == GST_STATE_PLAYING)
 		return TRUE;
@@ -224,7 +245,8 @@ gboolean isPaused(GsPlayer *me)
 {
 	GstState curr;
 
-	gst_element_get_state(me->play,&curr,NULL,GST_SECOND);
+	/* State transitions can wait on sinks, so this UI query must be immediate. */
+	gst_element_get_state(me->play,&curr,NULL,0);
 
 	if (curr == GST_STATE_PAUSED)
 		return TRUE;
@@ -350,6 +372,10 @@ my_bus_callback (GstBus     *bus,
 	GsPlayer *player = (GsPlayer *)data;
 	GstTagList *list;
 	gint percent;
+
+	/* A bus only supports one GLib watch. Forward messages through the player
+	 * so plugins can observe them without installing competing bus watches. */
+	g_signal_emit (player, signals[BUS_MESSAGE], 0, message);
 
 
 	//g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
@@ -480,7 +506,10 @@ void gst_new_tags                (const GstTagList *list,
 		}
 	}
 	else if(strcmp(tag,GST_TAG_DURATION)== 0){ 
-		gst_tag_list_get_int64(list,GST_TAG_DURATION,&(track->duration)); 
+		guint64 duration;
+
+		if (gst_tag_list_get_uint64(list, GST_TAG_DURATION, &duration))
+			track->duration = (gint64) duration;
 	}else{
 
 	}	 

@@ -58,7 +58,7 @@ typedef struct {
 
 typedef struct {
 	GObjectClass parent_class;
-	guint signals[5];
+	guint signals[6];
 } GsPlayerClass;
 
 
