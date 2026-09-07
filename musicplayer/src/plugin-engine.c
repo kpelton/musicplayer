@@ -136,6 +136,45 @@ music_plugins_engine_plugin_is_active(MusicPluginInfo *info)
 {
 	return info->active;
 }
+
+static MusicPluginInfo *
+music_plugins_engine_find_stats(void)
+{
+	GList *plugins;
+	GList *node;
+
+	plugins = music_plugins_get_list();
+	for (node = plugins; node != NULL; node = node->next)
+	{
+		MusicPluginInfo *info = node->data;
+
+		if (info->details && g_strcmp0(info->details->name, "Stats") == 0)
+			return info;
+	}
+
+	return NULL;
+}
+
+gboolean
+music_plugins_engine_stats_is_active(void)
+{
+	MusicPluginInfo *info = music_plugins_engine_find_stats();
+
+	return info != NULL && info->active && info->plugin != NULL;
+}
+
+gboolean
+music_plugins_engine_show_stats(void)
+{
+	MusicPluginInfo *info = music_plugins_engine_find_stats();
+
+	if (!info || !info->active || !info->plugin)
+		return FALSE;
+
+	g_signal_emit_by_name(info->plugin, "show-report");
+	return TRUE;
+}
+
 gboolean
 music_plugins_engine_activate_plugin(MusicPluginInfo *info)
 {

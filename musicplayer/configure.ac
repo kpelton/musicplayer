@@ -54,6 +54,9 @@ gst010_inspect="$gst010_toolsdir/gst-inspect-0.10"
 
 
 PKG_CHECK_MODULES([GTK],[gtk+-3.0 gthread-2.0])
+PKG_CHECK_MODULES([SQLITE3],[sqlite3])
+AC_SUBST(SQLITE3_CFLAGS)
+AC_SUBST(SQLITE3_LIBS)
 
 dnl run in source tree
 AC_ARG_ENABLE(run-in-source-tree,
@@ -76,5 +79,4 @@ src/plugins/stats/Makefile
 src/plugins/visual/Makefile
 src/plugins/album/Makefile
 ])
-
 
