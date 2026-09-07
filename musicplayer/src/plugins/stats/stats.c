@@ -481,13 +481,15 @@ stats_eof(GsPlayer *player,
 static void
 add_stats_column(GtkTreeView *view,
                  const gchar *title,
-                 gint column)
+                 gint column,
+                 gint sort_column)
 {
 	GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
 	GtkTreeViewColumn *view_column = gtk_tree_view_column_new_with_attributes(
 		title, renderer, "text", column, NULL);
 
 	gtk_tree_view_column_set_resizable(view_column, TRUE);
+	gtk_tree_view_column_set_sort_column_id(view_column, sort_column);
 	gtk_tree_view_append_column(view, view_column);
 }
 
@@ -548,9 +550,11 @@ show_stats(StatsPlugin *self)
 	gtk_box_pack_start(GTK_BOX(content), summary, FALSE, FALSE, 8);
 	g_free(summary_text);
 
-	model = gtk_list_store_new(6, G_TYPE_STRING, G_TYPE_STRING,
+	model = gtk_list_store_new(10, G_TYPE_STRING, G_TYPE_STRING,
 	                           G_TYPE_STRING, G_TYPE_STRING,
-	                           G_TYPE_STRING, G_TYPE_STRING);
+	                           G_TYPE_STRING, G_TYPE_STRING,
+	                           G_TYPE_INT64, G_TYPE_INT64,
+	                           G_TYPE_INT64, G_TYPE_INT64);
 	if (sqlite3_prepare_v2(self->db,
 	                       "SELECT t.title,t.uri,t.artist,s.play_count,"
 	                       "s.completion_count,s.skip_count,s.listened_ms "
@@ -579,6 +583,10 @@ show_stats(StatsPlugin *self)
 			                   3, completed_text,
 			                   4, skips_text,
 			                   5, time_text,
+			                   6, sqlite3_column_int64(statement, 3),
+			                   7, sqlite3_column_int64(statement, 4),
+			                   8, sqlite3_column_int64(statement, 5),
+			                   9, sqlite3_column_int64(statement, 6),
 			                   -1);
 			g_free(plays_text);
 			g_free(completed_text);
@@ -593,12 +601,12 @@ show_stats(StatsPlugin *self)
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow),
 	                               GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
-	add_stats_column(GTK_TREE_VIEW(tree), "Song", 0);
-	add_stats_column(GTK_TREE_VIEW(tree), "Artist", 1);
-	add_stats_column(GTK_TREE_VIEW(tree), "Plays", 2);
-	add_stats_column(GTK_TREE_VIEW(tree), "Completed", 3);
-	add_stats_column(GTK_TREE_VIEW(tree), "Skipped", 4);
-	add_stats_column(GTK_TREE_VIEW(tree), "Time", 5);
+	add_stats_column(GTK_TREE_VIEW(tree), "Song", 0, 0);
+	add_stats_column(GTK_TREE_VIEW(tree), "Artist", 1, 1);
+	add_stats_column(GTK_TREE_VIEW(tree), "Plays", 2, 6);
+	add_stats_column(GTK_TREE_VIEW(tree), "Completed", 3, 7);
+	add_stats_column(GTK_TREE_VIEW(tree), "Skipped", 4, 8);
+	add_stats_column(GTK_TREE_VIEW(tree), "Time", 5, 9);
 	gtk_container_add(GTK_CONTAINER(scrolledwindow), tree);
 	gtk_box_pack_start(GTK_BOX(content), scrolledwindow, TRUE, TRUE, 8);
 
