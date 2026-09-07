@@ -54,6 +54,7 @@ enum
 	COLUMN_ID,
 	COLUMN_MOD,
 	COLUMN_LENGTH,
+	COLUMN_QUEUED,
 	N_COLUMNS,
 
 };
@@ -187,6 +188,9 @@ muisc_queue_path_from_id(MusicQueue *self,guint terms);
 gboolean 
 has_selected(MusicQueue *self);
 
+static gboolean
+has_selected_queued(MusicQueue *self);
+
 /*
  static void 
  set_font   (gpointer    callback_data,
@@ -250,6 +254,33 @@ add_threaded_slist(gpointer user_data);
 static void 
 add_to_side_queue(gpointer    callback_data,
                   gpointer user_data);
+
+static void
+remove_from_side_queue(gpointer callback_data,
+                        gpointer user_data);
+
+static void
+get_song_info(gpointer callback_data,
+              gpointer user_data);
+
+static void
+append_info_field(GString *info,
+                  const gchar *label,
+                  const gchar *value);
+
+static void
+side_queue_changed(MusicSideQueue *sidequeue,
+                    gpointer user_data);
+
+static gchar *
+format_duration(gint64 duration);
+
+static void
+duration_cell_data_func(GtkTreeViewColumn *column,
+                        GtkCellRenderer *renderer,
+                        GtkTreeModel *model,
+                        GtkTreeIter *iter,
+                        gpointer user_data);
 //end priv functions
 
 //private varibles
@@ -259,6 +290,9 @@ struct _MusicQueuePrivate{
 	GtkWidget* scrolledwindow;
 	GtkWidget *menu;
 	GtkWidget *delete;
+	GtkWidget *remove_from_queue;
+	GtkWidget *info;
+	GtkTreeViewColumn *queue_column;
 	GtkListStore *store;
 	GtkTreeModel *musicstore;
 	GtkTreeIter  curr;
@@ -549,6 +583,8 @@ music_queue_init (MusicQueue *self)
 	self->priv->ts = NULL;
 	self->priv->read = PLAYLIST_READER(xspf_reader_new());
 	self->priv->sidequeue = music_side_queue_new ();
+	g_signal_connect (self->priv->sidequeue, "queue-changed",
+	                  G_CALLBACK (side_queue_changed), self);
 	self->priv->currid=0;
 	self->priv->totallength=0;
 	self->priv->ts = tag_scanner_new ();
@@ -572,7 +608,7 @@ init_widgets(MusicQueue *self)
 
 	gtk_widget_show (self->priv->scrolledwindow);
 
-	self->priv->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_INT,G_TYPE_BOOLEAN,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_UINT64,G_TYPE_INT64,-1);
+	self->priv->store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_INT,G_TYPE_BOOLEAN,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_UINT64,G_TYPE_INT64,G_TYPE_STRING,-1);
 
 	//add model to widget we want the jump window to have the filter store and the queue
 	// to have the regular list store
@@ -1311,6 +1347,8 @@ music_queue_next_file   (GsPlayer      *player,
 			path  = muisc_queue_path_from_id(self,id);
 			gtk_tree_model_get_iter(model,&self->priv->curr,path);
 			gtk_tree_selection_select_iter(self->priv->currselection,&self->priv->curr);
+			gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->treeview),
+			                             path, NULL, TRUE, 0.5, 0.5);
 			play_file(GTK_TREE_VIEW(self->priv->treeview),path,NULL,user_data);
 
 			gtk_tree_path_free(path);
@@ -1343,6 +1381,22 @@ add_columns(MusicQueue *self)
 	gchar *font = NULL;
 	g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
 
+	/* A compact position marker makes side-queued songs visible without
+	 * changing the title text itself. The tooltip explains it since headers
+	 * are hidden in the compact playlist view. */
+	renderer = gtk_cell_renderer_text_new ();
+	g_object_set(G_OBJECT(renderer), "font", font, "xalign", 0.5, NULL);
+	column = gtk_tree_view_column_new_with_attributes ("Queue",
+	                                                   renderer,
+	                                                   "text",
+	                                                   COLUMN_QUEUED,
+	                                                   NULL);
+	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
+	gtk_tree_view_column_set_fixed_width (column, 24);
+	self->priv->queue_column = column;
+	gtk_tree_view_column_set_visible (column, FALSE);
+	gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->treeview), column);
+
 
 	renderer = gtk_cell_renderer_text_new ();
 	g_object_set(G_OBJECT(renderer),"ellipsize",PANGO_ELLIPSIZE_END,NULL);
@@ -1361,11 +1415,101 @@ add_columns(MusicQueue *self)
 	                                                   NULL);
 
 	gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->treeview), column);
+	gtk_tree_view_column_set_expand (column, TRUE);
 
+	/* Keep the duration numeric in the model for sorting and playlist I/O,
+	 * but present it in the familiar player-list format. */
+	renderer = gtk_cell_renderer_text_new ();
+	g_object_set(G_OBJECT(renderer), "font", font, "xalign", 1.0, NULL);
+	column = gtk_tree_view_column_new ();
+	gtk_tree_view_column_set_title (column, "Length");
+	gtk_tree_view_column_pack_start (column, renderer, TRUE);
+	gtk_tree_view_column_set_cell_data_func (column, renderer,
+	                                         duration_cell_data_func,
+	                                         NULL, NULL);
+	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
+	gtk_tree_view_column_set_fixed_width (column, 58);
+	gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->treeview), column);
 
+	gtk_widget_set_tooltip_text (self->priv->treeview,
+	                             "Numbers show the order of queued songs");
+	g_free(font);
 
+}
 
+static gchar *
+format_duration(gint64 duration)
+{
+	guint64 total_seconds;
+	guint64 hours;
+	guint minutes;
+	guint seconds;
 
+	if (duration <= 0 || duration == GST_CLOCK_TIME_NONE)
+		return g_strdup("");
+
+	total_seconds = (guint64) duration / GST_SECOND;
+	hours = total_seconds / 3600;
+	minutes = (total_seconds % 3600) / 60;
+	seconds = total_seconds % 60;
+
+	if (hours > 0)
+		return g_strdup_printf("%" G_GUINT64_FORMAT ":%02u:%02u",
+		                       hours, minutes, seconds);
+
+	return g_strdup_printf("%u:%02u", minutes, seconds);
+}
+
+static void
+duration_cell_data_func(GtkTreeViewColumn *column,
+                        GtkCellRenderer *renderer,
+                        GtkTreeModel *model,
+                        GtkTreeIter *iter,
+                        gpointer user_data)
+{
+	gint64 duration;
+	gchar *formatted;
+
+	gtk_tree_model_get (model, iter, COLUMN_LENGTH, &duration, -1);
+	formatted = format_duration(duration);
+	g_object_set (renderer, "text", formatted, NULL);
+	g_free (formatted);
+}
+
+static void
+side_queue_changed(MusicSideQueue *sidequeue,
+                    gpointer user_data)
+{
+	MusicQueue *self = MUSIC_QUEUE(user_data);
+	GtkTreeIter iter;
+	gboolean has_queued = FALSE;
+
+	if (!gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store), &iter))
+	{
+		gtk_tree_view_column_set_visible(self->priv->queue_column, FALSE);
+		return;
+	}
+
+	do
+	{
+		gchar *id = NULL;
+		gchar *marker;
+		guint position;
+
+		gtk_tree_model_get (GTK_TREE_MODEL(self->priv->store), &iter,
+		                    COLUMN_ID, &id, -1);
+		position = id ? music_side_queue_get_position(sidequeue, (guint) atoi(id)) : 0;
+		marker = position > 0 ? g_strdup_printf("%u", position) : g_strdup("");
+		if (position > 0)
+			has_queued = TRUE;
+		gtk_list_store_set (self->priv->store, &iter,
+		                    COLUMN_QUEUED, marker, -1);
+		g_free(marker);
+		g_free(id);
+	}
+	while (gtk_tree_model_iter_next(GTK_TREE_MODEL(self->priv->store), &iter));
+
+	gtk_tree_view_column_set_visible(self->priv->queue_column, has_queued);
 }
 static void  
 row_changed  (GtkTreeModel *tree_model,
@@ -1402,18 +1546,32 @@ gboolean grab_focus_cb (GtkWidget *widget,
                         gpointer user_data)
 {
 	MusicQueue *self = (MusicQueue *) user_data;
-	GtkTreeModel *model;					      
-
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
+	GtkTreeSelection *selection;
+	GtkTreePath *path = NULL;
 
 	gtk_tree_view_set_reorderable(GTK_TREE_VIEW(self->priv->treeview),TRUE);
 
 	if((event->button ==3) && (event->type == GDK_BUTTON_PRESS))
 	{
-		if(has_selected(self))
-			gtk_widget_set_sensitive(self->priv->delete,TRUE);
-		else
-			gtk_widget_set_sensitive(self->priv->delete,FALSE);
+		selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->treeview));
+		if (gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(self->priv->treeview),
+		                                  (gint) event->x, (gint) event->y,
+		                                  &path, NULL, NULL, NULL))
+		{
+			/* Keep an existing multi-selection when the user right-clicks one
+			 * of its rows; otherwise make the row under the pointer the target. */
+			if (!gtk_tree_selection_path_is_selected(selection, path))
+			{
+				gtk_tree_selection_unselect_all(selection);
+				gtk_tree_selection_select_path(selection, path);
+			}
+			gtk_tree_path_free(path);
+		}
+
+		gtk_widget_set_sensitive(self->priv->delete, has_selected(self));
+		gtk_widget_set_sensitive(self->priv->info, has_selected(self));
+		gtk_widget_set_sensitive(self->priv->remove_from_queue,
+		                         has_selected_queued(self));
 
 		gtk_menu_popup(GTK_MENU(self->priv->menu),NULL,NULL,
 		               NULL,NULL,event->button,event->time);
@@ -1480,7 +1638,7 @@ static GtkWidget *
 get_context_menu(gpointer user_data)
 {
 
-	GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2, *queue, *seperator3,*sort3;
+	GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2, *queue, *remove_from_queue, *info, *seperator3,*sort3;
 	gboolean test;
 
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1501,6 +1659,10 @@ get_context_menu(gpointer user_data)
 	sort2   = gtk_menu_item_new_with_label("Sort By Date");
 	sort3   = gtk_menu_item_new_with_label("Sort By Length");
 	queue = gtk_menu_item_new_with_label("Add To Side Queue");
+	remove_from_queue = gtk_menu_item_new_with_label("Remove From Side Queue");
+	info = gtk_menu_item_new_with_label("Get Info");
+	self->priv->remove_from_queue = remove_from_queue;
+	self->priv->info = info;
 
 
 
@@ -1538,10 +1700,18 @@ get_context_menu(gpointer user_data)
 	g_signal_connect (G_OBJECT (queue), "activate",
 	                  G_CALLBACK (add_to_side_queue),
 	                  user_data);
+	g_signal_connect (G_OBJECT (remove_from_queue), "activate",
+	                  G_CALLBACK (remove_from_side_queue),
+	                  user_data);
+	g_signal_connect (G_OBJECT (info), "activate",
+	                  G_CALLBACK (get_song_info),
+	                  user_data);
 
 
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),self->priv->delete);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),queue);	
+	gtk_menu_shell_append (GTK_MENU_SHELL(menu),remove_from_queue);
+	gtk_menu_shell_append (GTK_MENU_SHELL(menu),info);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator3 );
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),repeat);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),plugins);
@@ -1553,6 +1723,10 @@ get_context_menu(gpointer user_data)
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort2);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort3);
+
+	gtk_widget_set_sensitive (self->priv->delete, FALSE);
+	gtk_widget_set_sensitive (self->priv->remove_from_queue, FALSE);
+	gtk_widget_set_sensitive (self->priv->info, FALSE);
 
 
 	return menu;
@@ -1618,6 +1792,193 @@ add_to_side_queue(gpointer    callback_data,
 
 
 
+}
+
+static void
+remove_from_side_queue(gpointer callback_data,
+                        gpointer user_data)
+{
+	MusicQueue *self = (MusicQueue *) user_data;
+	GtkTreeModel *model;
+	GList *list;
+	GList *node;
+	GtkTreeIter iter;
+	gchar *id;
+
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
+	list = gtk_tree_selection_get_selected_rows(self->priv->currselection,
+	                                             &model);
+
+	for (node = list; node != NULL; node = node->next)
+	{
+		id = NULL;
+		if (gtk_tree_model_get_iter(model, &iter, node->data))
+		{
+			gtk_tree_model_get(model, &iter, COLUMN_ID, &id, -1);
+			if (id)
+				music_side_queue_remove(self->priv->sidequeue,
+				                        (guint) atoi(id));
+			g_free(id);
+		}
+	}
+
+	g_list_foreach(list, (GFunc) gtk_tree_path_free, NULL);
+	g_list_free(list);
+}
+
+static void
+append_info_field(GString *info,
+                  const gchar *label,
+                  const gchar *value)
+{
+	if (value && value[0] != '\0')
+		g_string_append_printf(info, "%s: %s\n", label, value);
+}
+
+static void
+get_song_info(gpointer callback_data,
+              gpointer user_data)
+{
+	MusicQueue *self = (MusicQueue *) user_data;
+	GtkTreeModel *model;
+	GtkTreeSelection *selection;
+	GList *list;
+	GtkTreeIter iter;
+	gchar *song = NULL;
+	gchar *title = NULL;
+	gchar *artist = NULL;
+	gchar *uri = NULL;
+	gchar *length_text = NULL;
+	gchar *type_text = NULL;
+	gchar *type_description = NULL;
+	gchar *basename = NULL;
+	gchar *path = NULL;
+	gint64 length = 0;
+	metadata *metadata = NULL;
+	GFile *file = NULL;
+	GFileInfo *file_info = NULL;
+	GError *error = NULL;
+	const gchar *content_type = NULL;
+	GString *details;
+	GtkWidget *toplevel;
+	GtkWidget *dialog;
+	GtkWidget *content;
+	GtkWidget *scrolledwindow;
+	GtkWidget *textview;
+	GtkTextBuffer *buffer;
+	GtkWindow *parent = NULL;
+
+	selection = self->priv->currselection;
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
+	list = gtk_tree_selection_get_selected_rows(selection, &model);
+	if (list == NULL)
+		return;
+
+	if (gtk_tree_model_get_iter(model, &iter, list->data))
+	{
+		gtk_tree_model_get(model, &iter,
+		                   COLUMN_SONG, &song,
+		                   COLUMN_TITLE, &title,
+		                   COLUMN_ARTIST, &artist,
+		                   COLUMN_URI, &uri,
+		                   COLUMN_LENGTH, &length,
+		                   -1);
+
+		/* Scan on demand so the dialog can include tags that are not needed by
+		 * the compact playlist model, such as album, genre, and codec. */
+		if (uri && self->priv->ts)
+			metadata = ts_get_metadata(uri, self->priv->ts);
+
+		if (uri)
+		{
+			file = g_file_new_for_uri(uri);
+			file_info = g_file_query_info(file,
+			                              G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
+			                              G_FILE_QUERY_INFO_NONE,
+			                              NULL, &error);
+			if (file_info)
+				content_type = g_file_info_get_attribute_string(
+					file_info, G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE);
+			if (content_type)
+			{
+				type_description = g_content_type_get_description(content_type);
+				if (type_description)
+					type_text = g_strdup_printf("%s (%s)",
+					                            content_type, type_description);
+				else
+					type_text = g_strdup(content_type);
+			}
+			basename = g_file_get_basename(file);
+			path = g_file_get_path(file);
+		}
+
+		if (length <= 0 && metadata)
+			length = metadata->duration;
+		length_text = format_duration(length);
+		details = g_string_new("");
+		append_info_field(details, "Title",
+		                  metadata && metadata->title ? metadata->title : title);
+		append_info_field(details, "Name", song);
+		append_info_field(details, "Artist",
+		                  metadata && metadata->artist ? metadata->artist : artist);
+		append_info_field(details, "Album", metadata ? metadata->album : NULL);
+		append_info_field(details, "Genre", metadata ? metadata->genre : NULL);
+		append_info_field(details, "Codec", metadata ? metadata->codec : NULL);
+		append_info_field(details, "Type", type_text ? type_text : "Unknown");
+		append_info_field(details, "File", basename);
+		append_info_field(details, "Length",
+		                  length_text && length_text[0] ? length_text : "Unknown");
+		append_info_field(details, "Path", path);
+		append_info_field(details, "URL", uri);
+
+		toplevel = gtk_widget_get_toplevel(self->priv->treeview);
+		if (GTK_IS_WINDOW(toplevel))
+			parent = GTK_WINDOW(toplevel);
+		dialog = gtk_dialog_new_with_buttons(song ? song : "Track Information",
+		                                    parent,
+		                                    GTK_DIALOG_MODAL,
+		                                    "Close", GTK_RESPONSE_CLOSE,
+		                                    NULL);
+		gtk_window_set_default_size(GTK_WINDOW(dialog), 500, 350);
+		content = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+		scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
+		gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow),
+		                               GTK_POLICY_AUTOMATIC,
+		                               GTK_POLICY_AUTOMATIC);
+		textview = gtk_text_view_new();
+		gtk_text_view_set_editable(GTK_TEXT_VIEW(textview), FALSE);
+		gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(textview), FALSE);
+		gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(textview), GTK_WRAP_WORD_CHAR);
+		buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textview));
+		gtk_text_buffer_set_text(buffer, details->str, -1);
+		gtk_container_add(GTK_CONTAINER(scrolledwindow), textview);
+		gtk_box_pack_start(GTK_BOX(content), scrolledwindow, TRUE, TRUE, 0);
+		gtk_widget_show_all(content);
+		gtk_dialog_run(GTK_DIALOG(dialog));
+		gtk_widget_destroy(dialog);
+
+		g_string_free(details, TRUE);
+	}
+
+	if (error)
+		g_error_free(error);
+	if (file_info)
+		g_object_unref(file_info);
+	if (file)
+		g_object_unref(file);
+	if (metadata)
+		ts_metadata_free(metadata);
+	g_free(song);
+	g_free(title);
+	g_free(artist);
+	g_free(uri);
+	g_free(length_text);
+	g_free(type_text);
+	g_free(type_description);
+	g_free(basename);
+	g_free(path);
+	g_list_foreach(list, (GFunc) gtk_tree_path_free, NULL);
+	g_list_free(list);
 }
 
 static gboolean 
@@ -1745,6 +2106,7 @@ static void remove_files_from_list(GList * rows,
 			gtk_tree_model_get_iter (model, &iter,path);
 			gtk_tree_model_get (model, &iter, COLUMN_ID, &id, COLUMN_LENGTH,&length,-1);
 			self->priv->totallength-=length;
+			music_side_queue_remove(self->priv->sidequeue, (guint) atoi(id));
 			//last one was deleted or all was deleted
 			if(atoi(id) == self->priv->currid)
 			{
@@ -1882,6 +2244,38 @@ has_selected(MusicQueue *self)
 
 	}
 	return FALSE;
+}
+
+static gboolean
+has_selected_queued(MusicQueue *self)
+{
+	GtkTreeModel *model;
+	GList *rows;
+	GList *node;
+	GtkTreeIter iter;
+	gchar *id;
+	gboolean queued = FALSE;
+
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->treeview));
+	rows = gtk_tree_selection_get_selected_rows(self->priv->currselection,
+	                                             &model);
+
+	for (node = rows; node != NULL && !queued; node = node->next)
+	{
+		id = NULL;
+		if (gtk_tree_model_get_iter(model, &iter, node->data))
+		{
+			gtk_tree_model_get(model, &iter, COLUMN_ID, &id, -1);
+			queued = id && music_side_queue_contains(self->priv->sidequeue,
+		                                             (guint) atoi(id));
+			g_free(id);
+		}
+	}
+
+	g_list_foreach(rows, (GFunc) gtk_tree_path_free, NULL);
+	g_list_free(rows);
+
+	return queued;
 }
 
 static void 
@@ -2196,4 +2590,3 @@ music_queue_get_length(MusicQueue *self)
 {
 	return self->priv->totallength;
 }
-

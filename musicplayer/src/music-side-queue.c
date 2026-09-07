@@ -5,6 +5,14 @@
 
 G_DEFINE_TYPE (MusicSideQueue, music_side_queue, G_TYPE_OBJECT)
 
+enum
+{
+	QUEUE_CHANGED,
+	LAST_SIGNAL
+};
+
+static guint signals[LAST_SIGNAL];
+
 #define GET_PRIVATE(o) \
 (G_TYPE_INSTANCE_GET_PRIVATE ((o), MUSIC_TYPE_SIDE_QUEUE, MusicSideQueuePrivate))
 
@@ -64,6 +72,16 @@ music_side_queue_class_init (MusicSideQueueClass *klass)
 	object_class->set_property = music_side_queue_set_property;
 	object_class->dispose = music_side_queue_dispose;
 	object_class->finalize = music_side_queue_finalize;
+
+	signals[QUEUE_CHANGED] = g_signal_new ("queue-changed",
+	                                      G_TYPE_FROM_CLASS (klass),
+	                                      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+	                                      0,
+	                                      NULL,
+	                                      NULL,
+	                                      g_cclosure_marshal_VOID__VOID,
+	                                      G_TYPE_NONE,
+	                                      0);
 }
 
 static void
@@ -83,6 +101,62 @@ music_side_queue_enqueue(MusicSideQueue *self,
 	newid = g_malloc(sizeof(guint));
 	*newid = id;
 	self->priv->queue = g_list_prepend(self->priv->queue,newid); 
+	g_signal_emit (self, signals[QUEUE_CHANGED], 0);
+
+}
+
+gboolean
+music_side_queue_contains(MusicSideQueue *self,
+                          guint id)
+{
+	return music_side_queue_get_position(self, id) > 0;
+
+}
+
+guint
+music_side_queue_get_position(MusicSideQueue *self,
+                              guint id)
+{
+	GList *node;
+	guint position = 1;
+
+	/* New entries are prepended, while dequeue removes the last entry. Walk
+	 * backwards so position 1 is the next song to play. */
+	for (node = g_list_last(self->priv->queue);
+	     node != NULL;
+	     node = node->prev, position++)
+	{
+		if (node->data && *((guint *) node->data) == id)
+			return position;
+	}
+
+	return 0;
+
+}
+
+void
+music_side_queue_remove(MusicSideQueue *self,
+                        guint id)
+{
+	GList *node;
+	gboolean removed = FALSE;
+
+	for (node = self->priv->queue; node != NULL; )
+	{
+		GList *next = node->next;
+
+		if (node->data && *((guint *) node->data) == id)
+		{
+			g_free(node->data);
+			self->priv->queue = g_list_delete_link(self->priv->queue, node);
+			removed = TRUE;
+		}
+
+		node = next;
+	}
+
+	if (removed)
+		g_signal_emit (self, signals[QUEUE_CHANGED], 0);
 
 }
 
@@ -107,6 +181,7 @@ music_side_queue_dequeue(MusicSideQueue *self)
 		
 		g_free(last->data);
 		g_list_free1(last);
+		g_signal_emit (self, signals[QUEUE_CHANGED], 0);
 
 
 	}

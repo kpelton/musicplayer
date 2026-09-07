@@ -41,6 +41,15 @@ typedef struct {
 void
 music_side_queue_enqueue(MusicSideQueue *self,guint id);
 
+gboolean
+music_side_queue_contains(MusicSideQueue *self,guint id);
+
+guint
+music_side_queue_get_position(MusicSideQueue *self,guint id);
+
+void
+music_side_queue_remove(MusicSideQueue *self,guint id);
+
 guint
 music_side_queue_dequeue(MusicSideQueue *self);
 

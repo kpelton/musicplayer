@@ -40,6 +40,9 @@ key_press_cb(GtkWidget *widget,
              GdkEventKey *event,
              gpointer user_data);
 
+static void
+restore_window_size(MusicMainWindow *self);
+
 static void 
 music_main_window_get_property (GObject *object, guint property_id,
                                 GValue *value, GParamSpec *pspec)
@@ -103,18 +106,11 @@ static void
 music_main_window_init (MusicMainWindow *self)
 {
 
-	init_widgets(self);
-	self->currsong = NULL;
 	self->client = gconf_client_get_default ();
-
-	//was expanded when they quit last time 
-	if(gconf_client_get_bool (self->client,"/apps/musicplayer/expanded",NULL))
-	{
-
-		mwindow_expander_activate(GTK_EXPANDER(self->expander),self);	
-		gtk_expander_set_expanded(GTK_EXPANDER(self->expander),TRUE);
-		self->expanded=TRUE;
-	}
+	self->expanded = TRUE;
+	self->currsong = NULL;
+	init_widgets(self);
+	restore_window_size(self);
 	music_plugins_engine_init(self);
 }
 
@@ -133,7 +129,7 @@ init_widgets(MusicMainWindow *self)
 	//init player window
 	self->player = gs_player_new();
 
-	// gtk_window_set_resizable (GTK_WINDOW(self),FALSE);
+	gtk_window_set_resizable (GTK_WINDOW(self),TRUE);
 
 	gtk_window_set_title (GTK_WINDOW (self), ("squid player"));
 
@@ -210,7 +206,7 @@ init_widgets(MusicMainWindow *self)
 	self->dwidth = 350;
 	self->dhight = 250;
 
-	gtk_window_set_resizable (GTK_WINDOW(self),FALSE);
+	gtk_window_set_resizable (GTK_WINDOW(self),TRUE);
 	gtk_window_set_default_size         (GTK_WINDOW(self),
 	                                     self->dwidth,
 	                                     self->dhight);
@@ -364,7 +360,6 @@ static void mwindow_expander_activate (GtkExpander *expander,
 	else//undo expanded
 	{
 		gconf_client_set_bool (self->client,"/apps/musicplayer/expanded",FALSE,NULL);
-		gtk_window_set_resizable (GTK_WINDOW(self),FALSE);
 		gtk_widget_hide(self->albumlabel);
 		self->expanded = FALSE;
 
@@ -477,7 +472,7 @@ on_size_allocate (GtkWidget     *widget,
 
 	MusicMainWindow *self = (MusicMainWindow *)user_data;
 
-	if(self->expanded)
+	if(self->client && allocation->width > 0 && allocation->height > 0)
 	{
 		gconf_client_set_int                (self->client,
 		                                     "/apps/musicplayer/main_width",
@@ -488,4 +483,19 @@ on_size_allocate (GtkWidget     *widget,
 		                                     allocation->height,
 		                                     NULL);
 	}
+}
+
+static void
+restore_window_size(MusicMainWindow *self)
+{
+	gint width;
+	gint height;
+
+	width = gconf_client_get_int(self->client,
+	                             "/apps/musicplayer/main_width", NULL);
+	height = gconf_client_get_int(self->client,
+	                              "/apps/musicplayer/main_height", NULL);
+
+	if (width > 0 && height > 0)
+		gtk_window_resize(GTK_WINDOW(self), width, height);
 }
