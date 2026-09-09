@@ -20,6 +20,9 @@ static void
 mwindow_expander_activate(GtkExpander *expander,
                           gpointer     user_data);
 
+static gboolean
+mwindow_resize_collapsed(gpointer user_data);
+
 static void  
 on_size_allocate (GtkWidget     *widget,
                   GtkAllocation *allocation,
@@ -114,10 +117,21 @@ music_main_window_init (MusicMainWindow *self)
 	init_widgets(self);
 	gtk_expander_set_expanded (GTK_EXPANDER (self->expander), self->expanded);
 	if (self->expanded)
+	{
 		gtk_widget_show (self->albumlabel);
+	}
 	else
+	{
 		gtk_widget_hide (self->albumlabel);
-	restore_window_size(self);
+		gtk_widget_set_vexpand (self->expander, FALSE);
+		gtk_widget_set_vexpand (self->queue, FALSE);
+		gtk_box_set_child_packing (GTK_BOX (self->mainvbox), self->expander,
+		                           FALSE, FALSE, 0, GTK_PACK_START);
+	}
+	if (self->expanded)
+		restore_window_size(self);
+	else
+		g_idle_add (mwindow_resize_collapsed, self);
 	music_plugins_engine_init(self);
 }
 
@@ -184,6 +198,8 @@ init_widgets(MusicMainWindow *self)
 	//expander
 
 	self->expander = gtk_expander_new("Play List");
+	/* The resize is handled after GTK has recomputed the collapsed layout. */
+	gtk_expander_set_resize_toplevel (GTK_EXPANDER (self->expander), FALSE);
 	gtk_widget_set_hexpand (self->expander, TRUE);
 	gtk_widget_set_vexpand (self->expander, TRUE);
 
@@ -354,6 +370,10 @@ static void mwindow_expander_activate (GtkExpander *expander,
 	if(!gtk_expander_get_expanded(expander))
 	{
 		gtk_window_set_resizable (GTK_WINDOW(self),TRUE);
+		gtk_widget_set_vexpand (self->expander, TRUE);
+		gtk_widget_set_vexpand (self->queue, TRUE);
+		gtk_box_set_child_packing (GTK_BOX (self->mainvbox), self->expander,
+		                           TRUE, TRUE, 0, GTK_PACK_START);
 		height = g_settings_get_int(self->client,"window-height");
 		width = g_settings_get_int(self->client,"window-width");
 		g_settings_set_boolean(self->client,"expanded",TRUE);
@@ -383,8 +403,40 @@ static void mwindow_expander_activate (GtkExpander *expander,
 		g_settings_set_boolean(self->client,"expanded",FALSE);
 		gtk_widget_hide(self->albumlabel);
 		self->expanded = FALSE;
+		gtk_widget_set_vexpand (self->expander, FALSE);
+		gtk_widget_set_vexpand (self->queue, FALSE);
+		gtk_box_set_child_packing (GTK_BOX (self->mainvbox), self->expander,
+		                           FALSE, FALSE, 0, GTK_PACK_START);
+		/* The expander's preferred size is updated on the next main-loop turn. */
+		g_idle_add (mwindow_resize_collapsed, self);
 
 	}     
+}
+
+static gboolean
+mwindow_resize_collapsed(gpointer user_data)
+{
+	MusicMainWindow *self = (MusicMainWindow *)user_data;
+	GtkRequisition minimum;
+	gint width;
+
+	if (!self->expanded && GTK_IS_WINDOW (self))
+	{
+		gtk_widget_get_preferred_size (self->mainvbox, &minimum, NULL);
+		width = gtk_widget_get_allocated_width (GTK_WIDGET (self));
+		if (width <= 0)
+			width = self->dwidth;
+		if (minimum.height > 0)
+		{
+			/* Apply the compact size while the window is still resizable. */
+			gtk_window_set_resizable (GTK_WINDOW (self), TRUE);
+			gtk_window_set_default_size (GTK_WINDOW (self), width,
+			                             minimum.height);
+			gtk_window_resize (GTK_WINDOW (self), width, minimum.height);
+		}
+	}
+
+	return G_SOURCE_REMOVE;
 }
 
 
@@ -493,7 +545,8 @@ on_size_allocate (GtkWidget     *widget,
 
 	MusicMainWindow *self = (MusicMainWindow *)user_data;
 
-	if(self->client && allocation->width > 0 && allocation->height > 0)
+	if(self->client && self->expanded &&
+	   allocation->width > 0 && allocation->height > 0)
 	{
 		g_settings_set_int(self->client, "window-width", allocation->width);
 		g_settings_set_int(self->client, "window-height", allocation->height);

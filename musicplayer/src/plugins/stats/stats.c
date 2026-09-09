@@ -659,6 +659,13 @@ stats_plugin_music_plugin_activate(MusicPlugin *plugin,
 	self->text = gtk_label_new("");
 	self->text2 = gtk_label_new("");
 	self->details_button = gtk_button_new_with_label("Statistics");
+	/* This status row belongs at the bottom of the content, but must never
+	 * become a vertical spacer when the playlist expander is collapsed. */
+	gtk_widget_set_vexpand(self->hbox, FALSE);
+	gtk_widget_set_valign(self->hbox, GTK_ALIGN_START);
+	gtk_widget_set_vexpand(self->text, FALSE);
+	gtk_widget_set_vexpand(self->text2, FALSE);
+	gtk_widget_set_vexpand(self->details_button, FALSE);
 	gtk_label_set_xalign(GTK_LABEL(self->text2), 1.0f);
 	gtk_label_set_yalign(GTK_LABEL(self->text2), 1.0f);
 	gtk_box_pack_start(GTK_BOX(self->hbox), self->text, FALSE, FALSE, 0);

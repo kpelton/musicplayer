@@ -171,7 +171,7 @@ gboolean album_art_music_plugin_activate (MusicPlugin *self,MusicMainWindow *mw)
 	if (real->mw->currsong)
 	    album_art_new_file(NULL,real->mw->currsong,real);
 	else
-	    gtk_image_set_from_icon_name(GTK_IMAGE(real->album),"image-missing",GTK_ICON_SIZE_DIALOG);
+	    gtk_widget_hide(real->album);
 	return TRUE;
 }
 
@@ -191,6 +191,7 @@ static void album_art_new_file(GsPlayer *player,
 	AsyncMsg *amsg;
 
 
+	gtk_widget_show(self->album);
 	gtk_image_set_from_icon_name(GTK_IMAGE(self->album),"image-missing",GTK_ICON_SIZE_DIALOG);
 	
 	if(p_track->artist && p_track->album)   
