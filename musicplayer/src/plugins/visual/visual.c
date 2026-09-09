@@ -1,7 +1,6 @@
 #include "visual.h"
 
 #include <math.h>
-#include <gconf/gconf-client.h>
 
 static const char PLUGIN_NAME[] = "Visualize";
 static const char DESC[] = "Winamp-style spectrum visualizer";
@@ -131,13 +130,13 @@ visual_apply_layout(VisualPlugin *self)
 }
 
 static void
-visual_load_color(GConfClient *client,
+visual_load_color(GSettings *settings,
                   const gchar *key,
                   GdkRGBA *color)
 {
 	gchar *value;
 
-	value = gconf_client_get_string(client, key, NULL);
+	value = g_settings_get_string(settings, key);
 	if (value != NULL)
 		gdk_rgba_parse(color, value);
 	g_free(value);
@@ -146,113 +145,73 @@ visual_load_color(GConfClient *client,
 static void
 visual_load_preferences(VisualPlugin *self)
 {
-	GConfClient *client;
+	GSettings *settings;
 	gint scale;
-	GConfValue *show_line_value;
-	GConfValue *show_bars_value;
-	GConfValue *show_outline_value;
 
-	client = gconf_client_get_default();
-	scale = gconf_client_get_int(client,
-	                             "/apps/musicplayer/Visualize/scale",
-	                             NULL);
+	settings = music_settings_new();
+	scale = g_settings_get_int(settings, "visual-scale");
 	self->scale = scale >= 1 && scale <= 3 ? scale : 2;
-	self->placement_right = gconf_client_get_bool(
-		client, "/apps/musicplayer/Visualize/placement-right", NULL);
-	show_line_value = gconf_client_get(client,
-	                                   "/apps/musicplayer/Visualize/show-line",
-	                                   NULL);
-	if (show_line_value != NULL && show_line_value->type == GCONF_VALUE_BOOL)
-		self->show_line = gconf_value_get_bool(show_line_value);
-	if (show_line_value != NULL)
-		gconf_value_free(show_line_value);
-	show_bars_value = gconf_client_get(client,
-	                                   "/apps/musicplayer/Visualize/show-bars",
-	                                   NULL);
-	if (show_bars_value != NULL && show_bars_value->type == GCONF_VALUE_BOOL)
-		self->show_bars = gconf_value_get_bool(show_bars_value);
-	if (show_bars_value != NULL)
-		gconf_value_free(show_bars_value);
-	show_outline_value = gconf_client_get(
-		client, "/apps/musicplayer/Visualize/show-outline", NULL);
-	if (show_outline_value != NULL &&
-	    show_outline_value->type == GCONF_VALUE_BOOL)
-		self->show_outline = gconf_value_get_bool(show_outline_value);
-	if (show_outline_value != NULL)
-		gconf_value_free(show_outline_value);
-	self->x_compression = gconf_client_get_int(
-		client, "/apps/musicplayer/Visualize/x-compression", NULL);
+	self->placement_right = g_settings_get_boolean(settings,
+	                                               "visual-placement-right");
+	self->show_line = g_settings_get_boolean(settings, "visual-show-line");
+	self->show_bars = g_settings_get_boolean(settings, "visual-show-bars");
+	self->show_outline = g_settings_get_boolean(settings, "visual-show-outline");
+	self->x_compression = g_settings_get_int(settings, "visual-x-compression");
 	if (self->x_compression < 25 || self->x_compression > 100)
 		self->x_compression = 100;
-	self->y_amplitude_range = gconf_client_get_int(
-		client, "/apps/musicplayer/Visualize/y-amplitude-range", NULL);
+	self->y_amplitude_range = g_settings_get_int(settings,
+	                                             "visual-y-amplitude-range");
 	if (self->y_amplitude_range < 12 || self->y_amplitude_range > 96)
 		self->y_amplitude_range = 48;
-	self->sample_interval_ms = gconf_client_get_int(
-		client, "/apps/musicplayer/Visualize/sample-interval-ms", NULL);
+	self->sample_interval_ms = g_settings_get_int(settings,
+	                                              "visual-sample-interval-ms");
 	if (self->sample_interval_ms < 10 || self->sample_interval_ms > 100)
 		self->sample_interval_ms = 50;
-	visual_load_color(client, "/apps/musicplayer/Visualize/line-color",
+	visual_load_color(settings, "visual-line-color",
 	                  &self->line_color);
-	visual_load_color(client, "/apps/musicplayer/Visualize/bar-low-color",
+	visual_load_color(settings, "visual-bar-low-color",
 	                  &self->bar_low_color);
-	visual_load_color(client, "/apps/musicplayer/Visualize/bar-mid-color",
+	visual_load_color(settings, "visual-bar-mid-color",
 	                  &self->bar_mid_color);
-	visual_load_color(client, "/apps/musicplayer/Visualize/bar-high-color",
+	visual_load_color(settings, "visual-bar-high-color",
 	                  &self->bar_high_color);
-	g_object_unref(client);
+	g_object_unref(settings);
 }
 
 static void
-visual_save_color(GConfClient *client,
+visual_save_color(GSettings *settings,
                   const gchar *key,
                   const GdkRGBA *color)
 {
 	gchar *value = gdk_rgba_to_string(color);
 
-	gconf_client_set_string(client, key, value, NULL);
+	g_settings_set_string(settings, key, value);
 	g_free(value);
 }
 
 static void
 visual_save_preferences(VisualPlugin *self)
 {
-	GConfClient *client;
+	GSettings *settings;
 
-	client = gconf_client_get_default();
-	gconf_client_set_int(client,
-	                     "/apps/musicplayer/Visualize/scale",
-	                     self->scale, NULL);
-	gconf_client_set_bool(client,
-	                      "/apps/musicplayer/Visualize/placement-right",
-	                      self->placement_right, NULL);
-	gconf_client_set_bool(client,
-	                      "/apps/musicplayer/Visualize/show-line",
-	                      self->show_line, NULL);
-	gconf_client_set_bool(client,
-	                      "/apps/musicplayer/Visualize/show-bars",
-	                      self->show_bars, NULL);
-	gconf_client_set_bool(client,
-	                      "/apps/musicplayer/Visualize/show-outline",
-	                      self->show_outline, NULL);
-	gconf_client_set_int(client,
-	                     "/apps/musicplayer/Visualize/x-compression",
-	                     self->x_compression, NULL);
-	gconf_client_set_int(client,
-	                     "/apps/musicplayer/Visualize/y-amplitude-range",
-	                     self->y_amplitude_range, NULL);
-	gconf_client_set_int(client,
-	                     "/apps/musicplayer/Visualize/sample-interval-ms",
-	                     self->sample_interval_ms, NULL);
-	visual_save_color(client, "/apps/musicplayer/Visualize/line-color",
+	settings = music_settings_new();
+	g_settings_set_int(settings, "visual-scale", self->scale);
+	g_settings_set_boolean(settings, "visual-placement-right", self->placement_right);
+	g_settings_set_boolean(settings, "visual-show-line", self->show_line);
+	g_settings_set_boolean(settings, "visual-show-bars", self->show_bars);
+	g_settings_set_boolean(settings, "visual-show-outline", self->show_outline);
+	g_settings_set_int(settings, "visual-x-compression", self->x_compression);
+	g_settings_set_int(settings, "visual-y-amplitude-range", self->y_amplitude_range);
+	g_settings_set_int(settings, "visual-sample-interval-ms", self->sample_interval_ms);
+	visual_save_color(settings, "visual-line-color",
 	                  &self->line_color);
-	visual_save_color(client, "/apps/musicplayer/Visualize/bar-low-color",
+	visual_save_color(settings, "visual-bar-low-color",
 	                  &self->bar_low_color);
-	visual_save_color(client, "/apps/musicplayer/Visualize/bar-mid-color",
+	visual_save_color(settings, "visual-bar-mid-color",
 	                  &self->bar_mid_color);
-	visual_save_color(client, "/apps/musicplayer/Visualize/bar-high-color",
+	visual_save_color(settings, "visual-bar-high-color",
 	                  &self->bar_high_color);
-	g_object_unref(client);
+	g_object_unref(settings);
 }
 
 static void
@@ -521,7 +480,7 @@ visual_create_pipeline(VisualPlugin *self,
 		gst_object_unref(self->bin);
 		self->bin = NULL;
 		self->spectrum = NULL;
-		g_object_set(mw->player->play, "audio-sink", mw->player->gconf, NULL);
+		g_object_set(mw->player->play, "audio-sink", mw->player->audio_sink, NULL);
 		return FALSE;
 	}
 
@@ -532,7 +491,7 @@ visual_create_pipeline(VisualPlugin *self,
 		gst_object_unref(self->bin);
 		self->bin = NULL;
 		self->spectrum = NULL;
-		g_object_set(mw->player->play, "audio-sink", mw->player->gconf, NULL);
+		g_object_set(mw->player->play, "audio-sink", mw->player->audio_sink, NULL);
 		return FALSE;
 	}
 	ghost = gst_ghost_pad_new("sink", pad);
@@ -544,7 +503,7 @@ visual_create_pipeline(VisualPlugin *self,
 		gst_object_unref(self->bin);
 		self->bin = NULL;
 		self->spectrum = NULL;
-		g_object_set(mw->player->play, "audio-sink", mw->player->gconf, NULL);
+		g_object_set(mw->player->play, "audio-sink", mw->player->audio_sink, NULL);
 		return FALSE;
 	}
 	return TRUE;
@@ -855,7 +814,7 @@ visual_plugin_deactivate(MusicPlugin *plugin)
 	}
 	if (self->mw && self->mw->player)
 		g_object_set(self->mw->player->play, "audio-sink",
-		             self->mw->player->gconf, NULL);
+		             self->mw->player->audio_sink, NULL);
 	if (self->drawing_area)
 	{
 		gtk_widget_destroy(self->drawing_area);

@@ -5,7 +5,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
-#include <gconf/gconf-client.h>
+#include "music-settings.h"
 
 #include "player.h"
 #include "music-queue.h"
@@ -46,7 +46,7 @@ typedef struct {
 	GtkWidget *nextbutton;	
 	GtkWidget *volumebutton;
 	GtkWidget *expander;
-	GConfClient* client;
+	GSettings *client;
 	gint dhight;
 	gint dwidth;
 	gint signum;

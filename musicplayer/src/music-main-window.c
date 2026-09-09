@@ -9,7 +9,6 @@
 #include "musicplayer-icon.h"
 #include <gio/gio.h>
 #include <gdk/gdkkeysyms.h>
-#include <gconf/gconf-client.h>
 
 
 G_DEFINE_TYPE (MusicMainWindow, music_main_window, GTK_TYPE_WINDOW)
@@ -107,7 +106,7 @@ static void
 music_main_window_init (MusicMainWindow *self)
 {
 
-	self->client = gconf_client_get_default ();
+	self->client = music_settings_new ();
 	self->expanded = TRUE;
 	self->currsong = NULL;
 	init_widgets(self);
@@ -344,10 +343,10 @@ static void mwindow_expander_activate (GtkExpander *expander,
 	if(!gtk_expander_get_expanded(expander))
 	{
 		gtk_window_set_resizable (GTK_WINDOW(self),TRUE);
-		height =gconf_client_get_int(self->client,"/apps/musicplayer/main_height",NULL);
-		width =gconf_client_get_int(self->client,"/apps/musicplayer/main_width",NULL);
-		gconf_client_set_bool (self->client,"/apps/musicplayer/expanded",TRUE,NULL);
-		//if we are not running for the first time and we have a key in gconf
+		height = g_settings_get_int(self->client,"window-height");
+		width = g_settings_get_int(self->client,"window-width");
+		g_settings_set_boolean(self->client,"expanded",TRUE);
+		//if we are not running for the first time and have saved dimensions
 		if( width && height)
 		{
 			gtk_window_resize  (GTK_WINDOW(self),
@@ -370,7 +369,7 @@ static void mwindow_expander_activate (GtkExpander *expander,
 	}
 	else//undo expanded
 	{
-		gconf_client_set_bool (self->client,"/apps/musicplayer/expanded",FALSE,NULL);
+		g_settings_set_boolean(self->client,"expanded",FALSE);
 		gtk_widget_hide(self->albumlabel);
 		self->expanded = FALSE;
 
@@ -485,14 +484,8 @@ on_size_allocate (GtkWidget     *widget,
 
 	if(self->client && allocation->width > 0 && allocation->height > 0)
 	{
-		gconf_client_set_int                (self->client,
-		                                     "/apps/musicplayer/main_width",
-		                                     allocation->width,
-		                                     NULL);
-		gconf_client_set_int                (self->client,
-		                                     "/apps/musicplayer/main_height",
-		                                     allocation->height,
-		                                     NULL);
+		g_settings_set_int(self->client, "window-width", allocation->width);
+		g_settings_set_int(self->client, "window-height", allocation->height);
 	}
 }
 
@@ -502,10 +495,8 @@ restore_window_size(MusicMainWindow *self)
 	gint width;
 	gint height;
 
-	width = gconf_client_get_int(self->client,
-	                             "/apps/musicplayer/main_width", NULL);
-	height = gconf_client_get_int(self->client,
-	                              "/apps/musicplayer/main_height", NULL);
+	width = g_settings_get_int(self->client, "window-width");
+	height = g_settings_get_int(self->client, "window-height");
 
 	if (width > 0 && height > 0)
 		gtk_window_resize(GTK_WINDOW(self), width, height);

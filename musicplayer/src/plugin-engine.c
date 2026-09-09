@@ -23,6 +23,48 @@ gboolean music_plugins_load_all (MusicMainWindow * mainwindows);
 static gboolean
 load_file(gchar *location,MusicMainWindow * mainwindows);
 
+static gboolean
+plugin_is_enabled(const gchar *name)
+{
+	GSettings *settings;
+	gchar **enabled;
+	gboolean result;
+
+	settings = music_settings_new();
+	enabled = g_settings_get_strv(settings, "enabled-plugins");
+	result = g_strv_contains((const gchar * const *) enabled, name);
+	g_strfreev(enabled);
+	g_object_unref(settings);
+	return result;
+}
+
+static void
+plugin_set_enabled(const gchar *name,
+                   gboolean enabled)
+{
+	GSettings *settings;
+	gchar **current;
+	GPtrArray *updated;
+	guint i;
+
+	settings = music_settings_new();
+	current = g_settings_get_strv(settings, "enabled-plugins");
+	updated = g_ptr_array_new_with_free_func(g_free);
+	for (i = 0; current[i] != NULL; i++)
+	{
+		if (g_strcmp0(current[i], name) != 0)
+			g_ptr_array_add(updated, g_strdup(current[i]));
+	}
+	if (enabled)
+		g_ptr_array_add(updated, g_strdup(name));
+	g_ptr_array_add(updated, NULL);
+	g_settings_set_strv(settings, "enabled-plugins",
+	                    (const gchar * const *) updated->pdata);
+	g_ptr_array_free(updated, TRUE);
+	g_strfreev(current);
+	g_object_unref(settings);
+}
+
 //static void
 //music_plugins_free_details(MusicPluginDetails *details);
 
@@ -59,7 +101,6 @@ gboolean music_plugins_load_all (MusicMainWindow * mainwindow)
 	for(list1 = list->next; list1!=NULL; list1 = list1->next)
 	{   printf("file to load: %s\n",(gchar *)list1->data);
 
-		//need to check if it has a gconf entry to save it
 		load_file(list1->data,mainwindow);
 		g_free(list1->data);
 	}
@@ -75,10 +116,6 @@ load_file(gchar*            location,
 	MusicPluginInfo *info;
 
 	GType (*register_func)();
-	GConfClient* client;
-	client = gconf_client_get_default ();
-	gchar *gconf_path;
-
 	MusicPluginDetails * (*get_details_func)();
 
 	info = g_malloc(sizeof(MusicPluginInfo));
@@ -105,11 +142,9 @@ load_file(gchar*            location,
 
 	info->details = get_details_func();
 
-	gconf_path = g_strjoin("/","/apps/musicplayer",info->details->name,"active",NULL);
-
 	g_hash_table_insert (music_plugins, info->location, info);
 
-	if(gconf_client_get_bool (client,gconf_path,NULL))
+	if(plugin_is_enabled(info->details->name))
 	{
 		info->active = TRUE;
 		music_plugins_engine_activate_plugin(info);
@@ -122,9 +157,6 @@ load_file(gchar*            location,
 
 
 
-
-	g_object_unref(client);
-	g_free(gconf_path);
 
 	return TRUE;
 
@@ -140,16 +172,7 @@ music_plugins_engine_plugin_is_active(MusicPluginInfo *info)
 gboolean
 music_plugins_engine_activate_plugin(MusicPluginInfo *info)
 {
-	GConfClient* client;
-	gchar *gconf_path;
-
-
-	client = gconf_client_get_default ();
-
-	gconf_path = g_strjoin("/","/apps/musicplayer",info->details->name,"active",NULL);
-
-	gconf_client_set_bool (client,gconf_path,TRUE,NULL);
-
+	plugin_set_enabled(info->details->name, TRUE);
 
 	info->active = TRUE;
 	info->plugin = g_object_new  (info->type,
@@ -157,32 +180,18 @@ music_plugins_engine_activate_plugin(MusicPluginInfo *info)
 	                              NULL);
 
 	music_plugin_activate(info->plugin,mw);
-	g_object_unref(client);
-	g_free(gconf_path);
-
 	return TRUE;
 
 }
 gboolean
 music_plugins_engine_deactivate_plugin(MusicPluginInfo *info)
 {
-	GConfClient* client;
-	gchar *gconf_path;
-
-
-	client = gconf_client_get_default ();
-
-	gconf_path = g_strjoin("/","/apps/musicplayer",info->details->name,"active",NULL);
-
-	gconf_client_set_bool (client,gconf_path,FALSE,NULL);
+	plugin_set_enabled(info->details->name, FALSE);
 
 	info->active = FALSE;
 	music_plugin_deactivate(info->plugin);
 	g_object_unref(info->plugin);
 	info->plugin=NULL;
-	g_object_unref(client);
-	g_free(gconf_path);
-
 	return TRUE;
 }
 /*

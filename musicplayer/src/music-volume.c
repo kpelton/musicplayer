@@ -23,15 +23,15 @@ GtkWidget*
 music_volume_new_with_player (GsPlayer *player)
 {
 	MusicVolume *me;
-	GConfClient* client;
+	GSettings *client;
 	gdouble vol;
 
 	me = g_object_new (MUSIC_TYPE_VOLUME, NULL);
 
 	me->player = player;
-	client = gconf_client_get_default ();
+	client = music_settings_new ();
 
-	if((vol = gconf_client_get_float (client,"/apps/musicplayer/volume",NULL)) >= 0){
+	if((vol = g_settings_get_double (client,"volume")) >= 0){
 
 		gtk_scale_button_set_value (GTK_SCALE_BUTTON(me),vol); 
 		gs_Set_Volume(player,vol);
@@ -60,10 +60,10 @@ static void              value_changed                     (GtkScaleButton *butt
                                                             gpointer        user_data)
 {
 	GsPlayer *player = (GsPlayer *) user_data;
-	GConfClient* client;
-	client = gconf_client_get_default ();
+	GSettings *client;
+	client = music_settings_new ();
 
-	gconf_client_set_float (client,"/apps/musicplayer/volume",value,NULL); 
+	g_settings_set_double (client,"volume",value);
 	gs_Set_Volume(player,value);
 	g_object_unref(G_OBJECT(client));
 }

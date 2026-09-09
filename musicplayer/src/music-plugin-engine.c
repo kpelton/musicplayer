@@ -95,7 +95,6 @@ gboolean load_all (MusicMainWindow * mainwindow)
 	for(list1 = list->next; list1!=NULL; list1 = list1->next)
 	{   printf("file to load: %s\n",(gchar *)list1->data);
 
-		//need to check if it has a gconf entry to save it
 		//load_file(list1->data,mainwindow);
 		g_free(list1->data);
 	}

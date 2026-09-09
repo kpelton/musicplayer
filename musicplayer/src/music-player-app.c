@@ -9,7 +9,6 @@
 #include "pl-reader.h"
 #include "plugin-engine.h"
 #include "music-plugin-manager.h"
-#include <gconf/gconf-client.h>
 #include <unique/unique.h>
 #include <string.h>
 

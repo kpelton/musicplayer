@@ -9,7 +9,6 @@
 #include "pl-reader.h"
 #include "plugin-engine.h"
 #include "music-plugin-manager.h"
-#include <gconf/gconf-client.h>
 #include <string.h>
 
 
@@ -22,8 +21,6 @@ int main (int argc, char *argv[])
 	gtk_init (&argc, &argv);
 	make_pref_folder();
 	gst_init (&argc, &argv);
-
-	gconf_init(argc, argv, NULL);
 
 	mainwindow = music_main_window_new ();
 	gtk_widget_show (mainwindow);

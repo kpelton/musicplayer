@@ -4,8 +4,8 @@
 
 #include <glib/gstdio.h>
 
-/* The plugin engine uses this name in a GConf path, so it must not contain
- * spaces. The description supplies the user-facing downloader wording. */
+/* The plugin engine uses this name as the persisted plugin identifier, so it
+ * must not contain spaces. The description supplies the user-facing wording. */
 static const char PLUGIN_NAME[] = "YouTube";
 static const char DESC[] = "Download audio from a YouTube URL into the playlist";
 static const char COPYRIGHT[] = "Kyle Pelton";
@@ -17,7 +17,6 @@ static const gchar *const audio_quality_labels[] = {
 	"Best quality", "320 kbps", "256 kbps", "192 kbps", "128 kbps"
 };
 #define AUDIO_QUALITY_COUNT G_N_ELEMENTS(audio_quality_values)
-#define YOUTUBE_AUDIO_QUALITY_KEY "/apps/musicplayer/YouTube/mp3_quality"
 
 static gboolean youtube_plugin_activate(MusicPlugin *plugin,
                                         MusicMainWindow *mw);
@@ -241,7 +240,7 @@ youtube_quality_changed(GtkComboBox *combo,
                         gpointer user_data)
 {
 	YoutubePlugin *self = YOUTUBE_PLUGIN(user_data);
-	GConfClient *client;
+	GSettings *settings;
 	gint active;
 
 	active = gtk_combo_box_get_active(combo);
@@ -249,9 +248,9 @@ youtube_quality_changed(GtkComboBox *combo,
 		return;
 
 	self->audio_quality = active;
-	client = gconf_client_get_default();
-	gconf_client_set_int(client, YOUTUBE_AUDIO_QUALITY_KEY, active, NULL);
-	g_object_unref(client);
+	settings = music_settings_new();
+	g_settings_set_int(settings, "youtube-quality", active);
+	g_object_unref(settings);
 }
 
 static YoutubeDownload *
@@ -787,13 +786,13 @@ youtube_plugin_init(YoutubePlugin *self)
 	self->downloads_hide_source = 0;
 	self->audio_quality = 0;
 	{
-		GConfClient *client = gconf_client_get_default();
-		gint configured_quality = gconf_client_get_int(
-			client, YOUTUBE_AUDIO_QUALITY_KEY, NULL);
+		GSettings *settings = music_settings_new();
+		gint configured_quality = g_settings_get_int(settings,
+		                                             "youtube-quality");
 
 		if (configured_quality >= 0 &&
 		    configured_quality < (gint) AUDIO_QUALITY_COUNT)
 			self->audio_quality = configured_quality;
-		g_object_unref(client);
+		g_object_unref(settings);
 	}
 }

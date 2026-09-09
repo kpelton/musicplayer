@@ -5,7 +5,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
-#include <gconf/gconf-client.h>
+#include "music-settings.h"
 #include "player.h"
 #include "tag-scanner.h"
 #include "pl-reader.h"

@@ -35,8 +35,8 @@ gs_player_dispose (GObject *object)
 	{
 		gst_element_set_state (player->play, GST_STATE_NULL);
 		g_object_unref(player->play);
-		if (player->gconf)
-			g_object_unref(player->gconf);
+		if (player->audio_sink)
+			g_object_unref(player->audio_sink);
 		player->play=NULL;
 
 		G_OBJECT_CLASS (gs_player_parent_class)->dispose (object);
@@ -113,14 +113,14 @@ gs_player_init (GsPlayer *me)
 	audio_factory = gst_element_factory_find("gconfaudiosink");
 	if (audio_factory)
 	{
-		me->gconf = gst_element_factory_create(audio_factory, "audio-sink");
+		me->audio_sink = gst_element_factory_create(audio_factory, "audio-sink");
 		gst_object_unref(audio_factory);
 	}
-	if (me->gconf == NULL)
-		me->gconf = gst_element_factory_make("autoaudiosink", "audio-sink");
+	if (me->audio_sink == NULL)
+		me->audio_sink = gst_element_factory_make("autoaudiosink", "audio-sink");
 
-	if (me->gconf)
-		g_object_set(G_OBJECT(me->play),"audio-sink",me->gconf,NULL);
+	if (me->audio_sink)
+		g_object_set(G_OBJECT(me->play),"audio-sink",me->audio_sink,NULL);
 
 	gst_element_set_state (me->play, GST_STATE_READY);
 	me->isPlaying = FALSE;

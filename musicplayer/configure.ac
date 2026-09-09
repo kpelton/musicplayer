@@ -32,7 +32,6 @@ PKG_CHECK_MODULES(GLIB,[
   gio-2.0
   gtk+-3.0 >= $GTK_REQS
   gmodule-2.0
-  gconf-2.0
   gthread-2.0
   ])
 
@@ -73,6 +72,7 @@ fi
 
 AC_OUTPUT([
 Makefile
+data/Makefile
 src/Makefile
 src/plugins/Makefile
 src/plugins/stats/Makefile

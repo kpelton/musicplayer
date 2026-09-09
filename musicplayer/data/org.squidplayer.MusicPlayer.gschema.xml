@@ -1,0 +1,93 @@
+<schemalist>
+  <schema id="org.squidplayer.MusicPlayer"
+          path="/org/squidplayer/musicplayer/">
+    <key name="repeat" type="b">
+      <default>false</default>
+      <summary>Repeat the playlist</summary>
+    </key>
+    <key name="shuffle" type="b">
+      <default>false</default>
+      <summary>Shuffle the playlist</summary>
+    </key>
+    <key name="volume" type="d">
+      <default>1.0</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Playback volume</summary>
+    </key>
+    <key name="window-width" type="i">
+      <default>350</default>
+      <range min="1" max="10000"/>
+      <summary>Main window width</summary>
+    </key>
+    <key name="window-height" type="i">
+      <default>250</default>
+      <range min="1" max="10000"/>
+      <summary>Main window height</summary>
+    </key>
+    <key name="expanded" type="b">
+      <default>true</default>
+      <summary>Show the expanded player layout</summary>
+    </key>
+    <key name="enabled-plugins" type="as">
+      <default>[]</default>
+      <summary>Enabled plugins</summary>
+    </key>
+    <key name="youtube-quality" type="i">
+      <default>0</default>
+      <range min="0" max="4"/>
+      <summary>YouTube audio quality selection</summary>
+    </key>
+    <key name="visual-scale" type="i">
+      <default>2</default>
+      <range min="1" max="3"/>
+      <summary>Visualizer scale</summary>
+    </key>
+    <key name="visual-placement-right" type="b">
+      <default>false</default>
+      <summary>Place the visualizer to the right of the title</summary>
+    </key>
+    <key name="visual-show-line" type="b">
+      <default>true</default>
+      <summary>Show visualizer line</summary>
+    </key>
+    <key name="visual-show-bars" type="b">
+      <default>true</default>
+      <summary>Show visualizer bars</summary>
+    </key>
+    <key name="visual-show-outline" type="b">
+      <default>true</default>
+      <summary>Show visualizer outline</summary>
+    </key>
+    <key name="visual-x-compression" type="i">
+      <default>100</default>
+      <range min="25" max="100"/>
+      <summary>Visualizer horizontal compression</summary>
+    </key>
+    <key name="visual-y-amplitude-range" type="i">
+      <default>48</default>
+      <range min="12" max="96"/>
+      <summary>Visualizer amplitude range</summary>
+    </key>
+    <key name="visual-sample-interval-ms" type="i">
+      <default>50</default>
+      <range min="10" max="100"/>
+      <summary>Visualizer sample interval</summary>
+    </key>
+    <key name="visual-line-color" type="s">
+      <default>"rgba(115,242,242,1)"</default>
+      <summary>Visualizer line color</summary>
+    </key>
+    <key name="visual-bar-low-color" type="s">
+      <default>"rgba(26,217,56,1)"</default>
+      <summary>Visualizer low bar color</summary>
+    </key>
+    <key name="visual-bar-mid-color" type="s">
+      <default>"rgba(242,217,20,1)"</default>
+      <summary>Visualizer mid bar color</summary>
+    </key>
+    <key name="visual-bar-high-color" type="s">
+      <default>"rgba(242,51,20,1)"</default>
+      <summary>Visualizer high bar color</summary>
+    </key>
+  </schema>
+</schemalist>

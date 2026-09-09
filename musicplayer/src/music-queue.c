@@ -312,7 +312,7 @@ struct _MusicQueuePrivate{
 	GtkTreeModel *musicstore;
 	GtkTreeIter  curr;
 	GtkTreeSelection *currselection;
-	GConfClient* client;
+	GSettings *client;
 	GsPlayer *player;
 	TagScanner *ts;
 	PlaylistReader *read;
@@ -446,20 +446,8 @@ music_queue_dispose (GObject *object)
 			g_object_get(G_OBJECT(self),"musicqueue-repeat",&repeat,NULL);
 			g_object_get(G_OBJECT(self),"musicqueue-shuffle",&shuffle,NULL);
 
-			//save all the props we want to gconf
-			//gconf_client_set_string              (self->priv->client,
-			//                                      "/apps/musicplayer/font",
-			//                                      font,
-			//                                      NULL);
-
-			gconf_client_set_bool           (self->priv->client,
-			                                 "/apps/musicplayer/repeat",
-			                                 repeat,
-			                                 NULL);
-			gconf_client_set_bool           (self->priv->client,
-			                                 "/apps/musicplayer/shuffle",
-			                                 shuffle,
-			                                 NULL);
+			g_settings_set_boolean(self->priv->client, "repeat", repeat);
+			g_settings_set_boolean(self->priv->client, "shuffle", shuffle);
 
 
 			g_object_unref(self->priv->client);
@@ -650,17 +638,15 @@ music_queue_init (MusicQueue *self)
 
 
 
-	//need to pull in gconf stuff here
-
 	self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, MUSIC_TYPE_QUEUE, 
 	                                          MusicQueuePrivate);
 	//g_object_set(G_OBJECT (self), "musicqueue-font","verdanna bold 7",NULL);
 	g_object_set(G_OBJECT (self), "musicqueue-lastdir",g_get_home_dir(),NULL);
 
-	self->priv->client = gconf_client_get_default();
+	self->priv->client = music_settings_new();
 
-	repeat=gconf_client_get_bool (self->priv->client,"/apps/musicplayer/repeat",NULL);
-	shuffle=gconf_client_get_bool (self->priv->client,"/apps/musicplayer/shuffle",NULL);
+	repeat=g_settings_get_boolean(self->priv->client,"repeat");
+	shuffle=g_settings_get_boolean(self->priv->client,"shuffle");
 
 	g_object_set(G_OBJECT (self), "musicqueue-repeat",repeat,NULL);
 	g_object_set(G_OBJECT (self), "musicqueue-shuffle",shuffle,NULL);

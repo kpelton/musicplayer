@@ -1,2 +1,1 @@
-SUBDIRS =  src tests
-
+SUBDIRS =  data src tests
