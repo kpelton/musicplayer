@@ -1,0 +1,16 @@
+# Musicplayer
+
+This repository contains the Musicplayer GTK3 desktop application.
+
+The application source and build files are in [`musicplayer/`](musicplayer/).
+See the [project README](musicplayer/README) for build instructions and
+details about the Cairo/Pango title scroller, playlist, statistics, and
+visualizer plugins.
+
+To build and test from the project directory:
+
+```sh
+cd musicplayer
+make
+make -C tests check
+```
