@@ -4,9 +4,6 @@
 #include "plugin-engine.h"
 #include "plugins/music-plugin.h"
 
-G_DEFINE_TYPE (MusicPluginManager, music_plugin_manager, GTK_TYPE_WINDOW)
-
-
 struct _MusicPluginManagerPrivate {
 	GtkWidget	*tree;
 	GtkWidget	*about;
@@ -14,6 +11,9 @@ struct _MusicPluginManagerPrivate {
 	GtkWidget	*popup_menu;
 	int dummy;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (MusicPluginManager, music_plugin_manager,
+                            GTK_TYPE_WINDOW)
 
 enum
 {
@@ -69,8 +69,6 @@ music_plugin_manager_class_init (MusicPluginManagerClass *klass)
 
 
 	object_class->finalize = music_plugin_manager_finalize;
-	g_type_class_add_private (klass, sizeof (MusicPluginManagerPrivate));
-
 }
 
 static void
@@ -79,8 +77,7 @@ music_plugin_manager_construct_tree (MusicPluginManager *self);
 static void
 music_plugin_manager_init (MusicPluginManager *self)
 {
-	self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, MUSIC_TYPE_PLUGIN_MANAGER, 
-	                                          MusicPluginManagerPrivate);
+	self->priv = music_plugin_manager_get_instance_private (self);
 	music_plugin_init_widgets(self);
 	music_plugin_manager_populate_lists(self);
 

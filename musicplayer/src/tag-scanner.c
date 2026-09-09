@@ -78,13 +78,6 @@ cb_newpad (GstElement *decodebin,
            gpointer    data);
 
 
-typedef struct _TagScannerPrivate TagScannerPrivate;
-
-struct _TagScannerPrivate {
-	int dummy;
-
-};
-
 static void
 tag_scanner_get_property (GObject *object, guint property_id,
                           GValue *value, GParamSpec *pspec)
@@ -131,9 +124,6 @@ static void
 tag_scanner_class_init (TagScannerClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-
-	g_type_class_add_private (klass, sizeof (TagScannerPrivate));
 
 	object_class->get_property = tag_scanner_get_property;
 	object_class->set_property = tag_scanner_set_property;

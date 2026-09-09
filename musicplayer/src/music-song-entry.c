@@ -14,16 +14,6 @@ static gboolean
 mouse_released(GtkWidget      *widget,
                GdkEventButton *event);
 
-#define GET_PRIVATE(o) \
-(G_TYPE_INSTANCE_GET_PRIVATE ((o), MUSIC_TYPE_SONG_ENTRY, MusicSongEntryPrivate))
-
-typedef struct _MusicSongEntryPrivate MusicSongEntryPrivate;
-
-struct _MusicSongEntryPrivate {
-	int dummy;
-	char *text;
-
-};
 enum scroll
 {
 	AUTO_SCROLL,
@@ -47,8 +37,6 @@ music_song_entry_class_init (MusicSongEntryClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(klass);
-	g_type_class_add_private (klass, sizeof (MusicSongEntryPrivate));
-
 	object_class->dispose = music_song_entry_dispose;
 	object_class->finalize = music_song_entry_finalize;
 

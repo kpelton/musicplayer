@@ -172,7 +172,6 @@ m3u_reader_class_init (M3uReaderClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-	//g_type_class_add_private (klass, sizeof (M3uReaderPrivate));  
 	object_class->finalize = m3u_reader_finalize;
 }
 
@@ -187,4 +186,3 @@ m3u_reader_new (void)
 {
 	return g_object_new (M3U_TYPE_READER, NULL);
 }
-

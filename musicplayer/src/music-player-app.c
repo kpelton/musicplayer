@@ -13,18 +13,14 @@
 #include <string.h>
 
 
-G_DEFINE_TYPE (MusicPlayerApp, music_player_app, MUSIC_TYPE_PLAYER_APP)
-
-#define GET_PRIVATE(o) \
-(G_TYPE_INSTANCE_GET_PRIVATE ((o), MUSIC_TYPE_PLAYER_APP, MusicPlayerAppPrivate))
-
-
-
 struct _MusicPlayerAppPrivate {
 	int dummy;
 	GtkWidget *mainwindow;
 	UniqueApp* app;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (MusicPlayerApp, music_player_app,
+                            MUSIC_TYPE_PLAYER_APP)
 
 static void
 music_player_app_get_property (GObject *object, guint property_id,
@@ -63,8 +59,6 @@ music_player_app_class_init (MusicPlayerAppClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-	g_type_class_add_private (klass, sizeof (MusicPlayerAppPrivate));
-
 	object_class->get_property = music_player_app_get_property;
 	object_class->set_property = music_player_app_set_property;
 	object_class->dispose = music_player_app_dispose;
@@ -74,8 +68,7 @@ music_player_app_class_init (MusicPlayerAppClass *klass)
 static void
 music_player_app_init (MusicPlayerApp *self)
 {
-	self->priv =  G_TYPE_INSTANCE_GET_PRIVATE (self, MUSIC_TYPE_PLAYER_APP, 
-	                                           MusicPlayerApp);
+	self->priv = music_player_app_get_instance_private (self);
 }
 
 MusicPlayerApp*

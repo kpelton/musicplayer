@@ -128,7 +128,7 @@ static void album_art_download_art(AsyncMsg *amsg,const char *msg)
 	end = strstr(start,"</image>");
 	*end = '\0';
 	start+=comblen;
-	session = soup_session_async_new();
+		session = soup_session_new();
 	smsg = soup_message_new ("GET",start);
 	soup_session_queue_message(session,smsg,album_art_got_image_response,amsg);
     }else{
@@ -212,7 +212,7 @@ static void album_art_new_file(GsPlayer *player,
 			amsg->curr = ts_metadata_new();
 			ts_metadata_copy(p_track,amsg->curr);
 			snprintf(url2,5000,"%sartist=%s&album=%s",url,p_track->artist,p_track->album);
-			session = soup_session_sync_new();
+			session = soup_session_new();
 			msg = soup_message_new ("GET",url2);
 			soup_session_queue_message(session,msg,album_art_got_xml_response,amsg);
 		    }

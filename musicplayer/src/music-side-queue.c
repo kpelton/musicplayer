@@ -3,8 +3,6 @@
 #include "music-side-queue.h"
 #include <glib.h>
 
-G_DEFINE_TYPE (MusicSideQueue, music_side_queue, G_TYPE_OBJECT)
-
 enum
 {
 	QUEUE_CHANGED,
@@ -13,16 +11,13 @@ enum
 
 static guint signals[LAST_SIGNAL];
 
-#define GET_PRIVATE(o) \
-(G_TYPE_INSTANCE_GET_PRIVATE ((o), MUSIC_TYPE_SIDE_QUEUE, MusicSideQueuePrivate))
-
-
-
 struct _MusicSideQueuePrivate {
 	int dummy;
 	GList *queue;
 	guint size;
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (MusicSideQueue, music_side_queue, G_TYPE_OBJECT)
 
 static void
 music_side_queue_get_property (GObject *object, guint property_id,
@@ -66,8 +61,6 @@ music_side_queue_class_init (MusicSideQueueClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-	g_type_class_add_private (klass, sizeof (MusicSideQueuePrivate));
-
 	object_class->get_property = music_side_queue_get_property;
 	object_class->set_property = music_side_queue_set_property;
 	object_class->dispose = music_side_queue_dispose;
@@ -87,8 +80,7 @@ music_side_queue_class_init (MusicSideQueueClass *klass)
 static void
 music_side_queue_init (MusicSideQueue *self)
 {
-	self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, MUSIC_TYPE_SIDE_QUEUE, 
-	                                          MusicSideQueuePrivate);
+	self->priv = music_side_queue_get_instance_private (self);
 	self->priv->queue = NULL;
 	self->priv->size = 0;
 }

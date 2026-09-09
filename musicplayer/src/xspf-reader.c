@@ -19,9 +19,6 @@ foreach_xspf(gpointer data,gpointer user_data);
 static const char *
 xspf_mime_type(PlaylistReader *plist);
 
-G_DEFINE_TYPE_WITH_CODE (XspfReader, xspf_reader, G_TYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (PLAYLIST_TYPE_READER,xspf_reader_playlist_interface_init));
-
 #define XSPF_XMLNS "http://xspf.org/ns/0/"
 #define CREATOR "musicplayer"
 #define MIME_TYPE "application/xspf+xml"
@@ -33,6 +30,11 @@ struct _XspfReaderPrivate{
 	xmlNodePtr tracklist;
 
 };
+
+G_DEFINE_TYPE_WITH_CODE (XspfReader, xspf_reader, G_TYPE_OBJECT,
+                         G_ADD_PRIVATE (XspfReader)
+                         G_IMPLEMENT_INTERFACE (PLAYLIST_TYPE_READER,
+                                                xspf_reader_playlist_interface_init));
 
 
 
@@ -233,15 +235,13 @@ xspf_reader_class_init (XspfReaderClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-	g_type_class_add_private (klass, sizeof (XspfReaderPrivate));
-
 	object_class->finalize = xspf_reader_finalize;
 }
 
 static void
 xspf_reader_init (XspfReader *self)
 {
-	self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, XSPF_TYPE_READER, XspfReaderPrivate);
+	self->priv = xspf_reader_get_instance_private (self);
 }
 
 XspfReader*
@@ -249,4 +249,3 @@ xspf_reader_new (void)
 {
 	return g_object_new (XSPF_TYPE_READER, NULL);
 }
-

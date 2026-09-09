@@ -18,15 +18,6 @@ G_DEFINE_TYPE_WITH_CODE (MusicStore, music_store, GTK_TYPE_TREE_MODEL_FILTER,
                          G_IMPLEMENT_INTERFACE (GTK_TYPE_TREE_DRAG_DEST,
                                                 music_store_drag_dest_init))
 
-#define GET_PRIVATE(o) \
-(G_TYPE_INSTANCE_GET_PRIVATE ((o), MUSIC_TYPE_STORE, MusicStorePrivate))
-
-typedef struct _MusicStorePrivate MusicStorePrivate;
-
-struct _MusicStorePrivate {
-	int dummy;
-};
-
 static void
 music_store_get_property (GObject *object, guint property_id,
                           GValue *value, GParamSpec *pspec)
@@ -63,8 +54,6 @@ static void
 music_store_class_init (MusicStoreClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-	g_type_class_add_private (klass, sizeof (MusicStorePrivate));
 
 	object_class->get_property = music_store_get_property;
 	object_class->set_property = music_store_set_property;

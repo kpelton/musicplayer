@@ -9,12 +9,6 @@
 #include "plugin-engine.h"
 #endif
 
-G_DEFINE_TYPE (MusicPluginEngine, music_plugin_engine, MUSIC_TYPE_PLUGIN_ENGINE)
-
-#define GET_PRIVATE(o) \
-(G_TYPE_INSTANCE_GET_PRIVATE ((o), MUSIC_TYPE_PLUGIN_ENGINE, MusicPluginEnginePrivate))
-
-
 static gboolean 
 load_all (MusicMainWindow * mainwindow);
 
@@ -23,6 +17,9 @@ struct _MusicPluginEnginePrivate {
 	GHashTable *music_plugins;
 
 };
+
+G_DEFINE_TYPE_WITH_PRIVATE (MusicPluginEngine, music_plugin_engine,
+                            MUSIC_TYPE_PLUGIN_ENGINE)
 
 static void
 music_plugin_engine_get_property (GObject *object, guint property_id,
@@ -61,8 +58,6 @@ music_plugin_engine_class_init (MusicPluginEngineClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-	g_type_class_add_private (klass, sizeof (MusicPluginEnginePrivate));
-
 	object_class->get_property = music_plugin_engine_get_property;
 	object_class->set_property = music_plugin_engine_set_property;
 	object_class->dispose = music_plugin_engine_dispose;
@@ -72,8 +67,7 @@ music_plugin_engine_class_init (MusicPluginEngineClass *klass)
 static void
 music_plugin_engine_init (MusicPluginEngine *self)
 {
-	self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, MUSIC_TYPE_PLUGIN_ENGINE, 
-	                                          MusicPluginEnginePrivate);
+	self->priv = music_plugin_engine_get_instance_private (self);
 	self->priv->music_plugins = g_hash_table_new (g_str_hash, g_str_equal);//, NULL,NULL);
 
 }

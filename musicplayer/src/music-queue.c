@@ -11,8 +11,6 @@
 #include <gio/gio.h>
 #include <string.h>
 #include <stdlib.h>
-G_DEFINE_TYPE (MusicQueue, music_queue, GTK_TYPE_BOX)
-
 struct
 {
 	gchar *title;
@@ -332,6 +330,8 @@ struct _MusicQueuePrivate{
 	MusicSideQueue *sidequeue;
 };
 
+G_DEFINE_TYPE_WITH_PRIVATE (MusicQueue, music_queue, GTK_TYPE_BOX)
+
 //end private varibles
 
 //globals
@@ -480,7 +480,6 @@ music_queue_class_init (MusicQueueClass *klass)
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
 	GParamSpec *pspec;
-	g_type_class_add_private (klass, sizeof (MusicQueuePrivate));
 	object_class->dispose = music_queue_dispose;
 	object_class->finalize = music_queue_finalize;
 	object_class->get_property = music_queue_get_property;
@@ -638,8 +637,7 @@ music_queue_init (MusicQueue *self)
 
 
 
-	self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, MUSIC_TYPE_QUEUE, 
-	                                          MusicQueuePrivate);
+	self->priv = music_queue_get_instance_private (self);
 	//g_object_set(G_OBJECT (self), "musicqueue-font","verdanna bold 7",NULL);
 	g_object_set(G_OBJECT (self), "musicqueue-lastdir",g_get_home_dir(),NULL);
 
@@ -1708,8 +1706,8 @@ gboolean grab_focus_cb (GtkWidget *widget,
 		gtk_widget_set_sensitive(self->priv->info, has_selected(self));
 		gtk_widget_set_sensitive(self->priv->remove_from_queue,
 		                         has_selected_queued(self));
-		gtk_menu_popup(GTK_MENU(self->priv->menu),NULL,NULL,
-		               NULL,NULL,event->button,event->time);
+		gtk_menu_popup_at_pointer(GTK_MENU(self->priv->menu),
+		                          (GdkEvent *) event);
 		return FALSE;
 	}
 
