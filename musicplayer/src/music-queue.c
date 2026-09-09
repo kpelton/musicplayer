@@ -1,6 +1,7 @@
 /* Music-queue.c */
 #include "music-store.h"
 #include "music-queue.h"
+#include "shuffle-deck.h"
 #include "jump-window.h"
 #include "utils.h"
 #include "music-plugin-manager.h"
@@ -83,7 +84,8 @@ enum
 
 	PROP_MUSICQUEUE_FONT,
 	PROP_MUSICQUEUE_LASTDIR,
-	PROP_MUSICQUEUE_REPEAT
+	PROP_MUSICQUEUE_REPEAT,
+	PROP_MUSICQUEUE_SHUFFLE
 };
 
 
@@ -202,6 +204,18 @@ static void
 set_repeat   (GtkCheckMenuItem *widget,
               gpointer user_data);
 
+static void
+set_shuffle  (GtkCheckMenuItem *widget,
+              gpointer user_data);
+
+static void
+shuffle_rebuild (MusicQueue *self,
+                 gboolean include_current);
+
+static void
+shuffle_remove_id (MusicQueue *self,
+                   guint id);
+
 
 static void 
 got_jump(JumpWindow *jwindow,
@@ -311,6 +325,8 @@ struct _MusicQueuePrivate{
 	gchar *lastdir;
 	gboolean drag_started;
 	gboolean repeat;
+	gboolean shuffle;
+	MusicShuffleDeck *shuffle_deck;
 	GSList *list;
 	GList *dlist;
 	MusicSideQueue *sidequeue;
@@ -350,6 +366,10 @@ music_queue_get_property (GObject *object, guint property_id,
 			g_value_set_boolean (value, self->priv->repeat);
 			break;
 
+		case PROP_MUSICQUEUE_SHUFFLE:
+			g_value_set_boolean (value, self->priv->shuffle);
+			break;
+
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
 	}
@@ -379,6 +399,11 @@ music_queue_set_property (GObject *object, guint property_id,
 
 			break;
 
+		case PROP_MUSICQUEUE_SHUFFLE:
+			self->priv->shuffle = g_value_get_boolean (value);
+
+			break;
+
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
 	}
@@ -391,7 +416,8 @@ music_queue_dispose (GObject *object)
 	if(object){
 		MusicQueue *self = MUSIC_QUEUE(object) ;
 		GList *list;
-		gboolean repeat;	
+		gboolean repeat;
+		gboolean shuffle;
 		gchar *font;
 		const char *home;
 		char *outputdir;
@@ -418,6 +444,7 @@ music_queue_dispose (GObject *object)
 
 			g_object_get(G_OBJECT(self),"musicqueue-font",&font,NULL);
 			g_object_get(G_OBJECT(self),"musicqueue-repeat",&repeat,NULL);
+			g_object_get(G_OBJECT(self),"musicqueue-shuffle",&shuffle,NULL);
 
 			//save all the props we want to gconf
 			//gconf_client_set_string              (self->priv->client,
@@ -429,11 +456,17 @@ music_queue_dispose (GObject *object)
 			                                 "/apps/musicplayer/repeat",
 			                                 repeat,
 			                                 NULL);
+			gconf_client_set_bool           (self->priv->client,
+			                                 "/apps/musicplayer/shuffle",
+			                                 shuffle,
+			                                 NULL);
 
 
 			g_object_unref(self->priv->client);
 			self->priv->client = NULL;
 			g_free(font);
+			music_shuffle_deck_free(self->priv->shuffle_deck);
+			self->priv->shuffle_deck = NULL;
 			//g_object_unref(self->priv->store);
 			g_object_unref(self->priv->read);
 			g_object_unref(self->priv->sidequeue);
@@ -519,6 +552,16 @@ music_queue_class_init (MusicQueueClass *klass)
 	                                 PROP_MUSICQUEUE_REPEAT,
 	                                 pspec);
 
+	pspec = g_param_spec_boolean ("musicqueue-shuffle",
+	                              "shuffle",
+	                              "Play the playlist in random order",
+	                              FALSE /* default value */,
+	                              G_PARAM_READWRITE);
+
+	g_object_class_install_property (object_class,
+	                                 PROP_MUSICQUEUE_SHUFFLE,
+	                                 pspec);
+
 }
 static void 
 foreach_playlist_file(gpointer data,
@@ -528,6 +571,41 @@ foreach_playlist_file(gpointer data,
 	metadata *track = (metadata *)data;
 	if(data)
 		add_file(track->uri,user_data,track);
+}
+
+static void
+shuffle_remove_id (MusicQueue *self,
+                   guint id)
+{
+	music_shuffle_deck_remove(self->priv->shuffle_deck, id);
+}
+
+static void
+shuffle_rebuild (MusicQueue *self,
+                 gboolean include_current)
+{
+	GtkTreeIter iter;
+
+	music_shuffle_deck_clear(self->priv->shuffle_deck);
+
+	if (!gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store), &iter))
+		return;
+
+	do
+	{
+		gchar *id = NULL;
+		guint numeric_id;
+
+		gtk_tree_model_get(GTK_TREE_MODEL(self->priv->store), &iter,
+		                   COLUMN_ID, &id, -1);
+		numeric_id = id ? (guint) atoi(id) : 0;
+		if (numeric_id > 0 && (include_current || numeric_id != self->priv->currid))
+			music_shuffle_deck_add(self->priv->shuffle_deck, numeric_id);
+		g_free(id);
+	}
+	while (gtk_tree_model_iter_next(GTK_TREE_MODEL(self->priv->store), &iter));
+
+	music_shuffle_deck_shuffle(self->priv->shuffle_deck);
 }
 
 static void 
@@ -551,6 +629,7 @@ static void
 music_queue_init (MusicQueue *self)
 {
 	gboolean repeat=FALSE;
+	gboolean shuffle=FALSE;
 	char *outputdir;
 	const char *home;
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (self),
@@ -573,14 +652,17 @@ music_queue_init (MusicQueue *self)
 	self->priv->client = gconf_client_get_default();
 
 	repeat=gconf_client_get_bool (self->priv->client,"/apps/musicplayer/repeat",NULL);
+	shuffle=gconf_client_get_bool (self->priv->client,"/apps/musicplayer/shuffle",NULL);
 
 	g_object_set(G_OBJECT (self), "musicqueue-repeat",repeat,NULL);
+	g_object_set(G_OBJECT (self), "musicqueue-shuffle",shuffle,NULL);
 
 	init_widgets(self);
 	self->priv->changed =FALSE;
 	self->priv->i=1;
 	self->priv->size=0;
 	self->priv->drag_started=FALSE;
+	self->priv->shuffle_deck = music_shuffle_deck_new();
 	self->priv->ts = NULL;
 	self->priv->read = PLAYLIST_READER(xspf_reader_new());
 	self->priv->sidequeue = music_side_queue_new ();
@@ -766,6 +848,8 @@ static void play_file (GtkTreeView *treeview,
 		self->priv->curr = iter;
 		gtk_tree_model_get (model, &iter, COLUMN_ID, &id, -1);
 		self->priv->currid = atoi(id);
+		if (self->priv->shuffle)
+			shuffle_remove_id(self, self->priv->currid);
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_PLAYING,TRUE,-1);
 		gtk_list_store_set(self->priv->store,&iter,COLUMN_WEIGHT,PANGO_WEIGHT_BOLD,-1);
 		gtk_tree_model_get (model, &iter, COLUMN_URI, &uri, -1);
@@ -1252,6 +1336,12 @@ add_file(const gchar *uri,MusicQueue *self,metadata *track)
 		g_free(name);
 
 	}
+	if (self->priv->shuffle)
+	{
+		music_shuffle_deck_add(self->priv->shuffle_deck,
+		                       (guint) atoi(buffer2));
+		music_shuffle_deck_shuffle(self->priv->shuffle_deck);
+	}
 	//common to all
 	self->priv->size++;
 	if (track){ //either free value obtained from tag scanner or free passed in value
@@ -1383,6 +1473,30 @@ music_queue_next_file   (GsPlayer      *player,
 
 		}
 
+		else if (self->priv->shuffle)
+		{
+			/* Build a shuffled deck of the remaining songs. When repeat is
+			 * enabled, start a fresh deck after the current one is exhausted. */
+			if (music_shuffle_deck_length(self->priv->shuffle_deck) == 0 && test)
+				shuffle_rebuild(self, TRUE);
+
+			while (music_shuffle_deck_length(self->priv->shuffle_deck) > 0 && path == NULL)
+			{
+				music_shuffle_deck_take_next(self->priv->shuffle_deck, &id);
+				path = muisc_queue_path_from_id(self, id);
+			}
+
+			if (path != NULL)
+			{
+				gtk_tree_model_get_iter(model, &self->priv->curr, path);
+				gtk_tree_selection_select_iter(self->priv->currselection,
+				                              &self->priv->curr);
+				gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->treeview),
+				                             path, NULL, TRUE, 0.5, 0.5);
+				play_file(GTK_TREE_VIEW(self->priv->treeview), path, NULL, user_data);
+				gtk_tree_path_free(path);
+			}
+		}
 		else if(gtk_tree_model_iter_next(model,&self->priv->curr)) //next file in list
 		{
 			//there is a next file 
@@ -1665,7 +1779,7 @@ static GtkWidget *
 get_context_menu(gpointer user_data)
 {
 
-	GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2, *queue, *remove_from_queue, *info, *seperator3,*sort3;
+	GtkWidget  *menu,*repeat,*shuffle,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2, *queue, *remove_from_queue, *info, *seperator3,*sort3;
 	gboolean test;
 
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1677,6 +1791,7 @@ get_context_menu(gpointer user_data)
 
 	plugins   = gtk_menu_item_new_with_label("Plugins");
 	repeat =  gtk_check_menu_item_new_with_label("Repeat");
+	shuffle = gtk_check_menu_item_new_with_label("Shuffle");
 	seperator = gtk_separator_menu_item_new ();
 	seperator3 = gtk_separator_menu_item_new ();
 	duplicates = gtk_menu_item_new_with_label("Remove Duplicates");
@@ -1698,12 +1813,20 @@ get_context_menu(gpointer user_data)
 	if(test)
 		gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(repeat),TRUE);
 
+	g_object_get(G_OBJECT(self),"musicqueue-shuffle",&test,NULL);
+
+	if(test)
+		gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(shuffle),TRUE);
+
 	g_signal_connect (G_OBJECT (self->priv->delete), "activate",
 	                  G_CALLBACK (remove_files),
 	                  user_data);
 
 	g_signal_connect (G_OBJECT (repeat), "activate",
 	                  G_CALLBACK (set_repeat),
+	                  user_data);
+	g_signal_connect (G_OBJECT (shuffle), "activate",
+	                  G_CALLBACK (set_shuffle),
 	                  user_data);
 	g_signal_connect (G_OBJECT (sort), "activate",
 	                  G_CALLBACK (sort_by_artist),
@@ -1741,6 +1864,7 @@ get_context_menu(gpointer user_data)
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),info);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator3 );
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),repeat);
+	gtk_menu_shell_append (GTK_MENU_SHELL(menu),shuffle);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),plugins);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),current);
@@ -2096,6 +2220,24 @@ set_repeat (GtkCheckMenuItem *widget,
 	}
 }
 
+static void
+set_shuffle (GtkCheckMenuItem *widget,
+             gpointer user_data)
+{
+	MusicQueue *self = (MusicQueue *) user_data;
+	gboolean enabled;
+
+	g_object_get(G_OBJECT(self), "musicqueue-shuffle", &enabled, NULL);
+	enabled = !enabled;
+	g_object_set(G_OBJECT(self), "musicqueue-shuffle", enabled, NULL);
+	gtk_check_menu_item_set_active(widget, enabled);
+
+	if (enabled)
+		shuffle_rebuild(self, FALSE);
+	else
+		music_shuffle_deck_clear(self->priv->shuffle_deck);
+}
+
 
 //need help function that takes a list so we can remove files other than with a click or delete
 static void remove_files_from_list(GList * rows,
@@ -2132,6 +2274,7 @@ static void remove_files_from_list(GList * rows,
 			gtk_tree_model_get_iter (model, &iter,path);
 			gtk_tree_model_get (model, &iter, COLUMN_ID, &id, COLUMN_LENGTH,&length,-1);
 			self->priv->totallength-=length;
+			shuffle_remove_id(self, (guint) atoi(id));
 			music_side_queue_remove(self->priv->sidequeue, (guint) atoi(id));
 			//last one was deleted or all was deleted
 			if(atoi(id) == self->priv->currid)
