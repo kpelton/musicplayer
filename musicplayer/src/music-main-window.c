@@ -66,7 +66,9 @@ music_main_window_set_property (GObject *object, guint property_id,
 static void
 music_main_window_dispose (GObject *object)
 {
-	//MusicMainWindow *self = MUSIC_MAIN_WINDOW(object);	
+	/* Plugins own widgets inserted into this window. Deactivate them before
+	 * GTK tears down the window hierarchy, so their cleanup sees live widgets. */
+	music_plugins_engine_shutdown ();
 
 	G_OBJECT_CLASS (music_main_window_parent_class)->dispose (object);
 	gtk_main_quit();

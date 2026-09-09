@@ -84,6 +84,52 @@ music_plugins_engine_init (MusicMainWindow * mainwindow)
 
 }
 
+void
+music_plugins_engine_shutdown (void)
+{
+	GHashTableIter iter;
+	gpointer value;
+
+	if (music_plugins == NULL)
+		return;
+
+	g_hash_table_iter_init (&iter, music_plugins);
+	while (g_hash_table_iter_next (&iter, NULL, &value))
+	{
+		MusicPluginInfo *info = value;
+
+		if (info->plugin != NULL)
+		{
+			music_plugin_deactivate (info->plugin);
+			g_object_unref (info->plugin);
+			info->plugin = NULL;
+		}
+		info->active = FALSE;
+
+		if (info->details != NULL)
+		{
+			g_free (info->details->name);
+			g_free (info->details->desc);
+			g_strfreev (info->details->authors);
+			g_free (info->details->copyright);
+			g_free (info->details->website);
+			g_free (info->details);
+			info->details = NULL;
+		}
+		if (info->module != NULL)
+		{
+			g_module_close (info->module);
+			info->module = NULL;
+		}
+		g_free (info->location);
+		g_free (info);
+	}
+
+	g_hash_table_destroy (music_plugins);
+	music_plugins = NULL;
+	mw = NULL;
+}
+
 static 
 gboolean music_plugins_load_all (MusicMainWindow * mainwindow)
 {
@@ -99,7 +145,7 @@ gboolean music_plugins_load_all (MusicMainWindow * mainwindow)
 	list = listbeg;
 
 	for(list1 = list->next; list1!=NULL; list1 = list1->next)
-	{   printf("file to load: %s\n",(gchar *)list1->data);
+	{
 
 		load_file(list1->data,mainwindow);
 		g_free(list1->data);

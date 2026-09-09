@@ -21,6 +21,8 @@ typedef struct MusicPluginInfo{
 
 gboolean	 
 music_plugins_engine_init 		(MusicMainWindow *mainwindow);
+void
+music_plugins_engine_shutdown (void);
 GList *
 music_plugins_get_list();
 gboolean

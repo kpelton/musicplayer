@@ -64,7 +64,7 @@ get_details()
 
 	MusicPluginDetails *info;
 
-	info = g_malloc(sizeof(MusicPluginDetails));
+	info = g_malloc0(sizeof(MusicPluginDetails));
 
 	info->name = g_strdup(PLUGIN_NAME);
 	info->desc = g_strdup(DESC);
@@ -161,7 +161,11 @@ gboolean album_art_music_plugin_activate (MusicPlugin *self,MusicMainWindow *mw)
 	g_free(outputdir);
 
 	
-	gtk_box_pack_start (GTK_BOX (real->mw->mainhbox), real->album, TRUE, TRUE,10);
+	if (real->album == NULL)
+		real->album = gtk_image_new();
+	if (gtk_widget_get_parent(real->album) == NULL)
+		gtk_box_pack_start (GTK_BOX (real->mw->mainhbox), real->album,
+		                    TRUE, TRUE, 10);
 	
 	gtk_widget_show(real->album);
 	if (real->mw->currsong)
@@ -237,11 +241,23 @@ gboolean album_art_music_plugin_deactivate ( MusicPlugin *user_data)
 {
 	AlbumArt * self = (AlbumArt *)user_data;
 
-	g_signal_handler_disconnect (G_OBJECT (self->mw->player),
-	                             self->id2);
+	if (self->mw != NULL && self->id2 != 0)
+	{
+		g_signal_handler_disconnect (G_OBJECT (self->mw->player),
+		                             self->id2);
+		self->id2 = 0;
+	}
 
-	g_object_unref(self->mw);
-	gtk_widget_destroy(self->album);
+	if (self->mw != NULL)
+	{
+		g_object_unref(self->mw);
+		self->mw = NULL;
+	}
+	if (self->album != NULL)
+	{
+		gtk_widget_destroy(self->album);
+		self->album = NULL;
+	}
 	return TRUE;
 }
 
@@ -293,4 +309,3 @@ album_art_new (void)
 {
 	return g_object_new (ALBUM_TYPE_ART, NULL);
 }
-

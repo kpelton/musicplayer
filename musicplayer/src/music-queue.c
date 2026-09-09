@@ -1773,7 +1773,7 @@ static GtkWidget *
 get_context_menu(gpointer user_data)
 {
 
-	GtkWidget  *menu,*repeat,*shuffle,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2, *queue, *remove_from_queue, *info, *seperator3,*sort3;
+	GtkWidget  *menu,*repeat,*shuffle,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2,*seperator4, *queue, *remove_from_queue, *info, *seperator3,*sort3;
 	gboolean test;
 
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1790,6 +1790,7 @@ get_context_menu(gpointer user_data)
 	seperator3 = gtk_separator_menu_item_new ();
 	duplicates = gtk_menu_item_new_with_label("Remove Duplicates");
 	seperator2 = gtk_separator_menu_item_new ();
+	seperator4 = gtk_separator_menu_item_new ();
 	current = gtk_menu_item_new_with_label("Jump To Current Song");
 	sort   = gtk_menu_item_new_with_label("Sort By Artist");
 	sort2   = gtk_menu_item_new_with_label("Sort By Date");
@@ -1864,7 +1865,7 @@ get_context_menu(gpointer user_data)
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),current);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),duplicates);
 
-	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator2 );
+	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator4 );
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort2);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort3);

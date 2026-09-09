@@ -93,7 +93,7 @@ gboolean load_all (MusicMainWindow * mainwindow)
 	list = listbeg;
 
 	for(list1 = list->next; list1!=NULL; list1 = list1->next)
-	{   printf("file to load: %s\n",(gchar *)list1->data);
+	{
 
 		//load_file(list1->data,mainwindow);
 		g_free(list1->data);

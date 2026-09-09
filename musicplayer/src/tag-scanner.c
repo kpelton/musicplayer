@@ -118,7 +118,6 @@ tag_scanner_dispose (GObject *object)
 static void
 tag_scanner_finalize (GObject *object)
 {
-	printf("Free ts\n");
 	TagScanner *self = TAG_SCANNER(object);
 	if(self->pipeline !=NULL)
 		gst_object_unref(self->pipeline);
@@ -393,8 +392,6 @@ cb_newpad (GstElement *decodebin,
 static void
 tag_scanner_init (TagScanner *self)
 {
-	printf("New ts\n");
-
 }
 
 TagScanner*

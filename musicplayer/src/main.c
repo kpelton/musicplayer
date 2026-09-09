@@ -18,6 +18,7 @@ int main (int argc, char *argv[])
 {
 	GtkWidget *mainwindow;
 
+	music_settings_init (argv[0]);
 	gtk_init (&argc, &argv);
 	make_pref_folder();
 	gst_init (&argc, &argv);

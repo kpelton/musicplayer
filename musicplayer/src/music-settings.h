@@ -7,6 +7,7 @@ G_BEGIN_DECLS
 
 #define MUSIC_SETTINGS_SCHEMA_ID "org.squidplayer.MusicPlayer"
 
+void music_settings_init (const gchar *program_path);
 GSettings *music_settings_new (void);
 
 G_END_DECLS

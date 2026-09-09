@@ -107,17 +107,8 @@ gs_player_class_init (GsPlayerClass *klass)
 static void
 gs_player_init (GsPlayer *me)
 {
-	GstElementFactory *audio_factory;
-
 	me->play = gst_element_factory_make ("playbin", "playbin");
-	audio_factory = gst_element_factory_find("gconfaudiosink");
-	if (audio_factory)
-	{
-		me->audio_sink = gst_element_factory_create(audio_factory, "audio-sink");
-		gst_object_unref(audio_factory);
-	}
-	if (me->audio_sink == NULL)
-		me->audio_sink = gst_element_factory_make("autoaudiosink", "audio-sink");
+	me->audio_sink = gst_element_factory_make("autoaudiosink", "audio-sink");
 
 	if (me->audio_sink)
 		g_object_set(G_OBJECT(me->play),"audio-sink",me->audio_sink,NULL);
