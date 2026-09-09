@@ -4,6 +4,12 @@
 #include <glib/gstdio.h>
 #include "utils.h"
 
+void
+music_main_context_invoke (GSourceFunc callback, gpointer data)
+{
+	g_main_context_invoke (NULL, callback, data);
+}
+
 
 void make_pref_folder()
 {

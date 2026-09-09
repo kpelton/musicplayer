@@ -1,4 +1,4 @@
-check_PROGRAMS = shuffle-test side-queue-test settings-test
+check_PROGRAMS = shuffle-test side-queue-test settings-test main-context-test
 TESTS = $(check_PROGRAMS)
 AM_TESTS_ENVIRONMENT = GSETTINGS_SCHEMA_DIR=$(top_builddir)/data GSETTINGS_BACKEND=memory
 
@@ -22,3 +22,10 @@ settings_test_SOURCES = settings-test.c \
 settings_test_CPPFLAGS = -I$(top_srcdir)/src
 settings_test_CFLAGS = $(GLIB_CFLAGS)
 settings_test_LDADD = $(GLIB_LIBS)
+
+main_context_test_SOURCES = main-context-test.c \
+	$(top_srcdir)/src/utils.c \
+	$(top_srcdir)/src/utils.h
+main_context_test_CPPFLAGS = -I$(top_srcdir)/src
+main_context_test_CFLAGS = $(GLIB_CFLAGS)
+main_context_test_LDADD = $(GLIB_LIBS) $(GIO_LIBS)

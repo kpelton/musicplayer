@@ -615,7 +615,7 @@ music_queue_read_start_playlist(gchar *location,
 
 	playlist_reader_read_list(self->priv->read,location,&list);
 	str->user_data = list;
-	gdk_threads_add_idle((GSourceFunc)add_threaded_dlist,str);
+	music_main_context_invoke((GSourceFunc)add_threaded_dlist, str);
 	g_object_unref(self->priv->read);
 
 }
@@ -808,7 +808,7 @@ on_drag_data_received(GtkWidget *wgt, GdkDragContext *context, int x, int y,
 				}
 			}
 			str->user_data = slist;
-			gdk_threads_add_idle((GSourceFunc)add_threaded_slist,str);
+			music_main_context_invoke((GSourceFunc)add_threaded_slist, str);
 		} else {
 			printf("Didn't get any URIs on drag data\n");
 		}
@@ -1029,7 +1029,7 @@ file_chooser_cb(GtkWidget *data,
 		gtk_widget_destroy (dialog);
 
 		str->user_data = slist;
-		gdk_threads_add_idle((GSourceFunc)add_threaded_slist,str);
+		music_main_context_invoke((GSourceFunc)add_threaded_slist, str);
 
 	}
 	else if(response == 1) //folder(s) selected
@@ -1049,7 +1049,7 @@ file_chooser_cb(GtkWidget *data,
 		{
 			gtk_widget_destroy (dialog);
 			str->user_data = slist;
-			gdk_threads_add_idle((GSourceFunc)add_threaded_folders,str);
+			music_main_context_invoke((GSourceFunc)add_threaded_folders, str);
 		}
 	}
 }
