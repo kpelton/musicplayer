@@ -678,6 +678,8 @@ init_widgets(MusicQueue *self)
 	GtkTreeSelection *select;
 
 	self->priv->scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
+	gtk_widget_set_hexpand (self->priv->scrolledwindow, TRUE);
+	gtk_widget_set_vexpand (self->priv->scrolledwindow, TRUE);
 
 	gtk_box_pack_start (GTK_BOX (self),self->priv->scrolledwindow, TRUE, TRUE, 0);
 

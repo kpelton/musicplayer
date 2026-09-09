@@ -184,8 +184,12 @@ init_widgets(MusicMainWindow *self)
 	//expander
 
 	self->expander = gtk_expander_new("Play List");
+	gtk_widget_set_hexpand (self->expander, TRUE);
+	gtk_widget_set_vexpand (self->expander, TRUE);
 
 	gtk_container_add (GTK_CONTAINER (self->expander), self->queue);
+	gtk_widget_set_hexpand (self->queue, TRUE);
+	gtk_widget_set_vexpand (self->queue, TRUE);
 
 
 
