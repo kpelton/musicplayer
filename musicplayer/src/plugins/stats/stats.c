@@ -11,13 +11,6 @@ static const char DESC[] = "Track playback statistics";
 static const char COPYRIGHT[] = "Kyle Pelton";
 static const char WEBSITE[] = "www.squidman.net";
 
-enum {
-	SHOW_REPORT,
-	LAST_SIGNAL
-};
-
-static guint signals[LAST_SIGNAL];
-
 static gboolean draw_stats(gpointer data);
 static void stats_new_file(GsPlayer *player,
                            metadata *track,
@@ -27,6 +20,8 @@ static void stats_eof(GsPlayer *player,
 static void show_stats(StatsPlugin *self);
 static void show_stats_button(GtkButton *button,
                               gpointer user_data);
+static void stats_context_menu_item_activate(GtkMenuItem *item,
+                                             gpointer user_data);
 
 static gboolean db_exec(StatsPlugin *self,
                         const gchar *sql);
@@ -501,6 +496,14 @@ show_stats_button(GtkButton *button,
 }
 
 static void
+stats_context_menu_item_activate(GtkMenuItem *item,
+                                 gpointer user_data)
+{
+	(void) item;
+	show_stats(STATS_PLUGIN(user_data));
+}
+
+static void
 show_stats(StatsPlugin *self)
 {
 	GtkWidget *dialog;
@@ -643,13 +646,15 @@ stats_plugin_music_plugin_activate(MusicPlugin *plugin,
 	self->player = mw->player;
 	self->queue = MUSIC_QUEUE(mw->queue);
 	g_object_ref(self->queue);
+	self->context_menu_item = gtk_menu_item_new_with_label("Show Statistics");
+	g_signal_connect(self->context_menu_item, "activate",
+	                 G_CALLBACK(stats_context_menu_item_activate), self);
+	music_queue_register_context_menu_item(self->queue,
+	                                       self->context_menu_item);
 	self->new_file_handler = g_signal_connect(self->player, "new-file",
 	                                          G_CALLBACK(stats_new_file), self);
 	self->eof_handler = g_signal_connect(self->player, "eof",
 	                                     G_CALLBACK(stats_eof), self);
-	self->report_handler = g_signal_connect(self, "show-report",
-	                                        G_CALLBACK(show_stats), NULL);
-
 	self->hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
 	self->text = gtk_label_new("");
 	self->text2 = gtk_label_new("");
@@ -693,15 +698,15 @@ stats_plugin_music_plugin_deactivate(MusicPlugin *plugin)
 		self->new_file_handler = 0;
 		self->eof_handler = 0;
 	}
-	if (self->report_handler)
-	{
-		g_signal_handler_disconnect(self, self->report_handler);
-		self->report_handler = 0;
-	}
-
 	stats_close_current(self, "stopped", FALSE, FALSE);
 	if (self->queue)
 	{
+		if (self->context_menu_item)
+		{
+			music_queue_unregister_context_menu_item(self->queue,
+	                                             self->context_menu_item);
+			self->context_menu_item = NULL;
+		}
 		g_object_unref(self->queue);
 		self->queue = NULL;
 	}
@@ -784,13 +789,6 @@ stats_plugin_class_init(StatsPluginClass *klass)
 	plugin_class->music_plugin_deactivate = stats_plugin_music_plugin_deactivate;
 	object_class->dispose = stats_plugin_dispose;
 	object_class->finalize = stats_plugin_finalize;
-	signals[SHOW_REPORT] = g_signal_new("show-report",
-	                                   G_TYPE_FROM_CLASS(klass),
-	                                   G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE |
-	                                   G_SIGNAL_NO_HOOKS,
-	                                   0, NULL, NULL,
-	                                   g_cclosure_marshal_VOID__VOID,
-	                                   G_TYPE_NONE, 0);
 }
 
 StatsPlugin *

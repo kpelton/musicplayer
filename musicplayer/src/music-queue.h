@@ -83,6 +83,14 @@ void
 music_queue_prev_file(GsPlayer      *player,
                       gpointer    user_data);
 
+void
+music_queue_register_context_menu_item(MusicQueue *self,
+                                        GtkWidget *item);
+
+void
+music_queue_unregister_context_menu_item(MusicQueue *self,
+                                          GtkWidget *item);
+
 //end public methods
 
 G_END_DECLS

@@ -188,6 +188,10 @@ visual_load_preferences(VisualPlugin *self)
 		client, "/apps/musicplayer/Visualize/y-amplitude-range", NULL);
 	if (self->y_amplitude_range < 12 || self->y_amplitude_range > 96)
 		self->y_amplitude_range = 48;
+	self->sample_interval_ms = gconf_client_get_int(
+		client, "/apps/musicplayer/Visualize/sample-interval-ms", NULL);
+	if (self->sample_interval_ms < 10 || self->sample_interval_ms > 100)
+		self->sample_interval_ms = 50;
 	visual_load_color(client, "/apps/musicplayer/Visualize/line-color",
 	                  &self->line_color);
 	visual_load_color(client, "/apps/musicplayer/Visualize/bar-low-color",
@@ -237,6 +241,9 @@ visual_save_preferences(VisualPlugin *self)
 	gconf_client_set_int(client,
 	                     "/apps/musicplayer/Visualize/y-amplitude-range",
 	                     self->y_amplitude_range, NULL);
+	gconf_client_set_int(client,
+	                     "/apps/musicplayer/Visualize/sample-interval-ms",
+	                     self->sample_interval_ms, NULL);
 	visual_save_color(client, "/apps/musicplayer/Visualize/line-color",
 	                  &self->line_color);
 	visual_save_color(client, "/apps/musicplayer/Visualize/bar-low-color",
@@ -488,7 +495,9 @@ visual_create_pipeline(VisualPlugin *self,
 
 	g_object_set(self->spectrum,
 	             "bands", VISUAL_BANDS,
-	             "interval", (guint64) 100000000,
+	             /* The preference is in milliseconds; GStreamer expects
+	              * nanoseconds. Lower values make the analyzer more active. */
+	             "interval", (guint64) self->sample_interval_ms * 1000000,
 	             "post-messages", TRUE,
 	             "message-magnitude", TRUE,
 	             "message-phase", FALSE,
@@ -563,6 +572,7 @@ visual_config_response(GtkDialog *dialog,
 	GtkComboBox *scale_combo;
 	GtkRange *compression_scale;
 	GtkRange *amplitude_scale;
+	GtkRange *sample_scale;
 	GtkToggleButton *right_button;
 	GtkToggleButton *bar_button;
 	GtkToggleButton *line_button;
@@ -590,6 +600,8 @@ visual_config_response(GtkDialog *dialog,
 	                                                 "visual-compression"));
 	amplitude_scale = GTK_RANGE(g_object_get_data(G_OBJECT(dialog),
 	                                               "visual-amplitude"));
+	sample_scale = GTK_RANGE(g_object_get_data(G_OBJECT(dialog),
+	                                           "visual-sample"));
 	line_color_button = GTK_COLOR_BUTTON(g_object_get_data(
 		G_OBJECT(dialog), "visual-line-color"));
 	bar_low_color_button = GTK_COLOR_BUTTON(g_object_get_data(
@@ -609,6 +621,12 @@ visual_config_response(GtkDialog *dialog,
 	                                   0.5), 25, 100);
 	self->y_amplitude_range = CLAMP(
 		(gint)(gtk_range_get_value(amplitude_scale) + 0.5), 12, 96);
+	self->sample_interval_ms = CLAMP(
+		(gint)(gtk_range_get_value(sample_scale) + 0.5), 10, 100);
+	if (self->spectrum != NULL)
+		g_object_set(self->spectrum, "interval",
+		             (guint64) self->sample_interval_ms * 1000000,
+		             NULL);
 	gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(line_color_button),
 	                           &self->line_color);
 	gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(bar_low_color_button),
@@ -634,6 +652,7 @@ visual_plugin_get_config_window(MusicPlugin *plugin)
 	GtkWidget *scale_combo;
 	GtkWidget *compression_scale;
 	GtkWidget *amplitude_scale;
+	GtkWidget *sample_scale;
 	GtkWidget *left_button;
 	GtkWidget *right_button;
 	GtkWidget *bar_button;
@@ -743,6 +762,18 @@ visual_plugin_get_config_window(MusicPlugin *plugin)
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(outline_button),
 	                             self->show_outline);
 
+	label = gtk_label_new("Sample interval (ms):");
+	gtk_widget_set_halign(label, GTK_ALIGN_START);
+	gtk_grid_attach(GTK_GRID(grid), label, 0, 12, 1, 1);
+	sample_scale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL,
+	                                       10.0, 100.0, 5.0);
+	gtk_scale_set_digits(GTK_SCALE(sample_scale), 0);
+	gtk_scale_set_value_pos(GTK_SCALE(sample_scale), GTK_POS_RIGHT);
+	gtk_range_set_value(GTK_RANGE(sample_scale), self->sample_interval_ms);
+	gtk_widget_set_tooltip_text(sample_scale,
+	                            "Lower values update the visualizer faster");
+	gtk_grid_attach(GTK_GRID(grid), sample_scale, 1, 12, 1, 1);
+
 	g_object_set_data(G_OBJECT(dialog), "visual-scale", scale_combo);
 	g_object_set_data(G_OBJECT(dialog), "visual-right", right_button);
 	g_object_set_data(G_OBJECT(dialog), "visual-bars", bar_button);
@@ -750,6 +781,7 @@ visual_plugin_get_config_window(MusicPlugin *plugin)
 	g_object_set_data(G_OBJECT(dialog), "visual-outline", outline_button);
 	g_object_set_data(G_OBJECT(dialog), "visual-compression", compression_scale);
 	g_object_set_data(G_OBJECT(dialog), "visual-amplitude", amplitude_scale);
+	g_object_set_data(G_OBJECT(dialog), "visual-sample", sample_scale);
 	g_object_set_data(G_OBJECT(dialog), "visual-line-color", line_color_button);
 	g_object_set_data(G_OBJECT(dialog), "visual-bar-low-color", bar_low_color_button);
 	g_object_set_data(G_OBJECT(dialog), "visual-bar-mid-color", bar_mid_color_button);
@@ -871,6 +903,7 @@ visual_plugin_init(VisualPlugin *self)
 	self->show_line = TRUE;
 	self->show_outline = TRUE;
 	self->x_compression = 100;
+	self->sample_interval_ms = 50;
 	self->line_color.red = 0.45;
 	self->line_color.green = 0.95;
 	self->line_color.blue = 0.95;

@@ -31,11 +31,11 @@ typedef struct {
 	guint refresh_source;
 	gulong new_file_handler;
 	gulong eof_handler;
-	gulong report_handler;
 	GtkWidget *hbox;
 	GtkWidget *text;
 	GtkWidget *text2;
 	GtkWidget *details_button;
+	GtkWidget *context_menu_item;
 	sqlite3_int64 current_track_id;
 	sqlite3_int64 current_session_id;
 	gint64 current_duration;

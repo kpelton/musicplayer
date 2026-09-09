@@ -1,1 +1,1 @@
-SUBDIRS =   stats album visual 
+SUBDIRS =   stats album visual youtube

@@ -265,10 +265,6 @@ get_song_info(gpointer callback_data,
               gpointer user_data);
 
 static void
-show_stats_report(gpointer callback_data,
-                  gpointer user_data);
-
-static void
 append_info_field(GString *info,
                   const gchar *label,
                   const gchar *value);
@@ -297,7 +293,6 @@ struct _MusicQueuePrivate{
 	GtkWidget *delete;
 	GtkWidget *remove_from_queue;
 	GtkWidget *info;
-	GtkWidget *stats;
 	GtkTreeViewColumn *queue_column;
 	GtkListStore *store;
 	GtkTreeModel *musicstore;
@@ -1325,6 +1320,33 @@ music_queue_prev_file(GsPlayer      *player,
 
 }
 
+void
+music_queue_register_context_menu_item(MusicQueue *self,
+                                       GtkWidget *item)
+{
+	g_return_if_fail(MUSIC_IS_QUEUE(self));
+	g_return_if_fail(GTK_IS_MENU_ITEM(item));
+
+	if (self->priv->menu == NULL || gtk_widget_get_parent(item) != NULL)
+		return;
+
+	gtk_menu_shell_append(GTK_MENU_SHELL(self->priv->menu), item);
+	gtk_widget_show(item);
+}
+
+void
+music_queue_unregister_context_menu_item(MusicQueue *self,
+                                         GtkWidget *item)
+{
+	g_return_if_fail(MUSIC_IS_QUEUE(self));
+
+	if (item == NULL || !GTK_IS_WIDGET(item) ||
+	    gtk_widget_get_parent(item) != self->priv->menu)
+		return;
+
+	gtk_container_remove(GTK_CONTAINER(self->priv->menu), item);
+}
+
 void 
 music_queue_next_file   (GsPlayer      *player,
                          gpointer    user_data)
@@ -1578,9 +1600,6 @@ gboolean grab_focus_cb (GtkWidget *widget,
 		gtk_widget_set_sensitive(self->priv->info, has_selected(self));
 		gtk_widget_set_sensitive(self->priv->remove_from_queue,
 		                         has_selected_queued(self));
-		gtk_widget_set_sensitive(self->priv->stats,
-		                         music_plugins_engine_stats_is_active());
-
 		gtk_menu_popup(GTK_MENU(self->priv->menu),NULL,NULL,
 		               NULL,NULL,event->button,event->time);
 		return FALSE;
@@ -1646,7 +1665,7 @@ static GtkWidget *
 get_context_menu(gpointer user_data)
 {
 
-	GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2, *queue, *remove_from_queue, *info, *stats, *seperator3,*sort3;
+	GtkWidget  *menu,*repeat,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2, *queue, *remove_from_queue, *info, *seperator3,*sort3;
 	gboolean test;
 
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1669,10 +1688,8 @@ get_context_menu(gpointer user_data)
 	queue = gtk_menu_item_new_with_label("Add To Side Queue");
 	remove_from_queue = gtk_menu_item_new_with_label("Remove From Side Queue");
 	info = gtk_menu_item_new_with_label("Get Info");
-	stats = gtk_menu_item_new_with_label("Show Statistics");
 	self->priv->remove_from_queue = remove_from_queue;
 	self->priv->info = info;
-	self->priv->stats = stats;
 
 
 
@@ -1716,16 +1733,12 @@ get_context_menu(gpointer user_data)
 	g_signal_connect (G_OBJECT (info), "activate",
 	                  G_CALLBACK (get_song_info),
 	                  user_data);
-	g_signal_connect (G_OBJECT (stats), "activate",
-	                  G_CALLBACK (show_stats_report),
-	                  user_data);
 
 
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),self->priv->delete);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),queue);	
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),remove_from_queue);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),info);
-	gtk_menu_shell_append (GTK_MENU_SHELL(menu),stats);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator3 );
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),repeat);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),plugins);
@@ -1738,22 +1751,12 @@ get_context_menu(gpointer user_data)
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort2);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),sort3);
 
+	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator2 );
 	gtk_widget_set_sensitive (self->priv->delete, FALSE);
 	gtk_widget_set_sensitive (self->priv->remove_from_queue, FALSE);
 	gtk_widget_set_sensitive (self->priv->info, FALSE);
-	gtk_widget_set_sensitive (self->priv->stats,
-	                          music_plugins_engine_stats_is_active());
-
-
 	return menu;
 
-}
-
-static void
-show_stats_report(gpointer callback_data,
-                  gpointer user_data)
-{
-	music_plugins_engine_show_stats();
 }
 
 static void 

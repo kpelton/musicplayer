@@ -1,0 +1,7 @@
+{
+  "name": "musicplayer.ytdlp",
+  "description": "Downloads YouTube audio with yt-dlp",
+  "path": "__HOST_PATH__",
+  "type": "stdio",
+  "allowed_extensions": ["musicplayer-ytdlp@example.org"]
+}

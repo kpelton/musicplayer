@@ -6,6 +6,7 @@
 #include "plugin-engine.h"
 #include "tag-scanner.h"
 #include "utils.h"
+#include "musicplayer-icon.h"
 #include <gio/gio.h>
 #include <gdk/gdkkeysyms.h>
 #include <gconf/gconf-client.h>
@@ -132,6 +133,16 @@ init_widgets(MusicMainWindow *self)
 	gtk_window_set_resizable (GTK_WINDOW(self),TRUE);
 
 	gtk_window_set_title (GTK_WINDOW (self), ("squid player"));
+	{
+		GdkPixbuf *icon;
+
+		icon = gdk_pixbuf_new_from_xpm_data(musicplayer_icon_xpm);
+		if (icon != NULL)
+		{
+			gtk_window_set_icon(GTK_WINDOW(self), icon);
+			g_object_unref(icon);
+		}
+	}
 
 	//add mainvbox to mainwindow
 	self->mainvbox = gtk_box_new(GTK_ORIENTATION_VERTICAL,0);

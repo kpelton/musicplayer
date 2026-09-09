@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+  "name": "Download with yt-dlp",
+  "version": "1.0.0",
+  "description": "Add a YouTube right-click option that downloads audio with yt-dlp.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "musicplayer-ytdlp@example.org"
+    }
+  },
+  "permissions": [
+    "menus",
+    "nativeMessaging",
+    "notifications"
+  ],
+  "browser_action": {
+    "default_title": "Download current YouTube video with yt-dlp",
+    "default_icon": {
+      "16": "icons/icon.svg",
+      "32": "icons/icon.svg",
+      "48": "icons/icon.svg"
+    }
+  },
+  "background": {
+    "scripts": ["background.js"]
+  }
+}

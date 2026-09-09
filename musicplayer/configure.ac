@@ -78,5 +78,5 @@ src/plugins/Makefile
 src/plugins/stats/Makefile
 src/plugins/visual/Makefile
 src/plugins/album/Makefile
+src/plugins/youtube/Makefile
 ])
-

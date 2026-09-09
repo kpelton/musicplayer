@@ -29,10 +29,6 @@ gboolean
 music_plugins_engine_deactivate_plugin(MusicPluginInfo *info);
 gboolean
 music_plugins_engine_plugin_is_active(MusicPluginInfo *info);
-gboolean
-music_plugins_engine_stats_is_active(void);
-gboolean
-music_plugins_engine_show_stats(void);
 void
 music_plugins_find_plugins (gchar * start,
                             GList **list);

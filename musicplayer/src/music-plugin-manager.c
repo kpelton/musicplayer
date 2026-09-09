@@ -164,6 +164,7 @@ configure_button_cb(GtkButton *button,
 	GtkTreeIter iter;
 	MusicPluginInfo *info;
 	GtkWidget *dialog;
+	gint response;
 
 	(void) button;
 	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->tree));
@@ -181,7 +182,9 @@ configure_button_cb(GtkButton *button,
 		gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(self));
 	if (GTK_IS_DIALOG(dialog))
 	{
-		gtk_dialog_run(GTK_DIALOG(dialog));
+		do
+			response = gtk_dialog_run(GTK_DIALOG(dialog));
+		while (response == GTK_RESPONSE_NONE);
 		gtk_widget_destroy(dialog);
 	}
 	else

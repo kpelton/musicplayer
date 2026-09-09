@@ -43,6 +43,7 @@ typedef struct {
 	gboolean show_outline;
 	gint x_compression;
 	gint y_amplitude_range;
+	gint sample_interval_ms;
 	GdkRGBA line_color;
 	GdkRGBA bar_low_color;
 	GdkRGBA bar_mid_color;

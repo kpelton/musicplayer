@@ -24,6 +24,54 @@ static void gst_new_tags                (const GstTagList *list,
                                          const gchar *tag,
                                          gpointer user_data);
 
+static gchar *
+ts_normalize_metadata_text(const gchar *value)
+{
+	gchar *normalized;
+	const gchar *cursor;
+	GString *result;
+	gboolean pending_space = FALSE;
+
+	if (value == NULL)
+		return NULL;
+
+	/* Compatibility decomposition turns mathematical/fancy Unicode letters
+	 * into their ordinary forms. Any remaining non-ASCII decoration is
+	 * discarded and whitespace is collapsed. */
+	normalized = g_utf8_normalize(value, -1, G_NORMALIZE_ALL);
+	cursor = normalized ? normalized : value;
+	result = g_string_new(NULL);
+	while (*cursor != '\0')
+	{
+		gunichar character = g_utf8_get_char_validated(cursor, -1);
+
+		if (character == (gunichar) -1 || character == (gunichar) -2)
+		{
+			cursor++;
+			continue;
+		}
+		cursor = g_utf8_next_char(cursor);
+
+		if (character < 0x80 && g_ascii_isspace((gchar) character))
+		{
+			if (result->len > 0)
+				pending_space = TRUE;
+		}
+		else if (character < 0x80)
+		{
+			if (pending_space)
+			{
+				g_string_append_c(result, ' ');
+				pending_space = FALSE;
+			}
+			g_string_append_c(result, (gchar) character);
+		}
+	}
+
+	g_free(normalized);
+	return g_string_free(result, FALSE);
+}
+
 static void
 cb_newpad (GstElement *decodebin,
            GstPad     *pad,
@@ -368,24 +416,31 @@ static void gst_new_tags                (const GstTagList *list,
 
 	if(strcmp(tag,GST_TAG_TITLE) == 0){
 		if(gst_tag_list_get_string (list, GST_TAG_TITLE, &str) == TRUE){
-			track->title = str;
+			g_free(track->title);
+			track->title = ts_normalize_metadata_text(str);
+			g_free(str);
 		}
 	}
 	else if(strcmp(tag,GST_TAG_ARTIST) == 0){
 		if(gst_tag_list_get_string (list, GST_TAG_ARTIST, &str) == TRUE){
-			track->artist = str;
+			g_free(track->artist);
+			track->artist = ts_normalize_metadata_text(str);
+			g_free(str);
 		}
 	}
 	else if(strcmp(tag,GST_TAG_ALBUM) == 0){
 		if(gst_tag_list_get_string (list, GST_TAG_ALBUM, &str) == TRUE){
-
+			g_free(track->album);
+			track->album = ts_normalize_metadata_text(str);
 			g_free(str);
 		}
 	}
 	else if(strcmp(tag,GST_TAG_GENRE) == 0){
 
 		if(gst_tag_list_get_string (list, GST_TAG_GENRE, &str) == TRUE){
-			track->genre = str;
+			g_free(track->genre);
+			track->genre = ts_normalize_metadata_text(str);
+			g_free(str);
 		}
 	}
 	else if(strcmp(tag,GST_TAG_COMMENT) == 0){
@@ -402,7 +457,8 @@ static void gst_new_tags                (const GstTagList *list,
 	}
 	else if(strcmp(tag,GST_TAG_AUDIO_CODEC)== 0){
 		if(gst_tag_list_get_string (list, GST_TAG_AUDIO_CODEC, &str) == TRUE){
-
+			g_free(track->codec);
+			track->codec = ts_normalize_metadata_text(str);
 			g_free(str);
 		}
 	}
