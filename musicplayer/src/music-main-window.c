@@ -145,7 +145,6 @@ static void
 init_widgets(MusicMainWindow *self)
 {
 	GtkWidget *hbox;
-	char *markup;
 
 	//init player window
 	self->player = gs_player_new();
@@ -172,11 +171,9 @@ init_widgets(MusicMainWindow *self)
 
 
 	//song label
-	self->songlabel = gtk_label_new("");
-
-	gtk_label_set_line_wrap (GTK_LABEL(self->songlabel),TRUE);
-
-	gtk_label_set_text(GTK_LABEL(self->songlabel),"No File Loaded");
+	self->songlabel = music_song_entry_new();
+	music_song_entry_set_text (MUSIC_SONG_ENTRY (self->songlabel),
+	                           "No File Loaded");
 	gtk_box_pack_start (GTK_BOX (self->mainvbox), hbox, FALSE, FALSE,0);
 
 	//gtk_box_pack_start (GTK_BOX (hbox), test, FALSE, FALSE,0);
@@ -445,12 +442,9 @@ static void mwindow_new_file (GsPlayer *player,
 {
 	MusicMainWindow *self = (MusicMainWindow *)user_data;
 	gchar title[1024];
-	gchar output[1024];
 	gchar *escaped=NULL;
-	gchar *escaped_artist=NULL;
-	gchar *escaped_title=NULL;
+	gchar *album_markup;
 	GFile *file=NULL;
-	gchar *markup;
 
 	ts_metadata_free(self->currsong);
 	self->currsong = ts_metadata_new();
@@ -459,18 +453,14 @@ static void mwindow_new_file (GsPlayer *player,
 	if(p_track->artist && p_track->title){
 		g_snprintf(title,1023,"%s - %s",p_track->artist, p_track->title);           
 		gtk_window_set_title(GTK_WINDOW(self),title);
-		escaped_artist = g_markup_escape_text(p_track->artist,-1);
-		escaped_title  = g_markup_escape_text(p_track->title,-1);
-		markup = g_markup_printf_escaped ("<span style=\"oblique\" size=\"large\" >\n%s\n</span>", title);
-		gtk_label_set_markup (GTK_LABEL (self->songlabel), markup);
-		g_free (markup);
-
-		g_free(escaped_title);
-		g_free(escaped_artist);
+		music_song_entry_set_text (MUSIC_SONG_ENTRY (self->songlabel), title);
 		if(p_track->album)
 		{
-			g_snprintf(output,1023,"<span style=\"italic\" size=\"small\">from:%s</span>",p_track->album);
-			gtk_label_set_markup(GTK_LABEL(self->albumlabel),output);
+			album_markup = g_markup_printf_escaped (
+				"<span style=\"italic\" size=\"small\">from:%s</span>",
+				p_track->album);
+			gtk_label_set_markup(GTK_LABEL(self->albumlabel),album_markup);
+			g_free (album_markup);
 			gtk_widget_show(self->albumlabel);
 
 		}else{
@@ -485,10 +475,8 @@ static void mwindow_new_file (GsPlayer *player,
 		escaped   = parse_file_name(file);
 		if(escaped)
 		{
-			gtk_label_set_text(GTK_LABEL(self->songlabel),escaped);
-			markup = g_markup_printf_escaped ("<span style=\"oblique\" size=\"large\" >\n%s\n</span>", escaped);
-			gtk_label_set_markup (GTK_LABEL (self->songlabel), markup);
-			g_free (markup);
+			music_song_entry_set_text (MUSIC_SONG_ENTRY (self->songlabel),
+			                           escaped);
 			gtk_label_set_text(GTK_LABEL(self->albumlabel),""); 
 			gtk_window_set_title(GTK_WINDOW(self),escaped);
 			g_object_unref(file);

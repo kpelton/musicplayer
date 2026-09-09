@@ -28,7 +28,8 @@ typedef struct {
 	GtkDrawingArea parent;
 	gchar * text;
 	gint trans2;
-	gint type;   
+	gint type;
+	guint tick_id;
 } MusicSongEntry;
 
 typedef struct {
@@ -38,7 +39,7 @@ typedef struct {
 GType music_song_entry_get_type (void);
 
 GtkWidget* music_song_entry_new (void);
-void music_song_entry_set_text(MusicSongEntry *self,char *text);
+void music_song_entry_set_text(MusicSongEntry *self,const gchar *text);
 
 G_END_DECLS
 #endif

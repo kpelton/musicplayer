@@ -1,4 +1,11 @@
-To install
+# Musicplayer
+
+Musicplayer is a GTK3 desktop music player with playlist, shuffle, playback
+statistics, album-art, YouTube download, and spectrum-visualizer plugins.
+
+## Build and install
+
+```sh
 aclocal
 libtoolize
 automake --add-missing
@@ -6,3 +13,27 @@ autoconf
 ./configure --disable-run-in-source-tree
 make
 sudo make install
+```
+
+`--disable-run-in-source-tree` makes the player load plugins from the
+installation directory (`/usr/local/lib/musicplayer` by default). Run
+`src/musicplayer` after rebuilding, or install again when testing installed
+plugins.
+
+## Playback UI
+
+- Long track titles use a Cairo/Pango scroller; click the title to pause or
+  resume scrolling.
+- The playlist expands to fill the available window and collapses to its
+  compact content size while remaining resizable.
+- The visualizer can be configured for scale, placement, colors, bars, and
+  line display.
+- Playback statistics are shown in the status row and in a detailed dialog.
+
+## Tests
+
+Run the full test suite with:
+
+```sh
+make -C tests check
+```
