@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MusicPlayer Architecture and Tests</title>
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #5c6873;
+      --line: #ccd5dc;
+      --paper: #f7f9fb;
+      --card: #ffffff;
+      --blue: #1769aa;
+      --blue-soft: #eaf4fc;
+      --green: #18794e;
+      --green-soft: #eaf7f0;
+      --amber: #946200;
+      --amber-soft: #fff6dd;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 36px 22px 64px; }
+    h1, h2, h3 { line-height: 1.2; }
+    h1 { margin: 0 0 8px; font-size: clamp(2rem, 5vw, 3.4rem); }
+    h2 { margin-top: 42px; padding-bottom: 8px; border-bottom: 2px solid var(--line); }
+    h3 { margin-bottom: 6px; }
+    .lede { max-width: 780px; color: var(--muted); font-size: 1.08rem; }
+    .meta { color: var(--muted); font-size: .9rem; }
+    .summary, .card, .note {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 3px 14px rgba(23,32,42,.05);
+    }
+    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; overflow: hidden; margin: 28px 0; }
+    .metric { padding: 18px; background: var(--card); }
+    .metric strong { display: block; font-size: 1.8rem; color: var(--green); }
+    .metric span { color: var(--muted); }
+    .architecture { display: grid; gap: 16px; }
+    .layer { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+    .layer h3 { margin-top: 0; color: var(--blue); }
+    .nodes { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+    .node { padding: 12px; border-radius: 9px; background: var(--blue-soft); border: 1px solid #b9d9f1; }
+    .node code { display: block; color: var(--blue); font-size: .88rem; }
+    .node small { color: var(--muted); }
+    .flow { display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; gap: 8px; margin-top: 18px; }
+    .flow div { padding: 12px 8px; text-align: center; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .flow div:not(:last-child)::after { content: "→"; float: right; margin-right: -19px; color: var(--blue); font-weight: 700; }
+    .flow code { font-size: .8rem; }
+    table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    th, td { padding: 11px 13px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); background: #eef2f5; font-size: .9rem; }
+    tr:last-child td { border-bottom: 0; }
+    code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .9em; }
+    .pass { color: var(--green); font-weight: 700; }
+    .smoke { color: var(--amber); font-weight: 700; }
+    .note { margin-top: 18px; padding: 15px 18px; background: var(--amber-soft); border-color: #ead28a; }
+    ul { padding-left: 22px; }
+    @media (max-width: 760px) {
+      .summary { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: 1fr; }
+      .flow div:not(:last-child)::after { content: "↓"; float: none; display: block; margin: 3px 0 -8px; }
+      th, td { padding: 9px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="meta">MusicPlayer · architecture and test report · 2026-09-08</div>
+    <h1>Architecture and tests</h1>
+    <p class="lede">This report maps the current GTK/GStreamer music player, the boundaries between its components, and the automated tests added around the core behavior.</p>
+  </header>
+
+  <section class="summary" aria-label="Test summary">
+    <div class="metric"><strong>6/6</strong><span>test programs pass</span></div>
+    <div class="metric"><strong>18</strong><span>individual test cases</span></div>
+    <div class="metric"><strong>0</strong><span>failures, skips, or errors</span></div>
+  </section>
+
+  <h2>System architecture</h2>
+  <section class="architecture" aria-label="Architecture layers">
+    <article class="layer">
+      <h3>Application and presentation</h3>
+      <div class="nodes">
+        <div class="node"><code>main.c</code><small>GTK/GStreamer startup and application loop</small></div>
+        <div class="node"><code>music-player-app.c</code><small>Application object and lifecycle</small></div>
+        <div class="node"><code>music-main-window.c</code><small>Main window, controls, and shutdown</small></div>
+        <div class="node"><code>jump-window.c</code><small>Search/jump view over queue data</small></div>
+        <div class="node"><code>music-seek.c · music-volume.c</code><small>Playback controls</small></div>
+        <div class="node"><code>music-song-entry.c</code><small>Current-song display widget</small></div>
+      </div>
+    </article>
+    <article class="layer">
+      <h3>Queue and playback core</h3>
+      <div class="nodes">
+        <div class="node"><code>music-queue.c</code><small>Queue model, import actions, shuffle/repeat</small></div>
+        <div class="node"><code>music-store.c</code><small>Filtered tree model and drag destination</small></div>
+        <div class="node"><code>music-side-queue.c</code><small>FIFO queue for upcoming items</small></div>
+        <div class="node"><code>shuffle-deck.c</code><small>Unique randomized traversal</small></div>
+        <div class="node"><code>player.c</code><small>GStreamer playbin and playback state</small></div>
+        <div class="node"><code>tag-scanner.c</code><small>GStreamer metadata and duration extraction</small></div>
+      </div>
+    </article>
+    <article class="layer">
+      <h3>Persistence and input formats</h3>
+      <div class="nodes">
+        <div class="node"><code>music-settings.c</code><small>GSettings schema and preferences</small></div>
+        <div class="node"><code>utils.c</code><small>Filesystem helpers and main-context dispatch</small></div>
+        <div class="node"><code>xspf-reader.c</code><small>Saved playlist reader/writer</small></div>
+        <div class="node"><code>m3u-reader.c</code><small>M3U playlist reader</small></div>
+        <div class="node"><code>pl-reader.c</code><small>Common playlist-reader interface</small></div>
+      </div>
+    </article>
+    <article class="layer">
+      <h3>Extension system</h3>
+      <div class="nodes">
+        <div class="node"><code>plugin-engine.c</code><small>Module discovery, activation, shutdown</small></div>
+        <div class="node"><code>music-plugin.c</code><small>Plugin base class and virtual dispatch</small></div>
+        <div class="node"><code>stats · album · visual · youtube</code><small>Runtime plugin modules</small></div>
+      </div>
+    </article>
+  </section>
+
+  <h2>Primary data flows</h2>
+  <div class="flow" aria-label="Playlist loading flow">
+    <div><code>playlist file</code></div>
+    <div><code>XSPF/M3U reader</code></div>
+    <div><code>metadata list</code></div>
+    <div><code>queue/store</code></div>
+    <div><code>player</code></div>
+  </div>
+  <div class="flow" aria-label="Settings flow">
+    <div><code>GSettings</code></div>
+    <div><code>queue</code></div>
+    <div><code>volume/seek</code></div>
+    <div><code>main window</code></div>
+    <div><code>plugins</code></div>
+  </div>
+  <p class="meta">GLib main-context callbacks connect background/import work back to GTK-owned queue state. GStreamer supplies playback state and metadata; GTK presents the resulting model.</p>
+
+  <h2>Automated test coverage</h2>
+  <table>
+    <thead><tr><th>Test program</th><th>Components</th><th>Coverage</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td><code>shuffle-test</code></td><td><code>shuffle-deck.c</code></td><td>Unique traversal, current-song exclusion, empty/singleton behavior, remove/add, repeat rebuild.</td><td class="pass">PASS · 4 cases</td></tr>
+      <tr><td><code>side-queue-test</code></td><td><code>music-side-queue.c</code></td><td>FIFO ordering, positions, membership, removal, empty dequeue.</td><td class="pass">PASS · 2 cases</td></tr>
+      <tr><td><code>settings-test</code></td><td><code>music-settings.c</code></td><td>Schema discovery, defaults, and memory-backend round trips.</td><td class="pass">PASS · 3 cases</td></tr>
+      <tr><td><code>main-context-test</code></td><td><code>utils.c</code></td><td>One-shot callback delivery and multiple callback delivery through the GLib main context.</td><td class="pass">PASS · 2 cases</td></tr>
+      <tr><td><code>playlist-loading-test</code></td><td><code>pl-reader.c</code>, <code>xspf-reader.c</code>, <code>m3u-reader.c</code></td><td>Two-track XSPF parsing with metadata/duration assertions and empty M3U loading/MIME identification.</td><td class="pass">PASS · 2 cases</td></tr>
+      <tr><td><code>core-components-test</code></td><td><code>utils.c</code>, <code>tag-scanner.c</code>, <code>music-store.c</code>, <code>player.c</code>, <code>music-plugin.c</code></td><td>Filename parsing, metadata copying, tree-model wrapping, player volume API, plugin virtual dispatch and invalid-object behavior.</td><td class="pass">PASS · 5 cases</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Component status</h2>
+  <table>
+    <thead><tr><th>Component group</th><th>Automated boundary</th><th>Runtime boundary</th></tr></thead>
+    <tbody>
+      <tr><td>Core data structures and settings</td><td class="pass">Unit tested</td><td>Included in normal application use</td></tr>
+      <tr><td>Playlist readers and queue input</td><td class="pass">XSPF and M3U tested</td><td>Playlist import verified through the application</td></tr>
+      <tr><td>Player and metadata scanner</td><td class="pass">Volume and metadata ownership tested</td><td class="smoke">Full audio lifecycle requires GStreamer devices/plugins; runtime smoke-tested</td></tr>
+      <tr><td>GTK windows and controls</td><td class="smoke">Display-dependent; not forced into headless unit tests</td><td class="smoke">Launch, controls, plugin loading, and close verified manually</td></tr>
+      <tr><td>Plugin modules</td><td class="pass">Base virtual dispatch tested; all modules build</td><td class="smoke">Module loading and shutdown verified during runtime smoke test</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note"><strong>Verification command:</strong> <code>GSETTINGS_SCHEMA_DIR="$PWD/data" GSETTINGS_BACKEND=memory make check</code><br>Result: 6 test programs passed, with 18 individual cases and no skips/errors.</div>
+</main>
+</body>
+</html>

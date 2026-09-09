@@ -4,6 +4,7 @@
 
 #include "pl-reader.h"
 #include "tag-scanner.h"
+#include "m3u-reader.h"
 #include "xspf-reader.h"
 
 static gchar *
@@ -77,11 +78,42 @@ test_xspf_reader_loads_tracks (void)
 	g_free (path);
 }
 
+static void
+test_m3u_reader_loads_empty_playlist (void)
+{
+	GError *error = NULL;
+	GList *tracks = NULL;
+	M3uReader *reader;
+	gchar *path;
+	gint fd;
+
+	fd = g_file_open_tmp ("musicplayer-playlist-XXXXXX.m3u", &path, &error);
+	g_assert_no_error (error);
+	g_assert_cmpint (fd, >=, 0);
+	close (fd);
+	g_assert_true (g_file_set_contents (path, "#EXTM3U\n", -1, &error));
+	g_assert_no_error (error);
+
+	reader = m3u_reader_new ();
+	g_assert_cmpstr (playlist_reader_mime_supported (PLAYLIST_READER (reader)),
+	                ==, "audio/x-mpegurl");
+	g_assert_true (playlist_reader_read_list (PLAYLIST_READER (reader),
+	                                         path,
+	                                         &tracks));
+	g_assert_null (tracks);
+
+	g_object_unref (reader);
+	g_remove (path);
+	g_free (path);
+}
+
 int
 main (int argc, char **argv)
 {
 	g_test_init (&argc, &argv, NULL);
 	g_test_add_func ("/playlist-loading/xspf-reader-loads-tracks",
 	                test_xspf_reader_loads_tracks);
+	g_test_add_func ("/playlist-loading/m3u-reader-loads-empty-playlist",
+	                test_m3u_reader_loads_empty_playlist);
 	return g_test_run ();
 }

@@ -31,16 +31,15 @@ static void
 gs_player_dispose (GObject *object)
 {
 	GsPlayer *player =GS_PLAYER(object);
-	if(player->play)
+	if (player->play)
 	{
 		gst_element_set_state (player->play, GST_STATE_NULL);
-		g_object_unref(player->play);
-		if (player->audio_sink)
-			g_object_unref(player->audio_sink);
-		player->play=NULL;
-
-		G_OBJECT_CLASS (gs_player_parent_class)->dispose (object);
+		gst_object_unref (player->play);
+		player->play = NULL;
 	}
+	player->audio_sink = NULL;
+
+	G_OBJECT_CLASS (gs_player_parent_class)->dispose (object);
 }
 static void
 gs_player_finalize (GObject *object)
@@ -108,10 +107,21 @@ static void
 gs_player_init (GsPlayer *me)
 {
 	me->play = gst_element_factory_make ("playbin", "playbin");
+	me->audio_sink = NULL;
+	if (me->play == NULL)
+	{
+		g_warning ("GStreamer playbin is unavailable");
+		me->track = NULL;
+		me->uri = NULL;
+		return;
+	}
 	me->audio_sink = gst_element_factory_make("autoaudiosink", "audio-sink");
 
-	if (me->audio_sink)
+	if (me->audio_sink) {
 		g_object_set(G_OBJECT(me->play),"audio-sink",me->audio_sink,NULL);
+		gst_object_unref (me->audio_sink);
+		me->audio_sink = NULL;
+	}
 
 	gst_element_set_state (me->play, GST_STATE_READY);
 	me->isPlaying = FALSE;

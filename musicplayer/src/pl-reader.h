@@ -35,6 +35,7 @@ struct _PlaylistReaderInterface {
 GType playlist_reader_get_type (void);
 
 
+const gchar* playlist_reader_mime_supported (PlaylistReader *self);
 gboolean playlist_reader_write_list (PlaylistReader *self,gchar *location,GList * list);
 gboolean playlist_reader_read_list (PlaylistReader *self,gchar *location,GList **list);
 
