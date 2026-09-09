@@ -83,16 +83,16 @@ visual_get_size(gint scale,
 	{
 		case 1:
 			*width = 120;
-			*height = 28;
+			*height = 40;
 			break;
 		case 3:
 			*width = 240;
-			*height = 48;
+			*height = 64;
 			break;
 		case 2:
 		default:
 			*width = 180;
-			*height = 36;
+			*height = 48;
 			break;
 	}
 }
@@ -109,6 +109,7 @@ visual_apply_layout(VisualPlugin *self)
 
 	visual_get_size(self->scale, &width, &height);
 	gtk_widget_set_size_request(self->drawing_area, width, height);
+	gtk_widget_set_valign(self->drawing_area, GTK_ALIGN_CENTER);
 	parent = gtk_widget_get_parent(self->drawing_area);
 	if (!GTK_IS_BOX(parent))
 		return;
@@ -641,11 +642,11 @@ visual_plugin_get_config_window(MusicPlugin *plugin)
 	gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 1, 1);
 	scale_combo = gtk_combo_box_text_new();
 	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(scale_combo),
-	                               "Small (120 × 28)");
+	                               "Small (120 x 40)");
 	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(scale_combo),
-	                               "Medium (180 × 36)");
+	                               "Medium (180 x 48)");
 	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(scale_combo),
-	                               "Large (240 × 48)");
+	                               "Large (240 x 64)");
 	gtk_combo_box_set_active(GTK_COMBO_BOX(scale_combo), self->scale - 1);
 	gtk_grid_attach(GTK_GRID(grid), scale_combo, 1, 0, 1, 1);
 
@@ -768,7 +769,8 @@ visual_plugin_activate(MusicPlugin *plugin,
 	                                          self);
 
 	self->drawing_area = gtk_drawing_area_new();
-	gtk_widget_set_size_request(self->drawing_area, 180, 36);
+	gtk_widget_set_size_request(self->drawing_area, 180, 48);
+	gtk_widget_set_valign(self->drawing_area, GTK_ALIGN_CENTER);
 	g_signal_connect(self->drawing_area, "draw",
 	                 G_CALLBACK(visual_draw), self);
 	/* Keep the analyzer in the compact title/display row, like the classic
