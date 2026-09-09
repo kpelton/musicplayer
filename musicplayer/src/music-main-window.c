@@ -109,9 +109,14 @@ music_main_window_init (MusicMainWindow *self)
 {
 
 	self->client = music_settings_new ();
-	self->expanded = TRUE;
+	self->expanded = g_settings_get_boolean (self->client, "expanded");
 	self->currsong = NULL;
 	init_widgets(self);
+	gtk_expander_set_expanded (GTK_EXPANDER (self->expander), self->expanded);
+	if (self->expanded)
+		gtk_widget_show (self->albumlabel);
+	else
+		gtk_widget_hide (self->albumlabel);
 	restore_window_size(self);
 	music_plugins_engine_init(self);
 }
@@ -180,7 +185,7 @@ init_widgets(MusicMainWindow *self)
 
 	self->expander = gtk_expander_new("Play List");
 
-	//gtk_container_add (GTK_CONTAINER (self->expander), self->queue);
+	gtk_container_add (GTK_CONTAINER (self->expander), self->queue);
 
 
 
@@ -201,7 +206,7 @@ init_widgets(MusicMainWindow *self)
 	//packing of hbox expander in vbox
 
 	gtk_box_pack_start (GTK_BOX (self->mainvbox), self->mainhbox, FALSE, FALSE,0);
-	gtk_box_pack_start (GTK_BOX (self->mainvbox), self->queue, TRUE, TRUE,0);
+	gtk_box_pack_start (GTK_BOX (self->mainvbox), self->expander, TRUE, TRUE,0);
 
 	//pack into hbox
 	gtk_box_pack_start (GTK_BOX (self->mainhbox), self->playbutton, FALSE, FALSE,2);
