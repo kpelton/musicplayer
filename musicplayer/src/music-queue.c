@@ -585,11 +585,15 @@ shuffle_rebuild (MusicQueue *self,
                  gboolean include_current)
 {
 	GtkTreeIter iter;
+	GArray *ids;
 
-	music_shuffle_deck_clear(self->priv->shuffle_deck);
+	ids = g_array_new(FALSE, FALSE, sizeof(guint));
 
 	if (!gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->priv->store), &iter))
+	{
+		g_array_free(ids, TRUE);
 		return;
+	}
 
 	do
 	{
@@ -599,13 +603,17 @@ shuffle_rebuild (MusicQueue *self,
 		gtk_tree_model_get(GTK_TREE_MODEL(self->priv->store), &iter,
 		                   COLUMN_ID, &id, -1);
 		numeric_id = id ? (guint) atoi(id) : 0;
-		if (numeric_id > 0 && (include_current || numeric_id != self->priv->currid))
-			music_shuffle_deck_add(self->priv->shuffle_deck, numeric_id);
+		if (numeric_id > 0)
+			g_array_append_val(ids, numeric_id);
 		g_free(id);
 	}
 	while (gtk_tree_model_iter_next(GTK_TREE_MODEL(self->priv->store), &iter));
 
-	music_shuffle_deck_shuffle(self->priv->shuffle_deck);
+	music_shuffle_deck_rebuild(self->priv->shuffle_deck,
+	                           (guint *) ids->data,
+	                           ids->len,
+	                           include_current ? 0 : self->priv->currid);
+	g_array_free(ids, TRUE);
 }
 
 static void 

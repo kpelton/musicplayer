@@ -31,6 +31,25 @@ music_shuffle_deck_clear (MusicShuffleDeck *deck)
 }
 
 void
+music_shuffle_deck_rebuild (MusicShuffleDeck *deck,
+                            const guint *ids,
+                            gsize count,
+                            guint excluded_id)
+{
+	gsize i;
+
+	g_return_if_fail(deck != NULL);
+
+	music_shuffle_deck_clear(deck);
+	for (i = 0; i < count; i++)
+	{
+		if (ids[i] != excluded_id)
+			music_shuffle_deck_add(deck, ids[i]);
+	}
+	music_shuffle_deck_shuffle(deck);
+}
+
+void
 music_shuffle_deck_add (MusicShuffleDeck *deck,
                         guint id)
 {

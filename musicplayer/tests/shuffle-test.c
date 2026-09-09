@@ -11,11 +11,7 @@ test_excludes_current_and_visits_each_song (void)
 	guint id;
 	guint count = 0;
 
-	for (guint i = 0; i < G_N_ELEMENTS(ids); i++)
-		if (ids[i] != 30)
-			music_shuffle_deck_add(deck, ids[i]);
-
-	music_shuffle_deck_shuffle(deck);
+	music_shuffle_deck_rebuild(deck, ids, G_N_ELEMENTS(ids), 30);
 	g_assert_cmpuint(music_shuffle_deck_length(deck), ==, 5);
 
 	while (music_shuffle_deck_take_next(deck, &id))
@@ -34,6 +30,25 @@ test_excludes_current_and_visits_each_song (void)
 
 	g_assert_cmpuint(count, ==, 5);
 	g_assert_cmpuint(music_shuffle_deck_length(deck), ==, 0);
+	music_shuffle_deck_free(deck);
+}
+
+static void
+test_empty_and_single_song (void)
+{
+	MusicShuffleDeck *deck = music_shuffle_deck_new();
+	guint id;
+	guint only_id = 99;
+
+	g_assert_false(music_shuffle_deck_take_next(deck, &id));
+	music_shuffle_deck_rebuild(deck, &only_id, 1, only_id);
+	g_assert_cmpuint(music_shuffle_deck_length(deck), ==, 0);
+	g_assert_false(music_shuffle_deck_take_next(deck, &id));
+
+	music_shuffle_deck_rebuild(deck, &only_id, 1, 0);
+	g_assert_true(music_shuffle_deck_take_next(deck, &id));
+	g_assert_cmpuint(id, ==, only_id);
+	g_assert_false(music_shuffle_deck_take_next(deck, &id));
 	music_shuffle_deck_free(deck);
 }
 
@@ -94,6 +109,8 @@ main (int argc, char **argv)
 	                test_excludes_current_and_visits_each_song);
 	g_test_add_func("/shuffle/repeat-can-start-new-deck",
 	                test_repeat_can_start_a_new_deck);
+	g_test_add_func("/shuffle/empty-and-single-song",
+	                test_empty_and_single_song);
 	g_test_add_func("/shuffle/remove-and-add",
 	                test_remove_and_add);
 	return g_test_run();

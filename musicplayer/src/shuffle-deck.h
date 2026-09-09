@@ -10,6 +10,10 @@ typedef struct _MusicShuffleDeck MusicShuffleDeck;
 MusicShuffleDeck *music_shuffle_deck_new (void);
 void music_shuffle_deck_free (MusicShuffleDeck *deck);
 void music_shuffle_deck_clear (MusicShuffleDeck *deck);
+void music_shuffle_deck_rebuild (MusicShuffleDeck *deck,
+                                 const guint *ids,
+                                 gsize count,
+                                 guint excluded_id);
 void music_shuffle_deck_add (MusicShuffleDeck *deck, guint id);
 void music_shuffle_deck_remove (MusicShuffleDeck *deck, guint id);
 void music_shuffle_deck_shuffle (MusicShuffleDeck *deck);
