@@ -319,8 +319,43 @@ key_press_cb (GtkWidget *widget,
               gpointer user_data)
 {
 	MusicMainWindow *self = (MusicMainWindow *)user_data;
+	gboolean control = (event->state & GDK_CONTROL_MASK) != 0;
 
-	if(event->keyval == GDK_KEY_j)
+	(void) widget;
+
+	if (control && (event->keyval == GDK_KEY_o ||
+	                event->keyval == GDK_KEY_O))
+	{
+		music_queue_add_files (MUSIC_QUEUE (self->queue));
+		return TRUE;
+	}
+
+	if (control && (event->keyval == GDK_KEY_e ||
+	                event->keyval == GDK_KEY_E))
+	{
+		music_queue_export_playlist (MUSIC_QUEUE (self->queue));
+		return TRUE;
+	}
+
+	if (event->keyval == GDK_KEY_space)
+	{
+		on_pause_released (NULL, self->player);
+		return TRUE;
+	}
+
+	if (event->keyval == GDK_KEY_Left)
+	{
+		music_queue_prev_file (self->player, self->queue);
+		return TRUE;
+	}
+
+	if (event->keyval == GDK_KEY_Right)
+	{
+		music_queue_next_file (self->player, self->queue);
+		return TRUE;
+	}
+
+	if(event->keyval == GDK_KEY_j || event->keyval == GDK_KEY_J)
 	{
 		make_jump_window(MUSIC_QUEUE(self->queue));
 		return TRUE;

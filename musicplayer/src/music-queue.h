@@ -64,6 +64,12 @@ make_jump_window(MusicQueue *self);
 void 
 music_queue_play_selected (MusicQueue *self);
 
+void
+music_queue_add_files (MusicQueue *self);
+
+void
+music_queue_export_playlist (MusicQueue *self);
+
 gboolean 
 check_type_supported(const gchar *type);
 

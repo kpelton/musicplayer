@@ -101,6 +101,7 @@ static void
 choose_file_action(gchar * uri,
                    const gchar *type, 
                    gpointer user_data);
+
 static void 
 scan_file_action(gpointer data,
                  gpointer user_data);
@@ -112,6 +113,15 @@ traverse_folders(gpointer data,
 static void 
 add_from_dialog (GtkWidget *widget,
                  gpointer user_data);
+
+static void
+export_playlist (GtkMenuItem *item,
+                 gpointer user_data);
+
+static void
+export_filter_changed (GtkFileChooser *chooser,
+                       GParamSpec *pspec,
+                       gpointer user_data);
 
 static void 
 add_columns (MusicQueue *self);
@@ -261,6 +271,9 @@ remove_duplicates(GtkMenuItem *item,
 static gpointer 
 add_threaded_dlist(gpointer user_data);
 
+static gboolean
+scroll_initial_playlist_to_bottom(gpointer user_data);
+
 static gpointer 
 add_threaded_slist(gpointer user_data);
 
@@ -305,6 +318,7 @@ struct _MusicQueuePrivate{
 	GtkWidget *delete;
 	GtkWidget *remove_from_queue;
 	GtkWidget *info;
+	GtkWidget *export_item;
 	GtkTreeViewColumn *queue_column;
 	GtkListStore *store;
 	GtkTreeModel *musicstore;
@@ -873,6 +887,137 @@ void music_queue_play_selected (MusicQueue *self)
 
 }
 
+void
+music_queue_add_files (MusicQueue *self)
+{
+	if (self != NULL)
+		add_from_dialog (NULL, self);
+}
+
+void
+music_queue_export_playlist (MusicQueue *self)
+{
+	GtkWidget *dialog;
+	GtkWindow *parent = NULL;
+	GtkFileFilter *xspf_filter;
+	GtkFileFilter *m3u_filter;
+	GtkFileFilter *selected_filter;
+	GList *list;
+	gchar *filename;
+	gchar *export_filename;
+	gchar *base_filename;
+	PlaylistReader *writer;
+	gboolean m3u;
+
+	if (self == NULL)
+		return;
+
+	list = music_queue_get_list (self);
+	if (list == NULL)
+		return;
+
+	parent = GTK_WINDOW (gtk_widget_get_toplevel (GTK_WIDGET (self)));
+	dialog = gtk_file_chooser_dialog_new (
+		"Export Playlist",
+		GTK_IS_WINDOW (parent) ? parent : NULL,
+		GTK_FILE_CHOOSER_ACTION_SAVE,
+		"Cancel", GTK_RESPONSE_CANCEL,
+		"Export", GTK_RESPONSE_ACCEPT,
+		NULL);
+	gtk_file_chooser_set_do_overwrite_confirmation (
+		GTK_FILE_CHOOSER (dialog), TRUE);
+	xspf_filter = gtk_file_filter_new ();
+	gtk_file_filter_set_name (xspf_filter, "XSPF playlist (*.xspf)");
+	gtk_file_filter_add_pattern (xspf_filter, "*.xspf");
+	m3u_filter = gtk_file_filter_new ();
+	gtk_file_filter_set_name (m3u_filter, "M3U playlist (*.m3u)");
+	gtk_file_filter_add_pattern (m3u_filter, "*.m3u");
+	gtk_file_filter_add_pattern (m3u_filter, "*.m3u8");
+	gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), xspf_filter);
+	gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), m3u_filter);
+	g_signal_connect (dialog, "notify::filter",
+	                  G_CALLBACK (export_filter_changed), NULL);
+	gtk_file_chooser_set_filter (GTK_FILE_CHOOSER (dialog), xspf_filter);
+	gtk_file_chooser_set_current_name (GTK_FILE_CHOOSER (dialog),
+	                                   "playlist.xspf");
+
+	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+	{
+		filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+		if (filename != NULL)
+		{
+			selected_filter = gtk_file_chooser_get_filter (
+				GTK_FILE_CHOOSER (dialog));
+			m3u = selected_filter == m3u_filter ||
+			      g_str_has_suffix (filename, ".m3u") ||
+			      g_str_has_suffix (filename, ".m3u8");
+			export_filename = filename;
+			if (m3u)
+			{
+				if (!g_str_has_suffix (export_filename, ".m3u") &&
+				    !g_str_has_suffix (export_filename, ".m3u8"))
+				{
+					if (g_str_has_suffix (filename, ".xspf"))
+					{
+						base_filename = g_strdup (filename);
+						base_filename[strlen (base_filename) - 5] = '\0';
+						export_filename = g_strconcat (base_filename,
+						                              ".m3u", NULL);
+						g_free (base_filename);
+					}
+					else
+						export_filename = g_strconcat (filename, ".m3u", NULL);
+				}
+			}
+			else if (!g_str_has_suffix (export_filename, ".xspf"))
+				export_filename = g_strconcat (filename, ".xspf", NULL);
+
+			writer = m3u
+				? PLAYLIST_READER (m3u_reader_new ())
+				: PLAYLIST_READER (xspf_reader_new ());
+			playlist_reader_write_list (writer, export_filename, list);
+			g_object_unref (writer);
+			g_list_free (list);
+
+			if (export_filename != filename)
+				g_free (export_filename);
+			g_free (filename);
+			list = NULL;
+		}
+	}
+
+	gtk_widget_destroy (dialog);
+	if (list != NULL)
+		g_list_free_full (list, (GDestroyNotify) ts_metadata_free);
+}
+
+static void
+export_playlist (GtkMenuItem *item,
+                 gpointer user_data)
+{
+	(void) item;
+	music_queue_export_playlist (MUSIC_QUEUE (user_data));
+}
+
+static void
+export_filter_changed (GtkFileChooser *chooser,
+                        GParamSpec *pspec,
+                        gpointer user_data)
+{
+	GtkFileFilter *filter;
+	const gchar *name;
+
+	(void) pspec;
+	(void) user_data;
+	filter = gtk_file_chooser_get_filter (chooser);
+	name = filter != NULL ? gtk_file_filter_get_name (filter) : NULL;
+	gtk_file_chooser_set_current_name (
+		chooser,
+		name != NULL && strstr (name, "M3U") != NULL
+			? "playlist.m3u"
+			: "playlist.xspf");
+}
+
 
 
 
@@ -986,11 +1131,38 @@ gpointer add_threaded_dlist(gpointer user_data)
 			add_file(md->uri,self,md); //add_file will free md
 		}
 	}
+	/* Let GTK finish measuring the newly appended rows before positioning the
+	 * view. This applies only to the playlist restored during startup. */
+	g_idle_add_full(G_PRIORITY_DEFAULT_IDLE,
+	                scroll_initial_playlist_to_bottom,
+	                g_object_ref(self),
+	                (GDestroyNotify)g_object_unref);
 	g_list_free(self->priv->dlist);
 	g_free(str);
 
 	return NULL;
 
+}
+
+static gboolean
+scroll_initial_playlist_to_bottom(gpointer user_data)
+{
+	MusicQueue *self = MUSIC_QUEUE(user_data);
+	GtkTreeModel *model;
+	GtkTreePath *path;
+	gint rows;
+
+	model = GTK_TREE_MODEL(self->priv->store);
+	rows = gtk_tree_model_iter_n_children(model, NULL);
+	if (rows > 0)
+	{
+		path = gtk_tree_path_new_from_indices(rows - 1, -1);
+		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->treeview),
+		                             path, NULL, TRUE, 1.0, 1.0);
+		gtk_tree_path_free(path);
+	}
+
+	return G_SOURCE_REMOVE;
 }
 
 
@@ -1773,7 +1945,7 @@ static GtkWidget *
 get_context_menu(gpointer user_data)
 {
 
-	GtkWidget  *menu,*repeat,*shuffle,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2,*seperator4, *queue, *remove_from_queue, *info, *seperator3,*sort3;
+	GtkWidget  *menu,*repeat,*shuffle,*sort,*sort2,*seperator,*plugins,*current,*duplicates,*seperator2,*seperator4, *queue, *remove_from_queue, *info, *seperator3,*sort3, *export_item;
 	gboolean test;
 
 	MusicQueue *self = (MusicQueue *) user_data;
@@ -1798,6 +1970,8 @@ get_context_menu(gpointer user_data)
 	queue = gtk_menu_item_new_with_label("Add To Side Queue");
 	remove_from_queue = gtk_menu_item_new_with_label("Remove From Side Queue");
 	info = gtk_menu_item_new_with_label("Get Info");
+	export_item = gtk_menu_item_new_with_label("Export Playlist...");
+	self->priv->export_item = export_item;
 	self->priv->remove_from_queue = remove_from_queue;
 	self->priv->info = info;
 
@@ -1851,12 +2025,16 @@ get_context_menu(gpointer user_data)
 	g_signal_connect (G_OBJECT (info), "activate",
 	                  G_CALLBACK (get_song_info),
 	                  user_data);
+	g_signal_connect (G_OBJECT (export_item), "activate",
+	                  G_CALLBACK (export_playlist),
+	                  user_data);
 
 
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),self->priv->delete);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),queue);	
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),remove_from_queue);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),info);
+	gtk_menu_shell_append (GTK_MENU_SHELL(menu),export_item);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),seperator3 );
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),repeat);
 	gtk_menu_shell_append (GTK_MENU_SHELL(menu),shuffle);
@@ -2133,8 +2311,48 @@ handle_key_input(GtkWidget *widget,
 {
 
 	MusicQueue *self = (MusicQueue *) user_data;
+	gboolean control = (event->state & GDK_CONTROL_MASK) != 0;
+
+	(void) widget;
+
+	if (control && (event->keyval == GDK_KEY_o ||
+	                event->keyval == GDK_KEY_O))
+	{
+		music_queue_add_files (self);
+		return TRUE;
+	}
+	if (control && (event->keyval == GDK_KEY_e ||
+	                event->keyval == GDK_KEY_E))
+	{
+		music_queue_export_playlist (self);
+		return TRUE;
+	}
+	if (event->keyval == GDK_KEY_space)
+	{
+		if (isPlaying (self->priv->player))
+			gs_pause (self->priv->player);
+		else if (isPaused (self->priv->player))
+			gs_pauseResume (self->priv->player);
+		else
+			music_queue_play_selected (self);
+		return TRUE;
+	}
+	if (event->keyval == GDK_KEY_Left)
+	{
+		music_queue_prev_file (self->priv->player, self);
+		return TRUE;
+	}
+	if (event->keyval == GDK_KEY_Right)
+	{
+		music_queue_next_file (self->priv->player, self);
+		return TRUE;
+	}
+
 	if(event->keyval == GDK_KEY_Delete && has_selected(self) == TRUE)
+	{
 		remove_files(NULL,user_data);
+		return TRUE;
+	}
 
 	if(event->keyval == GDK_KEY_j || event->keyval == GDK_KEY_J)
 	{
